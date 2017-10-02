@@ -1,0 +1,34 @@
+category LSE
+Input {
+    ECA Digitals Digitals
+    ECA StatusWords StatusWords
+    ECA PhasorCollection VoltagePhasors
+    ECA PhasorCollection CurrentPhasors
+}
+
+category ECA
+Digitals {
+    FloatingPoint Double[] Values
+}
+
+category ECA
+StatusWords {
+    FloatingPoint Double[] Values
+}
+
+category ECA
+PhasorCollection {
+    ECA Phasor[] Phasors
+}
+
+category ECA
+Phasor {
+    FloatingPoint Double Magnitude
+    FloatingPoint Double Angle
+}
+
+category LSE
+NullOutput {
+    Other Boolean Value
+}
+

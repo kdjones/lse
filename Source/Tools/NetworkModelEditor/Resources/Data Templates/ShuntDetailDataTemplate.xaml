@@ -1,0 +1,135 @@
+﻿<!--
+******************************************************************************************************
+//  ShuntDetailDataTemplate.xaml
+//
+//  Copyright © 2014, Kevin D. Jones.  All Rights Reserved.
+//
+//  This file is licensed to you under the Eclipse Public License -v 1.0 (the "License"); you may
+//  not use this file except in compliance with the License. You may obtain a copy of the License at:
+//
+//      http://www.opensource.org/licenses/eclipse-1.0.php
+//
+//  Unless agreed to in writing, the subject software distributed under the License is distributed on an
+//  "AS-IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. Refer to the
+//  License for the specific language governing permissions and limitations.
+//
+//  Code Modification History:
+//  **************************************************************************************************
+//  05/12/2014 - Kevin D. Jones
+//       Generated original version of source code.
+//
+//****************************************************************************************************
+-->
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:System="clr-namespace:System;assembly=mscorlib"
+                xmlns:Synchrophasor="clr-namespace:SynchrophasorAnalytics.Modeling;assembly=SynchrophasorAnalytics">
+    <ObjectDataProvider x:Key="ShuntImpedanceCalculationMethodEnumeration" MethodName="GetValues" ObjectType="{x:Type System:Enum}">
+        <ObjectDataProvider.MethodParameters>
+            <x:Type TypeName="Synchrophasor:ShuntImpedanceCalculationMethod"/>
+        </ObjectDataProvider.MethodParameters>
+    </ObjectDataProvider>
+    <DataTemplate x:Key="ShuntDetailTemplate">
+        <StackPanel Orientation="Vertical" >
+            <Label Padding="20" Content="Shunt Compensator Detail" FontSize="25" Style="{StaticResource SegoeFontStyle}"/>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="5" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="5" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="5" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="5" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="5" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="5" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="5" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="5" />
+                    <RowDefinition Height="5" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="10" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="10" />
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="5" />
+                    <ColumnDefinition Width="*" MinWidth="120"/>
+                    <ColumnDefinition Width="5" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="5" />
+                    <ColumnDefinition Width="*" MinWidth="120"/>
+                    <ColumnDefinition Width="5" />
+                    <ColumnDefinition Width="*" MinWidth="120"/>
+                </Grid.ColumnDefinitions>
+                <Label Grid.Row="0" Grid.Column="1" Content="Internal ID" Style="{StaticResource LabelStyle}"/>
+                <Label Grid.Row="2" Grid.Column="1" Content="Number" Style="{StaticResource LabelStyle}"/>
+                <Label Grid.Row="4" Grid.Column="1" Content="Name" Style="{StaticResource LabelStyle}"/>
+                <Label Grid.Row="6" Grid.Column="1" Content="Description" Style="{StaticResource LabelStyle}"/>
+                <Label Grid.Row="8" Grid.Column="1" Content="Parent Substation" Style="{StaticResource LabelStyle}"/>
+                <Label Grid.Row="10" Grid.Column="1" Content="Connected Node" Style="{StaticResource LabelStyle}"/>
+                <Label Grid.Row="12" Grid.Column="1" Content="Impedance Calculation Method" Style="{StaticResource LabelStyle}"/>
+                <Label Grid.Row="14" Grid.Column="1" Content="Nominal MVAR at Base KV" Style="{StaticResource LabelStyle}"/>
+                <TextBox Grid.Row="0" Grid.Column="3" Text="{Binding Path=InternalID}" Style="{StaticResource TextBoxStyle}" Validation.ErrorTemplate="{StaticResource IntegerValidationTemplate}"/>
+                <TextBox Grid.Row="2" Grid.Column="3" Text="{Binding Path=Number}" Style="{StaticResource TextBoxStyle}" Validation.ErrorTemplate="{StaticResource IntegerValidationTemplate}"/>
+                <TextBox Grid.Row="4" Grid.Column="3" Text="{Binding Path=Name}" Style="{StaticResource TextBoxStyle}"/>
+                <TextBox Grid.Row="6" Grid.Column="3" Text="{Binding Path=Description}" Style="{StaticResource TextBoxStyle}"/>
+                <ComboBox Grid.Row="8" Grid.Column="3" ItemsSource="{Binding Path=Substations}" DisplayMemberPath="Name" SelectedValue="{Binding ParentSubstation}" Style="{StaticResource ComboBoxStyle}"/>
+                <ComboBox Grid.Row="10" Grid.Column="3" ItemsSource="{Binding Path=Nodes}" DisplayMemberPath="Name" SelectedValue="{Binding ConnectedNode}" Style="{StaticResource ComboBoxStyle}"/>
+                <ComboBox Grid.Row="12" Grid.Column="3" ItemsSource="{Binding Source={StaticResource ShuntImpedanceCalculationMethodEnumeration}}" SelectedValue="{Binding ImpedanceCalculationMethod}" Style="{StaticResource ComboBoxStyle}"/>
+                <TextBox Grid.Row="14" Grid.Column="3" Text="{Binding Path=NominalMvar}" Style="{StaticResource TextBoxStyle}" Validation.ErrorTemplate="{StaticResource FloatingPointValidationTemplate}"/>
+                <TabControl Grid.Row="16" Grid.RowSpan="10" Grid.Column="1" Grid.ColumnSpan="7" IsEnabled="{Binding Path=ImpedanceTableIsEnabled}" >
+                    <TabItem Header="Shunt Impedance" MinWidth="150">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="10" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="10" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="10" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="3" />
+                                <RowDefinition Height="*" />
+
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="10" />
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*" MinWidth="100"/>
+                                <ColumnDefinition Width="10" />
+                                <ColumnDefinition Width="Auto" MinWidth="20"/>
+                                <ColumnDefinition Width="*" MinWidth="100"/>
+                                <ColumnDefinition Width="10" />
+                                <ColumnDefinition Width="Auto" MinWidth="20"/>
+                                <ColumnDefinition Width="*" MinWidth="100"/>
+                                <ColumnDefinition Width="Auto" MinWidth="10"/>
+                            </Grid.ColumnDefinitions>
+                            <Label Grid.Row="1" Grid.Column="1" Content="B1" Style="{StaticResource LabelStyle}"/>
+                            <Label Grid.Row="3" Grid.Column="1" Content="B2" Style="{StaticResource LabelStyle}"/>
+                            <Label Grid.Row="3" Grid.Column="4" Content="B3" Style="{StaticResource LabelStyle}"/>
+                            <Label Grid.Row="5" Grid.Column="1" Content="B4" Style="{StaticResource LabelStyle}"/>
+                            <Label Grid.Row="5" Grid.Column="4" Content="B5" Style="{StaticResource LabelStyle}"/>
+                            <Label Grid.Row="5" Grid.Column="7" Content="B6" Style="{StaticResource LabelStyle}"/>
+
+                            <TextBox Grid.Row="1" Grid.Column="2" Text="{Binding Path=B1, Mode=TwoWay}" Style="{StaticResource TextBoxStyle}"/>
+                            <TextBox Grid.Row="3" Grid.Column="2" Text="{Binding Path=B2, Mode=TwoWay}" Style="{StaticResource TextBoxStyle}"/>
+                            <TextBox Grid.Row="3" Grid.Column="5" Text="{Binding Path=B3, Mode=TwoWay}" Style="{StaticResource TextBoxStyle}"/>
+                            <TextBox Grid.Row="5" Grid.Column="2" Text="{Binding Path=B4, Mode=TwoWay}" Style="{StaticResource TextBoxStyle}"/>
+                            <TextBox Grid.Row="5" Grid.Column="5" Text="{Binding Path=B5, Mode=TwoWay}" Style="{StaticResource TextBoxStyle}"/>
+                            <TextBox Grid.Row="5" Grid.Column="8" Text="{Binding Path=B6, Mode=TwoWay}" Style="{StaticResource TextBoxStyle}"/>
+
+                            <Label Grid.Row="1" Grid.Column="5" Content="{Binding Path=B2, Mode=TwoWay}" Style="{StaticResource LabelStyle}"/>
+                            <Label Grid.Row="1" Grid.Column="8" Content="{Binding Path=B4, Mode=TwoWay}" Style="{StaticResource LabelStyle}"/>
+                            <Label Grid.Row="3" Grid.Column="8" Content="{Binding Path=B5, Mode=TwoWay}" Style="{StaticResource LabelStyle}"/>
+
+                        </Grid>
+                    </TabItem>
+                </TabControl>
+            </Grid>
+        </StackPanel>
+    </DataTemplate>
+</ResourceDictionary>

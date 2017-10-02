@@ -1,0 +1,266 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{7E806A7D-20C8-4CDE-A1F8-4A92D1BC89F4}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>SynchrophasorAnalytics</RootNamespace>
+    <AssemblyName>SynchrophasorAnalytics</AssemblyName>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\..\Build\Output\Debug\Libraries\SynchrophasorAnalytics\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>..\..\..\Build\Output\Debug\Libraries\SynchrophasorAnalytics\SynchrophasorAnalytics.XML</DocumentationFile>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\..\..\Build\Output\Release\Libraries\SynchrophasorAnalytics\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+    <DocumentationFile>..\..\..\Build\Output\Release\Libraries\SynchrophasorAnalytics\SynchrophasorAnalytics.xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <DocumentationFile>bin\x86\Debug\SynchrophasorAnalytics.xml</DocumentationFile>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <PlatformTarget>x64</PlatformTarget>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <PlatformTarget>x64</PlatformTarget>
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>SynchrophasorAnalytics.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="MathNet.Numerics, Version=3.13.0.0, Culture=neutral, PublicKeyToken=cd8b63ad3d691a37, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\MathNet.Numerics.Signed.3.13.0\lib\net40\MathNet.Numerics.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="MathNet.Numerics.Data.Matlab, Version=3.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\MathNet.Numerics.Data.Matlab.3.2.0\lib\net40\MathNet.Numerics.Data.Matlab.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Calibration\CalibrationSetting.cs" />
+    <Compile Include="Calibration\ICalibratable.cs" />
+    <Compile Include="Csv\CsvFile.cs" />
+    <Compile Include="Csv\CsvFileReader.cs" />
+    <Compile Include="Csv\CsvFileWithHeader.cs" />
+    <Compile Include="Csv\CsvFileWriter.cs" />
+    <Compile Include="Csv\CsvRow.cs" />
+    <Compile Include="DataConditioning\Smoothing\AssertedMeasurementType.cs" />
+    <Compile Include="DataConditioning\Smoothing\Smoother.cs" />
+    <Compile Include="GIC\IGic.cs" />
+    <Compile Include="Graphs\IGraphable.cs" />
+    <Compile Include="Graphs\SubstationGraph.cs" />
+    <Compile Include="Graphs\TopologyEstimationLevel.cs" />
+    <Compile Include="Graphs\TransmissionLineGraph.cs" />
+    <Compile Include="Graphs\TreeNode.cs" />
+    <Compile Include="Graphs\TreeNodeList.cs" />
+    <Compile Include="Graphs\VertexAdjacencyList.cs" />
+    <Compile Include="Graphs\VertexAdjacencyRow.cs" />
+    <Compile Include="Graphs\VertexCluster.cs" />
+    <Compile Include="Hdb\Records\Area.cs" />
+    <Compile Include="Hdb\Records\CircuitBreaker.cs" />
+    <Compile Include="Hdb\Records\CircuitBreakerExtension.cs" />
+    <Compile Include="Hdb\Records\Company.cs" />
+    <Compile Include="Hdb\Context.cs" />
+    <Compile Include="Hdb\Records\Division.cs" />
+    <Compile Include="Hdb\Records\LineSegment.cs" />
+    <Compile Include="Hdb\ModelFiles.cs" />
+    <Compile Include="Hdb\Records\LineSegmentExtension.cs" />
+    <Compile Include="Hdb\Records\Node.cs" />
+    <Compile Include="Hdb\Reader.cs" />
+    <Compile Include="Hdb\Records\NodeExtension.cs" />
+    <Compile Include="Hdb\Records\ParentTransformer.cs" />
+    <Compile Include="Hdb\Records\Shunt.cs" />
+    <Compile Include="Hdb\Records\ShuntExtension.cs" />
+    <Compile Include="Hdb\Records\Station.cs" />
+    <Compile Include="Hdb\Records\Transformer.cs" />
+    <Compile Include="Hdb\Records\TransformerExtension.cs" />
+    <Compile Include="Hdb\Records\TransformerTap.cs" />
+    <Compile Include="Hdb\Records\TransmissionLine.cs" />
+    <Compile Include="Matrices\CovarianceMatrix.cs" />
+    <Compile Include="Matrices\CurrentFlowMeasurementBusIncidenceMatrix.cs" />
+    <Compile Include="Matrices\MatrixCalculationExtensions.cs" />
+    <Compile Include="Matrices\SeriesAdmittanceMatrix.cs" />
+    <Compile Include="Matrices\ShuntDeviceSusceptanceMatrix.cs" />
+    <Compile Include="Matrices\LineShuntSusceptanceMatrix.cs" />
+    <Compile Include="Matrices\SystemMatrix.cs" />
+    <Compile Include="Matrices\VoltageMeasurementBusIncidenceMatrix.cs" />
+    <Compile Include="Measurements\BreakerStatus.cs" />
+    <Compile Include="Measurements\BreakerStatusBit.cs" />
+    <Compile Include="Measurements\ComplexPowerGroup.cs" />
+    <Compile Include="Measurements\CurrentFlowPhasorGroup.cs" />
+    <Compile Include="Measurements\IClearable.cs" />
+    <Compile Include="Measurements\IPhasor.cs" />
+    <Compile Include="Measurements\IPowerCalculatable.cs" />
+    <Compile Include="Measurements\MeasuredDeviceType.cs" />
+    <Compile Include="Measurements\OutputMeasurement.cs" />
+    <Compile Include="Measurements\OutputType.cs" />
+    <Compile Include="Measurements\Phasor.cs" />
+    <Compile Include="Measurements\PhasorBase.cs" />
+    <Compile Include="Measurements\PhasorBaseSerializationConditions.cs" />
+    <Compile Include="Measurements\PhasorGroupPair.cs" />
+    <Compile Include="Measurements\PhasorPair.cs" />
+    <Compile Include="Measurements\PhasorEstimate.cs" />
+    <Compile Include="Measurements\PhasorGroup.cs" />
+    <Compile Include="Measurements\PhasorMeasurement.cs" />
+    <Compile Include="Measurements\PhasorType.cs" />
+    <Compile Include="Measurements\CurrentInjectionPhasorGroup.cs" />
+    <Compile Include="Measurements\StatusWord.cs" />
+    <Compile Include="Measurements\StatusWordBit.cs" />
+    <Compile Include="Measurements\StatusWordSerializeConditions.cs" />
+    <Compile Include="Measurements\VoltagePhasorGroup.cs" />
+    <Compile Include="Modeling\CircuitBreaker.cs" />
+    <Compile Include="Modeling\Company.cs" />
+    <Compile Include="Modeling\Division.cs" />
+    <Compile Include="Modeling\IImpedance.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Modeling\Impedance.cs" />
+    <Compile Include="Modeling\INetworkDescribable.cs" />
+    <Compile Include="Modeling\IPrunable.cs" />
+    <Compile Include="Modeling\ISingleTerminal.cs" />
+    <Compile Include="Modeling\IThreeTerminal.cs" />
+    <Compile Include="Modeling\ITwoTerminal.cs" />
+    <Compile Include="Modeling\LineSegment.cs" />
+    <Compile Include="Modeling\NetworkModel.cs" />
+    <Compile Include="Modeling\Node.cs" />
+    <Compile Include="Modeling\ObservationState.cs" />
+    <Compile Include="Modeling\ObservedBus.cs" />
+    <Compile Include="Modeling\SeriesBranchBase.cs" />
+    <Compile Include="Modeling\SeriesCompensator.cs" />
+    <Compile Include="Modeling\SeriesCompensatorStatus.cs" />
+    <Compile Include="Modeling\SeriesCompensatorType.cs" />
+    <Compile Include="Modeling\ShuntCompensator.cs" />
+    <Compile Include="Measurements\CurrentInjectionDirectionConvention.cs" />
+    <Compile Include="Modeling\ShuntImpedanceCalculationMethod.cs" />
+    <Compile Include="Modeling\Substation.cs" />
+    <Compile Include="Modeling\Switch.cs" />
+    <Compile Include="Modeling\SwitchingDeviceActualState.cs" />
+    <Compile Include="Modeling\SwitchingDeviceBase.cs" />
+    <Compile Include="Modeling\SwitchingDeviceInferredState.cs" />
+    <Compile Include="Modeling\SwitchingDeviceMeasuredState.cs" />
+    <Compile Include="Modeling\SwitchingDeviceNormalState.cs" />
+    <Compile Include="Modeling\TapConfiguration.cs" />
+    <Compile Include="Modeling\Transformer.cs" />
+    <Compile Include="Modeling\TransformerConnectionType.cs" />
+    <Compile Include="Modeling\TransmissionLine.cs" />
+    <Compile Include="Modeling\VoltageCoherencyDetectionMethod.cs" />
+    <Compile Include="Modeling\VoltageLevel.cs" />
+    <Compile Include="Modeling\VoltageLevelGroup.cs" />
+    <Compile Include="Networks\CurrentFlowPostProcessingSetting.cs" />
+    <Compile Include="Networks\CurrentInjectionPostProcessingSetting.cs" />
+    <Compile Include="Networks\Network.cs" />
+    <Compile Include="Networks\InputOutputSettings.cs" />
+    <Compile Include="Networks\PerformanceMetrics.cs" />
+    <Compile Include="Networks\PhaseSelection.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Psse\AdhocNodeGroup.cs" />
+    <Compile Include="Psse\Area.cs" />
+    <Compile Include="Psse\Branch.cs" />
+    <Compile Include="Psse\Bus.cs" />
+    <Compile Include="Psse\FixedShunt.cs" />
+    <Compile Include="Psse\Owner.cs" />
+    <Compile Include="Psse\RawFile.cs" />
+    <Compile Include="Psse\RecordTypes.cs" />
+    <Compile Include="Psse\Zone.cs" />
+    <Compile Include="Testing\MeasurementSnapshotPath.cs" />
+    <Compile Include="Testing\RawMeasurements.cs" />
+    <Compile Include="Testing\SequencedMeasurementSnapshotPathSet.cs" />
+    <Compile Include="Testing\SnapshotPeriodicity.cs" />
+    <Compile Include="Testing\SnapshotRequest.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Hdb\Scripts\placeholder.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="ClassDiagram1.cd" />
+    <None Include="Hdb\Scripts\Pattern\altlim.pattern" />
+    <None Include="Hdb\Scripts\Pattern\area.pattern" />
+    <None Include="Hdb\Scripts\Pattern\bs.pattern" />
+    <None Include="Hdb\Scripts\Pattern\cb.pattern" />
+    <None Include="Hdb\Scripts\Pattern\cblim.pattern" />
+    <None Include="Hdb\Scripts\Pattern\co.pattern" />
+    <None Include="Hdb\Scripts\Pattern\cp.pattern" />
+    <None Include="Hdb\Scripts\Pattern\dv.pattern" />
+    <None Include="Hdb\Scripts\Pattern\line.pattern" />
+    <None Include="Hdb\Scripts\Pattern\ln.pattern" />
+    <None Include="Hdb\Scripts\Pattern\lnlim.pattern" />
+    <None Include="Hdb\Scripts\Pattern\mnol.pattern" />
+    <None Include="Hdb\Scripts\Pattern\nd.pattern" />
+    <None Include="Hdb\Scripts\Pattern\ndlim.pattern" />
+    <None Include="Hdb\Scripts\Pattern\st.pattern" />
+    <None Include="Hdb\Scripts\Pattern\tapty.pattern" />
+    <None Include="Hdb\Scripts\Pattern\xf.pattern" />
+    <None Include="Hdb\Scripts\Pattern\xflim.pattern" />
+    <None Include="Hdb\Scripts\Pattern\xfmr.pattern" />
+    <None Include="packages.config" />
+    <None Include="SynchrophasorAnalytics.snk" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

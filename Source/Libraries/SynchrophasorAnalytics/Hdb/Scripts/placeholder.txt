@@ -1,0 +1,1 @@
+﻿This folder will contain the hdbexport scripts for exporting the Hdb data to run against the model build script.

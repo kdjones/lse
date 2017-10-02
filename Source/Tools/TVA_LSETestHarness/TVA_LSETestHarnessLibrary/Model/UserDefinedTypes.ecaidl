@@ -1,0 +1,11 @@
+category ECA
+PhasorCollection {
+    ECA Phasor[] Phasors
+}
+
+category ECA
+Phasor {
+    FloatingPoint Double Magnitude
+    FloatingPoint Double Angle
+}
+

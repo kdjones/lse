@@ -1,0 +1,34 @@
+﻿<Application x:Class="NetworkModelEditor.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:viewModels="clr-namespace:NetworkModelEditor.ViewModels"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Resources/Styles.xaml"/>
+                <ResourceDictionary Source="Resources/Data Templates/NetworkDetailDataTemplate.xaml"/>
+                <ResourceDictionary Source="Resources/Data Templates/ModelDetailDataTemplate.xaml"/>
+                <ResourceDictionary Source="Resources/Data Templates/CompanyDetailDataTemplate.xaml"/>
+                <ResourceDictionary Source="Resources/Data Templates/DivisionDetailDataTemplate.xaml"/>
+                <ResourceDictionary Source="Resources/Data Templates/SubstationDetailDataTemplate.xaml"/>
+                <ResourceDictionary Source="Resources/Data Templates/TransmissionLineDetailDataTemplate.xaml"/>
+                <ResourceDictionary Source="Resources/Data Templates/NodeDetailDataTemplate.xaml"/>
+                <ResourceDictionary Source="Resources/Data Templates/ShuntDetailDataTemplate.xaml" />
+                <ResourceDictionary Source="Resources/Data Templates/CircuitBreakerDetailDataTemplate.xaml"/>
+                <ResourceDictionary Source="Resources/Data Templates/SwitchDetailDataTemplate.xaml"/>
+                <ResourceDictionary Source="Resources/Data Templates/TransformerDetailDataTemplate.xaml"/>
+                <ResourceDictionary Source="Resources/Data Templates/LineSegmentDetailDataTemplate.xaml"/>
+                <ResourceDictionary Source="Resources/Data Templates/BreakerStatusDetailDataTemplate.xaml"/>
+                <ResourceDictionary Source="Resources/Data Templates/StatusWordDetailDataTemplate.xaml"/>
+                <ResourceDictionary Source="Resources/Data Templates/VoltageLevelDetailDataTemplate.xaml"/>
+                <ResourceDictionary Source="Resources/Data Templates/TapConfigurationDetailDataTemplate.xaml"/>
+                <ResourceDictionary Source="Resources/Data Templates/VoltagePhasorGroupDetailDataTemplate.xaml"/>
+                <ResourceDictionary Source="Resources/Data Templates/CurrentPhasorGroupDetailDataTemplate.xaml"/>
+                <ResourceDictionary Source="Resources/Data Templates/CurrentInjectionPhasorGroupDetailDataTemplate.xaml"/>
+                <ResourceDictionary Source="Resources/Data Templates/SeriesCompensatorDetailDataTemplate.xaml"/>
+                <ResourceDictionary Source="Resources/Data Templates/MeasurementSampleDetailDataTemplate.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

@@ -1,0 +1,7 @@
+xcopy /y /s C:\Users\kdjones\Source\Repos\linear-state-estimator\Build\Output\Release\Tools\NetworkModelEditor\NetworkModelEditor.exe C:\Users\kdjones\Source\Repos\openLSE\Dependencies\LSE
+xcopy /y /s C:\Users\kdjones\Source\Repos\linear-state-estimator\Build\Output\Release\Tools\NetworkModelEditor\NetworkModelEditor.exe.config C:\Users\kdjones\Source\Repos\openLSE\Dependencies\LSE
+xcopy /y /s C:\Users\kdjones\Source\Repos\linear-state-estimator\Build\Output\Release\Tools\NetworkModelEditor\MeasurementSampler.dll C:\Users\kdjones\Source\Repos\openLSE\Dependencies\LSE
+xcopy /y /s C:\Users\kdjones\Source\Repos\linear-state-estimator\Build\Output\Release\Libraries\SynchrophasorAnalytics\SynchrophasorAnalytics.dll C:\Users\kdjones\Source\Repos\openLSE\Dependencies\LSE
+xcopy /y /s C:\Users\kdjones\Source\Repos\linear-state-estimator\Build\Output\Release\Libraries\SynchrophasorAnalytics\SynchrophasorAnalytics.dll.config C:\Users\kdjones\Source\Repos\openLSE\Dependencies\LSE
+xcopy /y /s C:\Users\kdjones\Source\Repos\linear-state-estimator\Build\Output\Release\Libraries\SynchrophasorAnalytics\MathNet.Numerics.Data.Matlab.dll C:\Users\kdjones\Source\Repos\openLSE\Dependencies\LSE
+xcopy /y /s C:\Users\kdjones\Source\Repos\linear-state-estimator\Build\Output\Release\Libraries\SynchrophasorAnalytics\MathNet.Numerics.dll.config C:\Users\kdjones\Source\Repos\openLSE\Dependencies\LSE

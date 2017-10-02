@@ -1,0 +1,766 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Operations Version="1.0" xmlns="http://schemas.microsoft.com/sqlserver/dac/Serialization/2012/02">
+  <Operation Name="Rename Refactor" Key="1739f9df-3409-4eca-a4a3-d403787ab3ad" ChangeDateTime="06/29/2014 15:59:47">
+    <Property Name="ElementName" Value="[dbo].[Model].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Model]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="UID" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="738b1b17-aec2-4c01-beb0-a0dbb041cc78" ChangeDateTime="06/29/2014 16:00:59">
+    <Property Name="ElementName" Value="[dbo].[Model].[UID]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Model]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Uid" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="dfe119fb-d033-4a71-83d8-0bcd6d25cb6b" ChangeDateTime="06/29/2014 16:01:01">
+    <Property Name="ElementName" Value="[dbo].[Model].[ID]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Model]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Id" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="4d688fa5-3b37-47be-8497-99fe54cefd86" ChangeDateTime="06/29/2014 16:01:04">
+    <Property Name="ElementName" Value="[dbo].[Model].[N]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Model]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Number" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="5e36a8af-3ef8-4333-ab83-368c212dfe98" ChangeDateTime="06/29/2014 16:06:54">
+    <Property Name="ElementName" Value="[dbo].[Company].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Company]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Uid" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="157f6274-7bec-46f7-8eb5-3a169430e13d" ChangeDateTime="06/29/2014 16:08:04">
+    <Property Name="ElementName" Value="[dbo].[Company].[LastEditedBy]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Company]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="LastEditedOn" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="da079eb7-76a3-49ea-b863-a46a77c63876" ChangeDateTime="06/29/2014 16:08:08">
+    <Property Name="ElementName" Value="[dbo].[Company].[LastEditedOn]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Company]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="CreatedBy" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="1511031b-490e-431c-b89d-bea5c1594b4f" ChangeDateTime="06/29/2014 16:08:12">
+    <Property Name="ElementName" Value="[dbo].[Company].[CreatedBy]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Company]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="CreatedOn" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="213cb27a-a4d9-46d9-8496-52aceb060d9e" ChangeDateTime="06/29/2014 16:08:20">
+    <Property Name="ElementName" Value="[dbo].[Company].[CreatedOn]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Company]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="ParentModel" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="dfa74835-e4a8-4353-b73f-583330ac54dc" ChangeDateTime="06/29/2014 16:14:03">
+    <Property Name="ElementName" Value="[dbo].[Division].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Division]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Uid" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="7fb674aa-2f44-4460-af35-16926d7e1d76" ChangeDateTime="06/29/2014 16:20:25">
+    <Property Name="ElementName" Value="[dbo].[Substation].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Substation]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Uid" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="01337b50-5ec4-4d6c-8036-af57b9e5b87c" ChangeDateTime="06/29/2014 17:13:06">
+    <Property Name="ElementName" Value="[dbo].[TransmissionLine].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[TransmissionLine]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Uid" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="909f85a4-724e-46f5-9c74-f36403f064e5" ChangeDateTime="06/29/2014 17:16:44">
+    <Property Name="ElementName" Value="[dbo].[VoltageLevel].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[VoltageLevel]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Uid" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="328be349-0f82-421b-ba12-62ba34555c2d" ChangeDateTime="06/29/2014 17:36:31">
+    <Property Name="ElementName" Value="[dbo].[Node].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Node]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Uid" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="23b3a839-b134-461d-9f7d-486516a71879" ChangeDateTime="06/29/2014 17:39:54">
+    <Property Name="ElementName" Value="[dbo].[Node].[BaseKv]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Node]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="ParentTransmissionLine" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="7499ad7e-517b-4b5a-8a4a-fd9cb93d3157" ChangeDateTime="06/29/2014 18:01:34">
+    <Property Name="ElementName" Value="[dbo].[VoltagePhasorGroup].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[VoltagePhasorGroup]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Uid" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="2e7dda14-0408-4336-b50b-d3bedf46990e" ChangeDateTime="06/29/2014 18:05:53">
+    <Property Name="ElementName" Value="[dbo].[VoltagePhasorGroup].[IsEnabled]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[VoltagePhasorGroup]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Enabled" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="fbde3d54-f3ad-4a7b-9ead-fcdfeef9dff9" ChangeDateTime="06/29/2014 18:11:26">
+    <Property Name="ElementName" Value="[dbo].[Phasor].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Phasor]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Uid" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="9087d462-5100-4449-ad9b-cb8dee91a34b" ChangeDateTime="06/29/2014 18:22:23">
+    <Property Name="ElementName" Value="[dbo].[FK_VoltagePhasorGroup_ToTable]" />
+    <Property Name="ElementType" Value="SqlForeignKeyConstraint" />
+    <Property Name="ParentElementName" Value="[dbo].[VoltagePhasorGroup]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[FK_VoltagePhasorGroup_StatusWord]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="4d00aeb1-7748-4112-990b-ed3894d9256e" ChangeDateTime="06/29/2014 18:22:41">
+    <Property Name="ElementName" Value="[dbo].[Phasor].[AngleResidualKey]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Phasor]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="MagnitudeResidualKey" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="f43daf42-9575-406a-8a6c-de3e0a9e391d" ChangeDateTime="06/29/2014 18:22:43">
+    <Property Name="ElementName" Value="[dbo].[Phasor].[MagnitudeResidualKey]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Phasor]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="EstimateAngleKey" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="fe458050-5853-40bd-ba3f-604c993763c1" ChangeDateTime="06/29/2014 18:22:46">
+    <Property Name="ElementName" Value="[dbo].[Phasor].[EstimateAngleKey]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Phasor]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="EstimateMagnitudeKey" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="027c394a-9635-48aa-ab1e-675299b70525" ChangeDateTime="06/29/2014 18:22:48">
+    <Property Name="ElementName" Value="[dbo].[Phasor].[EstimateMagnitudeKey]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Phasor]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="ShouldBeCalibrated" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="ce216a16-49a0-4be5-ad53-feecaf39d1ea" ChangeDateTime="06/29/2014 18:22:50">
+    <Property Name="ElementName" Value="[dbo].[Phasor].[ShouldBeCalibrated]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Phasor]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="PhaseAngleCorrectionFactor" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="65f23f79-b0d0-41dd-816d-e19850d1319f" ChangeDateTime="06/29/2014 18:22:52">
+    <Property Name="ElementName" Value="[dbo].[Phasor].[PhaseAngleCorrectionFactor]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Phasor]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="RatioCorrectionFactor" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="0c2a4054-8ea1-416f-9983-78dff093a587" ChangeDateTime="06/29/2014 18:22:55">
+    <Property Name="ElementName" Value="[dbo].[Phasor].[RatioCorrectionFactor]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Phasor]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="MeasurementVariance" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="dbd261d7-9c63-4a23-bd93-fff5bb9e7d2f" ChangeDateTime="06/29/2014 18:22:57">
+    <Property Name="ElementName" Value="[dbo].[Phasor].[MeasurementVariance]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Phasor]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="MeasurementAngleKey" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="9e7dc610-2bba-4913-b4ff-f50bbb5051bd" ChangeDateTime="06/29/2014 18:22:59">
+    <Property Name="ElementName" Value="[dbo].[Phasor].[MeasurementAngleKey]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Phasor]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="MeasurementMagnitudeKey" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="7235df3a-3138-448d-b1f4-af519a68dc2a" ChangeDateTime="06/29/2014 18:23:07">
+    <Property Name="ElementName" Value="[dbo].[Phasor].[MeasurementMagnitudeKey]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Phasor]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="ParentModel" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="694ca490-90b0-4744-ac35-40ad9e26e828" ChangeDateTime="06/29/2014 18:26:30">
+    <Property Name="ElementName" Value="[dbo].[StatusWord].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[StatusWord]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Uid" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="d5f4b08d-c2ed-423a-bfa1-d1dfdf8c0150" ChangeDateTime="06/29/2014 19:12:23">
+    <Property Name="ElementName" Value="[dbo].[StatusWord].[LastEditedBy]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[StatusWord]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="LastEditedOn" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="dcdad6ef-c14a-4645-a99f-fbbaeb5c4281" ChangeDateTime="06/29/2014 19:12:27">
+    <Property Name="ElementName" Value="[dbo].[StatusWord].[LastEditedOn]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[StatusWord]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="CreatedBy" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="1d5e500f-1ac2-4d1e-b1e2-246a51b67596" ChangeDateTime="06/29/2014 19:12:31">
+    <Property Name="ElementName" Value="[dbo].[StatusWord].[CreatedBy]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[StatusWord]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="CreatedOn" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="6b91ce54-3678-4eb7-9ead-4c502f097c05" ChangeDateTime="06/29/2014 19:12:34">
+    <Property Name="ElementName" Value="[dbo].[StatusWord].[CreatedOn]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[StatusWord]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Key" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="f79347c0-5aca-49b8-bfff-5e38ecd1b907" ChangeDateTime="06/29/2014 19:12:37">
+    <Property Name="ElementName" Value="[dbo].[StatusWord].[Key]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[StatusWord]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Enabled" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="6e63bd60-8cd1-4135-9fa2-785bd8cbb30d" ChangeDateTime="06/29/2014 19:12:40">
+    <Property Name="ElementName" Value="[dbo].[StatusWord].[Enabled]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[StatusWord]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Description" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="86125b34-2681-4775-9d06-20aca6de4f74" ChangeDateTime="06/29/2014 19:12:43">
+    <Property Name="ElementName" Value="[dbo].[StatusWord].[Description]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[StatusWord]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Number" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="d85460e4-72b9-4123-aa83-b57bc76a9875" ChangeDateTime="06/29/2014 19:12:45">
+    <Property Name="ElementName" Value="[dbo].[StatusWord].[Number]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[StatusWord]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Id" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="1ce7095a-e06e-44ff-a2bb-e88b3ede0061" ChangeDateTime="06/29/2014 19:12:50">
+    <Property Name="ElementName" Value="[dbo].[StatusWord].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[StatusWord]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="ParentModel" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="77660689-d82c-47b8-8d56-d2a67919d495" ChangeDateTime="06/29/2014 20:20:31">
+    <Property Name="ElementName" Value="[dbo].[Switch].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Switch]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Uid" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="c4cd973f-3ed7-49c8-9d51-180c45ada548" ChangeDateTime="06/29/2014 20:28:01">
+    <Property Name="ElementName" Value="[dbo].[SwitchingDeviceNormalState].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[SwitchingDeviceNormalState]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Uid" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="eb819965-3388-4f66-b33f-2dcc676c9a1d" ChangeDateTime="06/29/2014 20:29:19">
+    <Property Name="ElementName" Value="[dbo].[SwitchingDeviceNormalState].[Value]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[SwitchingDeviceNormalState]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="State" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="944d8ba4-d121-4d87-8dfe-17a5ff771703" ChangeDateTime="06/29/2014 20:30:40">
+    <Property Name="ElementName" Value="[dbo].[FK_Switch_ToTable]" />
+    <Property Name="ElementType" Value="SqlForeignKeyConstraint" />
+    <Property Name="ParentElementName" Value="[dbo].[Switch]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[FK_Switch_Substation]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="a62ea2e8-5885-4c0d-941d-af536c9aed0b" ChangeDateTime="06/29/2014 20:30:50">
+    <Property Name="ElementName" Value="[dbo].[FK_Switch_ToTable_1]" />
+    <Property Name="ElementType" Value="SqlForeignKeyConstraint" />
+    <Property Name="ParentElementName" Value="[dbo].[Switch]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[FK_Switch_TransmissionLine]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="8ad6cf32-52a3-426d-b2a2-d1d531b70122" ChangeDateTime="06/29/2014 20:31:00">
+    <Property Name="ElementName" Value="[dbo].[FK_Switch_ToTable_2]" />
+    <Property Name="ElementType" Value="SqlForeignKeyConstraint" />
+    <Property Name="ParentElementName" Value="[dbo].[Switch]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[FK_Switch_SwitchingDeviceNormalState]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="af5f6127-17a3-422f-91e4-7bbaf2b1c410" ChangeDateTime="06/29/2014 20:31:17">
+    <Property Name="ElementName" Value="[dbo].[FK_Switch_ToTable_3]" />
+    <Property Name="ElementType" Value="SqlForeignKeyConstraint" />
+    <Property Name="ParentElementName" Value="[dbo].[Switch]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[FK_Switch_FromNode]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="8c26f1f4-10fa-4497-822d-0ab334ddb066" ChangeDateTime="06/29/2014 20:31:23">
+    <Property Name="ElementName" Value="[dbo].[FK_Switch_ToTable_4]" />
+    <Property Name="ElementType" Value="SqlForeignKeyConstraint" />
+    <Property Name="ParentElementName" Value="[dbo].[Switch]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[FK_Switch_ToNode]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="307fdc07-afda-4ee7-93b7-4fb3f7f341d9" ChangeDateTime="06/29/2014 20:35:01">
+    <Property Name="ElementName" Value="[dbo].[CircuitBreaker].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[CircuitBreaker]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Uid" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="9ffdbfd5-b48d-43fc-9321-c8a864d5d7b2" ChangeDateTime="06/29/2014 20:39:31">
+    <Property Name="ElementName" Value="[dbo].[BreakerStatus].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[BreakerStatus]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Uid" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="8cafe091-87b0-4521-b807-6669d13a8c43" ChangeDateTime="06/29/2014 20:46:33">
+    <Property Name="ElementName" Value="[dbo].[FK_CircuitBreaker_ToTable]" />
+    <Property Name="ElementType" Value="SqlForeignKeyConstraint" />
+    <Property Name="ParentElementName" Value="[dbo].[CircuitBreaker]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[FK_CircuitBreaker_Substation]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="af5dcb3b-4c2f-4f64-81c4-02ca81bc32e0" ChangeDateTime="06/29/2014 20:46:40">
+    <Property Name="ElementName" Value="[dbo].[FK_CircuitBreaker_ToTable_1]" />
+    <Property Name="ElementType" Value="SqlForeignKeyConstraint" />
+    <Property Name="ParentElementName" Value="[dbo].[CircuitBreaker]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[FK_CircuitBreaker_TransmissionLine]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="96759c90-94e6-4a53-9b70-517933f78072" ChangeDateTime="06/29/2014 20:46:50">
+    <Property Name="ElementName" Value="[dbo].[FK_CircuitBreaker_ToTable_2]" />
+    <Property Name="ElementType" Value="SqlForeignKeyConstraint" />
+    <Property Name="ParentElementName" Value="[dbo].[CircuitBreaker]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[FK_CircuitBreaker_BreakerStatus]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="385b5332-2d69-42f6-85fe-5b0713d2571c" ChangeDateTime="06/29/2014 20:47:02">
+    <Property Name="ElementName" Value="[dbo].[FK_CircuitBreaker_ToTable_3]" />
+    <Property Name="ElementType" Value="SqlForeignKeyConstraint" />
+    <Property Name="ParentElementName" Value="[dbo].[CircuitBreaker]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[FK_CircuitBreaker_SwitchingDeviceNormalState]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="276b41bc-24a3-477d-be0f-240c630d84fd" ChangeDateTime="06/29/2014 20:47:13">
+    <Property Name="ElementName" Value="[dbo].[FK_CircuitBreaker_ToTable_4]" />
+    <Property Name="ElementType" Value="SqlForeignKeyConstraint" />
+    <Property Name="ParentElementName" Value="[dbo].[CircuitBreaker]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[FK_CircuitBreaker_FromNode]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="748c117e-933c-4ffb-ab3e-d3bcbc6875c4" ChangeDateTime="06/29/2014 20:47:20">
+    <Property Name="ElementName" Value="[dbo].[FK_CircuitBreaker_ToTable_5]" />
+    <Property Name="ElementType" Value="SqlForeignKeyConstraint" />
+    <Property Name="ParentElementName" Value="[dbo].[CircuitBreaker]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[FK_CircuitBreaker_ToNode]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="3a995aee-7455-4146-bf87-d0d2493d280c" ChangeDateTime="06/29/2014 21:00:32">
+    <Property Name="ElementName" Value="[dbo].[BreakerStatusBit].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[BreakerStatusBit]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Uid" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="a67cfdb3-1730-4e7c-b05d-ee74c8384bbc" ChangeDateTime="06/29/2014 21:04:34">
+    <Property Name="ElementName" Value="[dbo].[FK_TransmissionLine_ToTable]" />
+    <Property Name="ElementType" Value="SqlForeignKeyConstraint" />
+    <Property Name="ParentElementName" Value="[dbo].[TransmissionLine]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[FK_TransmissionLine_FromNode]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="9727c664-9d4f-478e-be3b-02dcf6ca8983" ChangeDateTime="06/29/2014 21:04:39">
+    <Property Name="ElementName" Value="[dbo].[FK_TransmissionLine_ToTable_1]" />
+    <Property Name="ElementType" Value="SqlForeignKeyConstraint" />
+    <Property Name="ParentElementName" Value="[dbo].[TransmissionLine]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[FK_TransmissionLine_ToNode]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="1dcb3ff3-bf45-460b-a79f-b9a5ecf688c1" ChangeDateTime="06/29/2014 21:06:06">
+    <Property Name="ElementName" Value="[dbo].[TapConfiguration].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[TapConfiguration]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Uid" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="56f87f27-cdf8-47d8-a035-74c0072af5c8" ChangeDateTime="06/29/2014 21:07:46">
+    <Property Name="ElementName" Value="[dbo].[TapConfiguration].[L]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[TapConfiguration]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="LowerPositionBounds" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="2f3cf62a-fa32-4724-bb91-921465e75dc7" ChangeDateTime="06/29/2014 21:28:53">
+    <Property Name="ElementName" Value="[dbo].[ShuntCompensator].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[ShuntCompensator]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Uid" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="3e86df98-8582-4a25-8431-afb7aa643837" ChangeDateTime="06/29/2014 21:42:33">
+    <Property Name="ElementName" Value="[dbo].[CurrentFlowPhasorGroup].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[CurrentFlowPhasorGroup]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Uid" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="e7da7146-282b-4531-810d-fcac9ff44e8e" ChangeDateTime="06/29/2014 21:43:12">
+    <Property Name="ElementName" Value="[dbo].[CurrentInjectionPhasorGroup].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[CurrentInjectionPhasorGroup]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Uid" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="dcb8dbe8-2477-4d85-a40d-4980a52f8f34" ChangeDateTime="06/29/2014 21:51:50">
+    <Property Name="ElementName" Value="[dbo].[ShuntImpedanceCalculationMethod].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[ShuntImpedanceCalculationMethod]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Uid" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="374a6018-90f9-4ecf-a597-9702f76fe225" ChangeDateTime="06/29/2014 21:53:30">
+    <Property Name="ElementName" Value="[dbo].[FK_ShuntCompensator_ToTable]" />
+    <Property Name="ElementType" Value="SqlForeignKeyConstraint" />
+    <Property Name="ParentElementName" Value="[dbo].[ShuntCompensator]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[FK_ShuntCompensator_Substation]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="f9e0e490-326b-4504-8a8f-d38e768011cc" ChangeDateTime="06/29/2014 21:53:35">
+    <Property Name="ElementName" Value="[dbo].[FK_ShuntCompensator_ToTable_1]" />
+    <Property Name="ElementType" Value="SqlForeignKeyConstraint" />
+    <Property Name="ParentElementName" Value="[dbo].[ShuntCompensator]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[FK_ShuntCompensator_Node]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="1c0c45b6-4bf6-4d65-9fe6-c46b37d2f1df" ChangeDateTime="06/29/2014 21:53:44">
+    <Property Name="ElementName" Value="[dbo].[FK_ShuntCompensator_ToTable_2]" />
+    <Property Name="ElementType" Value="SqlForeignKeyConstraint" />
+    <Property Name="ParentElementName" Value="[dbo].[ShuntCompensator]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[FK_ShuntCompensator_CurrentInjection]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="c6d1f53e-f700-4b87-910f-000a7c0e306f" ChangeDateTime="06/29/2014 21:53:57">
+    <Property Name="ElementName" Value="[dbo].[FK_ShuntCompensator_ToTable_3]" />
+    <Property Name="ElementType" Value="SqlForeignKeyConstraint" />
+    <Property Name="ParentElementName" Value="[dbo].[ShuntCompensator]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[FK_ShuntCompensator_ImpedanceCalculationMethod]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="2fa99d66-b04a-4700-aaa1-e804d63a52b0" ChangeDateTime="06/29/2014 22:04:28">
+    <Property Name="ElementName" Value="[dbo].[FK_CurrentFlowPhasorGroup_ToTable]" />
+    <Property Name="ElementType" Value="SqlForeignKeyConstraint" />
+    <Property Name="ParentElementName" Value="[dbo].[CurrentFlowPhasorGroup]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[FK_CurrentFlowPhasorGroup_FromNode]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="b1861d29-b57f-4980-99e5-c0f540ebb5fa" ChangeDateTime="06/29/2014 22:04:33">
+    <Property Name="ElementName" Value="[dbo].[FK_CurrentFlowPhasorGroup_ToTable_1]" />
+    <Property Name="ElementType" Value="SqlForeignKeyConstraint" />
+    <Property Name="ParentElementName" Value="[dbo].[CurrentFlowPhasorGroup]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[FK_CurrentFlowPhasorGroup_ToNode]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="6ecf49e8-7e23-4d37-a9d4-fd14bb0d25a4" ChangeDateTime="06/29/2014 22:04:45">
+    <Property Name="ElementName" Value="[dbo].[FK_CurrentFlowPhasorGroup_ToTable_2]" />
+    <Property Name="ElementType" Value="SqlForeignKeyConstraint" />
+    <Property Name="ParentElementName" Value="[dbo].[CurrentFlowPhasorGroup]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[FK_CurrentFlowPhasorGroup_StatusWord]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="e419686a-cc66-495c-b881-5d2a0d2c2664" ChangeDateTime="06/29/2014 22:04:59">
+    <Property Name="ElementName" Value="[dbo].[FK_CurrentFlowPhasorGroup_ToTable_3]" />
+    <Property Name="ElementType" Value="SqlForeignKeyConstraint" />
+    <Property Name="ParentElementName" Value="[dbo].[CurrentFlowPhasorGroup]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[FK_CurrentFlowPhasorGroup_PositiveSequence]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="58eebea1-878d-46d8-88a0-caf6182d4eee" ChangeDateTime="06/29/2014 22:05:05">
+    <Property Name="ElementName" Value="[dbo].[FK_CurrentFlowPhasorGroup_ToTable_4]" />
+    <Property Name="ElementType" Value="SqlForeignKeyConstraint" />
+    <Property Name="ParentElementName" Value="[dbo].[CurrentFlowPhasorGroup]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[FK_CurrentFlowPhasorGroup_PhaseA]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="2c0c7a30-4b81-4b09-8a5f-6c75659865d4" ChangeDateTime="06/29/2014 22:05:10">
+    <Property Name="ElementName" Value="[dbo].[FK_CurrentFlowPhasorGroup_ToTable_5]" />
+    <Property Name="ElementType" Value="SqlForeignKeyConstraint" />
+    <Property Name="ParentElementName" Value="[dbo].[CurrentFlowPhasorGroup]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[FK_CurrentFlowPhasorGroup_PhaseB]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="0d0e128d-d53d-474e-9234-a9b6ddaf8f5e" ChangeDateTime="06/29/2014 22:05:48">
+    <Property Name="ElementName" Value="[dbo].[FK_CurrentFlowPhasorGroup_ToTable_6]" />
+    <Property Name="ElementType" Value="SqlForeignKeyConstraint" />
+    <Property Name="ParentElementName" Value="[dbo].[CurrentFlowPhasorGroup]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[FK_CurrentFlowPhasorGroup_PhaseC]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="228b5cc7-74ac-4994-873a-3d11ae762651" ChangeDateTime="06/29/2014 22:10:17">
+    <Property Name="ElementName" Value="[dbo].[CurrentInjectionPhasorGroup].[Description]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[CurrentInjectionPhasorGroup]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Acronym" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="f0da159e-4160-441d-89c5-651be56b1ab6" ChangeDateTime="06/29/2014 22:18:28">
+    <Property Name="ElementName" Value="[dbo].[FK_CurrentInjectionPhasorGroup_ToTable]" />
+    <Property Name="ElementType" Value="SqlForeignKeyConstraint" />
+    <Property Name="ParentElementName" Value="[dbo].[CurrentInjectionPhasorGroup]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[FK_CurrentInjectionPhasorGroup_Node]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="6c2bcd48-6721-436c-b82f-ee2ffe1e0d05" ChangeDateTime="06/29/2014 22:18:36">
+    <Property Name="ElementName" Value="[dbo].[FK_CurrentInjectionPhasorGroup_ToTable_1]" />
+    <Property Name="ElementType" Value="SqlForeignKeyConstraint" />
+    <Property Name="ParentElementName" Value="[dbo].[CurrentInjectionPhasorGroup]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[FK_CurrentInjectionPhasorGroup_StatusWord]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="2d84dcc7-4a3a-4ef5-8e75-8ed9ca992ccf" ChangeDateTime="06/29/2014 22:18:49">
+    <Property Name="ElementName" Value="[dbo].[FK_CurrentInjectionPhasorGroup_ToTable_2]" />
+    <Property Name="ElementType" Value="SqlForeignKeyConstraint" />
+    <Property Name="ParentElementName" Value="[dbo].[CurrentInjectionPhasorGroup]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[FK_CurrentInjectionPhasorGroup_PositiveSequence]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="ce0d124d-7e2f-4490-bb60-430f22ea2c5c" ChangeDateTime="06/29/2014 22:18:56">
+    <Property Name="ElementName" Value="[dbo].[FK_CurrentInjectionPhasorGroup_ToTable_3]" />
+    <Property Name="ElementType" Value="SqlForeignKeyConstraint" />
+    <Property Name="ParentElementName" Value="[dbo].[CurrentInjectionPhasorGroup]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[FK_CurrentInjectionPhasorGroup_PhaseA]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="eb7cf302-61ff-4e03-9dd5-2189bcd89ddc" ChangeDateTime="06/29/2014 22:19:03">
+    <Property Name="ElementName" Value="[dbo].[FK_CurrentInjectionPhasorGroup_ToTable_4]" />
+    <Property Name="ElementType" Value="SqlForeignKeyConstraint" />
+    <Property Name="ParentElementName" Value="[dbo].[CurrentInjectionPhasorGroup]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[FK_CurrentInjectionPhasorGroup_PhaseB]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="654e81f4-8692-4e95-b345-59d812798a6d" ChangeDateTime="06/29/2014 22:19:10">
+    <Property Name="ElementName" Value="[dbo].[FK_CurrentInjectionPhasorGroup_ToTable_5]" />
+    <Property Name="ElementType" Value="SqlForeignKeyConstraint" />
+    <Property Name="ParentElementName" Value="[dbo].[CurrentInjectionPhasorGroup]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[FK_CurrentInjectionPhasorGroup_PhaseC]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="025fca32-a7dd-488d-804f-107bd34087d8" ChangeDateTime="06/29/2014 22:23:52">
+    <Property Name="ElementName" Value="[dbo].[Transformer].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Transformer]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Uid" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="a63b570f-e0ac-4710-bd07-3dc60390980c" ChangeDateTime="06/29/2014 22:28:20">
+    <Property Name="ElementName" Value="[dbo].[Transformer].[FromNode]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Transformer]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="ParentSubstation" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="e912ffda-c15b-494c-beb7-51310481b55c" ChangeDateTime="06/29/2014 22:28:21">
+    <Property Name="ElementName" Value="[dbo].[Transformer].[ToNode]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Transformer]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="FromNode" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="afce7f68-d804-43a0-b634-00a0bcf40d23" ChangeDateTime="06/29/2014 22:28:24">
+    <Property Name="ElementName" Value="[dbo].[Transformer].[FromNodeConnectionType]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Transformer]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="ToNode" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="aaf472b6-12fd-4e9d-aaa8-af160b880550" ChangeDateTime="06/29/2014 22:28:28">
+    <Property Name="ElementName" Value="[dbo].[Transformer].[ToNodeConnectionType]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Transformer]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="FromNodeConnectionType" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="7d346cbc-7618-451b-b2e9-ec23fc6a6671" ChangeDateTime="06/29/2014 22:40:39">
+    <Property Name="ElementName" Value="[dbo].[LineSegment].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[LineSegment]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Uid" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="68ea74ab-3ae5-454a-8260-2dbc52f4515b" ChangeDateTime="06/30/2014 00:35:26">
+    <Property Name="ElementName" Value="[dbo].[FK_Transformer_ToTable]" />
+    <Property Name="ElementType" Value="SqlForeignKeyConstraint" />
+    <Property Name="ParentElementName" Value="[dbo].[Transformer]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[FK_Transformer_Substation]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="6b6cb068-efe9-4913-915a-149f8f64f7d9" ChangeDateTime="06/30/2014 00:35:32">
+    <Property Name="ElementName" Value="[dbo].[FK_Transformer_ToTable_1]" />
+    <Property Name="ElementType" Value="SqlForeignKeyConstraint" />
+    <Property Name="ParentElementName" Value="[dbo].[Transformer]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[FK_Transformer_FromNode]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="25ac2bb5-b8a3-4c60-a508-d8aadb13b1c6" ChangeDateTime="06/30/2014 00:35:38">
+    <Property Name="ElementName" Value="[dbo].[FK_Transformer_ToTable_2]" />
+    <Property Name="ElementType" Value="SqlForeignKeyConstraint" />
+    <Property Name="ParentElementName" Value="[dbo].[Transformer]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[FK_Transformer_ToNode]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="66a123b2-92cb-4947-937e-89e6436e4437" ChangeDateTime="06/30/2014 00:35:52">
+    <Property Name="ElementName" Value="[dbo].[FK_Transformer_ToTable_3]" />
+    <Property Name="ElementType" Value="SqlForeignKeyConstraint" />
+    <Property Name="ParentElementName" Value="[dbo].[Transformer]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[FK_Transformer_FromNodeConnectionType]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="0d20ff60-fdbc-461c-8ceb-3ca49582b90c" ChangeDateTime="06/30/2014 00:36:01">
+    <Property Name="ElementName" Value="[dbo].[FK_Transformer_ToTable_4]" />
+    <Property Name="ElementType" Value="SqlForeignKeyConstraint" />
+    <Property Name="ParentElementName" Value="[dbo].[Transformer]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[FK_Transformer_ToNodeConnectionType]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="a7be157a-f192-4564-91a0-6c0a26beb7b1" ChangeDateTime="06/30/2014 00:36:10">
+    <Property Name="ElementName" Value="[dbo].[FK_Transformer_ToTable_5]" />
+    <Property Name="ElementType" Value="SqlForeignKeyConstraint" />
+    <Property Name="ParentElementName" Value="[dbo].[Transformer]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[FK_Transformer_FromNodeCurrent]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="fe660b11-4afe-4dad-9f3a-9057012ea514" ChangeDateTime="06/30/2014 00:36:17">
+    <Property Name="ElementName" Value="[dbo].[FK_Transformer_ToTable_6]" />
+    <Property Name="ElementType" Value="SqlForeignKeyConstraint" />
+    <Property Name="ParentElementName" Value="[dbo].[Transformer]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[FK_Transformer_ToNodeCurrent]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="db9e9953-ed89-447c-8828-f3eecf5d2009" ChangeDateTime="06/30/2014 00:36:27">
+    <Property Name="ElementName" Value="[dbo].[FK_Transformer_ToTable_7]" />
+    <Property Name="ElementType" Value="SqlForeignKeyConstraint" />
+    <Property Name="ParentElementName" Value="[dbo].[Transformer]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[FK_Transformer_Tap]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="034dd1f5-13dc-48d9-8b74-e6f73d2bbfcc" ChangeDateTime="06/30/2014 00:40:56">
+    <Property Name="ElementName" Value="[dbo].[TransformerConnectionType].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[TransformerConnectionType]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Uid" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="6147dfa4-b1d0-41aa-92dc-ec92d54d7210" ChangeDateTime="06/30/2014 00:43:21">
+    <Property Name="ElementName" Value="[dbo].[FK_LineSegment_ToTable]" />
+    <Property Name="ElementType" Value="SqlForeignKeyConstraint" />
+    <Property Name="ParentElementName" Value="[dbo].[LineSegment]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[FK_LineSegment_TransmissionLine]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="4d327f36-e2f6-4c7a-a694-791dc0891f29" ChangeDateTime="06/30/2014 00:43:27">
+    <Property Name="ElementName" Value="[dbo].[FK_LineSegment_ToTable_1]" />
+    <Property Name="ElementType" Value="SqlForeignKeyConstraint" />
+    <Property Name="ParentElementName" Value="[dbo].[LineSegment]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[FK_LineSegment_FromNode]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="46ae0208-d0fb-48a1-8934-71a02934d0ad" ChangeDateTime="06/30/2014 00:43:33">
+    <Property Name="ElementName" Value="[dbo].[FK_LineSegment_ToTable_2]" />
+    <Property Name="ElementType" Value="SqlForeignKeyConstraint" />
+    <Property Name="ParentElementName" Value="[dbo].[LineSegment]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[FK_LineSegment_ToNode]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="63fa55c7-fed8-45c1-8103-0b73b150d87b" ChangeDateTime="07/06/2014 03:28:45">
+    <Property Name="ElementName" Value="[dbo].[StatusWord].[IX_StatusWord_Column]" />
+    <Property Name="ElementType" Value="SqlIndex" />
+    <Property Name="ParentElementName" Value="[dbo].[StatusWord]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[IX_StatusWord_Id]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="e864fa78-b453-44fb-841a-a6578f2df129" ChangeDateTime="07/06/2014 03:40:28">
+    <Property Name="ElementName" Value="[dbo].[Trigger_Switch]" />
+    <Property Name="ElementType" Value="SqlDmlTrigger" />
+    <Property Name="ParentElementName" Value="[dbo].[Switch]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[Trigger_SwitchUpdated]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="ed52cd9b-a563-4672-bd9a-63a24afcacb2" ChangeDateTime="07/06/2014 20:11:17">
+    <Property Name="ElementName" Value="[dbo].[BreakerStatus].[Enable]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[BreakerStatus]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Enabled" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="c05f6369-007a-4300-8a6a-f98e6ea3be32" ChangeDateTime="07/06/2014 21:08:59">
+    <Property Name="ElementName" Value="[dbo].[CurrentFlowPostProcessingSetting].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[CurrentFlowPostProcessingSetting]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Uid" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="bb468fb2-3fd8-48f8-90e2-2bb972a3f401" ChangeDateTime="07/06/2014 21:16:57">
+    <Property Name="ElementName" Value="[dbo].[PhaseSelection].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[PhaseSelection]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Uid" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="62d324d7-ab75-480c-afd6-ff5252fca52c" ChangeDateTime="07/06/2014 21:18:38">
+    <Property Name="ElementName" Value="[dbo].[CK_PhaseSelection_Column]" />
+    <Property Name="ElementType" Value="SqlCheckConstraint" />
+    <Property Name="ParentElementName" Value="[dbo].[PhaseSelection]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[CK_PhaseSelection_Configuration]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="7a44cd73-4a81-4010-926a-928cadd8cf2f" ChangeDateTime="07/08/2014 01:59:43">
+    <Property Name="ElementName" Value="[dbo].[StatusWord].[Key]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[StatusWord]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="InputKey" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="49cf9007-ffc8-4288-9b0a-b79e1b4596ed" ChangeDateTime="07/08/2014 02:00:24">
+    <Property Name="ElementName" Value="[dbo].[CircuitBreaker].[Key]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[CircuitBreaker]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="OutputKey" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="92b05bf2-fe89-482f-adc1-47370e316047" ChangeDateTime="07/09/2014 13:49:19">
+    <Property Name="ElementName" Value="[dbo].[Switch].[Key]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Switch]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="OutputKey" />
+  </Operation>
+</Operations>
