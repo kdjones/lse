@@ -28,9 +28,9 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows;
-using System.Windows.Forms;
 using System.Xml.Serialization;
 using NetworkModelEditor.Commands;
 using SynchrophasorAnalytics.Networks;
@@ -3112,6 +3112,7 @@ namespace NetworkModelEditor.ViewModels
         private void ApplyNodeExtensions()
         {
             int unmappedExtensionCount = 0;
+            StringBuilder unmappedExtensionList = new StringBuilder("Failed to map the following nodes: \r\n");
             foreach (SynchrophasorAnalytics.Hdb.Records.NodeExtension nodeExtension in m_nodeExtensions)
             {
                 Node node = m_network.Model.Nodes.Find(x => x.Name == $"{nodeExtension.StationName}_{nodeExtension.Id}");
@@ -3119,7 +3120,7 @@ namespace NetworkModelEditor.ViewModels
                 {
                     node.Voltage.PositiveSequence.Measurement.MagnitudeKey = nodeExtension.MagnitudeHistorianId;
                     node.Voltage.PositiveSequence.Measurement.AngleKey = nodeExtension.AngleHistorianId;
-                    DataRow row = m_openEcaConnection.Metadata.Tables["MeasurementDetail"].Select($"SignalAcronym = 'FLAG' AND SignalReference LIKE '{nodeExtension.DeviceName}*'").Single();
+                    DataRow row = m_openEcaConnection.Metadata.Tables["MeasurementDetail"].Select($"SignalAcronym = 'FLAG' AND DeviceAcronym LIKE '{nodeExtension.DeviceName}'").Single();
                     string guid = row["SignalID"].ToString();
                     StatusWord statusWord = m_network.Model.StatusWords.Find(x => x.Key == guid);
                     node.Voltage.Status = statusWord;
@@ -3127,9 +3128,14 @@ namespace NetworkModelEditor.ViewModels
                 else
                 {
                     unmappedExtensionCount++;
+                    unmappedExtensionList.AppendLine($"{nodeExtension.StationName}.{nodeExtension.Id}");
                 }
             }
             SpecialStatus = $"Failed to map {unmappedExtensionCount} extension(s).";
+            if (unmappedExtensionCount > 0)
+            {
+                System.Windows.Forms.MessageBox.Show(unmappedExtensionList.ToString());
+            }
         }
 
         private void OpenLineSegmentExtensionFile()
@@ -3171,7 +3177,7 @@ namespace NetworkModelEditor.ViewModels
         private void ApplyLineSegmentExtensions()
         {
             int unmappedExtensionCount = 0;
-
+            StringBuilder unmappedExtensions = new StringBuilder("Failed to map the following devices: \r\n");
             foreach (SynchrophasorAnalytics.Hdb.Records.LineSegmentExtension lineSegmentExtension in m_lineSegmentExtensions)
             {
                 LineSegment lineSegment = m_network.Model.LineSegments.Find(x => x.InternalID == lineSegmentExtension.Number);
@@ -3185,14 +3191,14 @@ namespace NetworkModelEditor.ViewModels
                     toSubstationCurrent.PositiveSequence.Measurement.AngleKey = lineSegmentExtension.ToNodeAngleHistorianId;
                     if (lineSegmentExtension.FromNodeDeviceName != "Undefined")
                     {
-                        DataRow row = m_openEcaConnection.Metadata.Tables["MeasurementDetail"].Select($"SignalAcronym = 'FLAG' AND SignalReference LIKE '{lineSegmentExtension.FromNodeDeviceName}*'").Single();
+                        DataRow row = m_openEcaConnection.Metadata.Tables["MeasurementDetail"].Select($"SignalAcronym = 'FLAG' AND DeviceAcronym LIKE '{lineSegmentExtension.FromNodeDeviceName}'").Single();
                         string guid = row["SignalID"].ToString();
                         StatusWord statusWord = m_network.Model.StatusWords.Find(x => x.Key == guid);
                         fromSubstationCurrent.Status = statusWord;
                     }
                     if (lineSegmentExtension.ToNodeDeviceName != "Undefined")
                     {
-                        DataRow row = m_openEcaConnection.Metadata.Tables["MeasurementDetail"].Select($"SignalAcronym = 'FLAG' AND SignalReference LIKE '{lineSegmentExtension.ToNodeDeviceName}*'").Single();
+                        DataRow row = m_openEcaConnection.Metadata.Tables["MeasurementDetail"].Select($"SignalAcronym = 'FLAG' AND DeviceAcronym LIKE '{lineSegmentExtension.ToNodeDeviceName}'").Single();
                         string guid = row["SignalID"].ToString();
                         StatusWord statusWord = m_network.Model.StatusWords.Find(x => x.Key == guid);
                         toSubstationCurrent.Status = statusWord;
@@ -3201,9 +3207,15 @@ namespace NetworkModelEditor.ViewModels
                 else
                 {
                     unmappedExtensionCount++;
+                    unmappedExtensions.AppendLine($"{lineSegmentExtension.DivisionName}.{lineSegmentExtension.TransmissionLineId}.{lineSegmentExtension.Id}");
                 }
             }
             SpecialStatus = $"Failed to map {unmappedExtensionCount} extension(s).";
+
+            if (unmappedExtensionCount > 0)
+            {
+                System.Windows.Forms.MessageBox.Show(unmappedExtensions.ToString());
+            }
         }
 
         private void OpenBreakerExtensionFile()
@@ -3326,7 +3338,45 @@ namespace NetworkModelEditor.ViewModels
 
         private void ApplyTransformerExtensions()
         {
-
+            int unmappedExtensionCount = 0;
+            StringBuilder unmappedExtensionList = new StringBuilder("Failed to map the following devices:\r\n");
+            foreach (SynchrophasorAnalytics.Hdb.Records.TransformerExtension transformerExtension in m_transformerExtensions)
+            {
+                Transformer transformer = m_network.Model.Transformers.Find(x => x.InternalID == transformerExtension.Number);
+                if (transformer != null)
+                {
+                    CurrentFlowPhasorGroup fromSubstationCurrent = transformer.FromNodeCurrent;
+                    fromSubstationCurrent.PositiveSequence.Measurement.MagnitudeKey = transformerExtension.FromNodeMagnitudeHistorianId;
+                    fromSubstationCurrent.PositiveSequence.Measurement.AngleKey = transformerExtension.FromNodeAngleHistorianId;
+                    CurrentFlowPhasorGroup toSubstationCurrent = transformer.ToNodeCurrent;
+                    toSubstationCurrent.PositiveSequence.Measurement.MagnitudeKey = transformerExtension.ToNodeMagnitudeHistorianId;
+                    toSubstationCurrent.PositiveSequence.Measurement.AngleKey = transformerExtension.ToNodeAngleHistorianId;
+                    if (transformerExtension.FromNodeDeviceName != "Undefined")
+                    {
+                        DataRow row = m_openEcaConnection.Metadata.Tables["MeasurementDetail"].Select($"SignalAcronym = 'FLAG' AND DeviceAcronym LIKE '{transformerExtension.FromNodeDeviceName}'").Single();
+                        string guid = row["SignalID"].ToString();
+                        StatusWord statusWord = m_network.Model.StatusWords.Find(x => x.Key == guid);
+                        fromSubstationCurrent.Status = statusWord;
+                    }
+                    if (transformerExtension.ToNodeDeviceName != "Undefined")
+                    {
+                        DataRow row = m_openEcaConnection.Metadata.Tables["MeasurementDetail"].Select($"SignalAcronym = 'FLAG' AND DeviceAcronym LIKE '{transformerExtension.ToNodeDeviceName}'").Single();
+                        string guid = row["SignalID"].ToString();
+                        StatusWord statusWord = m_network.Model.StatusWords.Find(x => x.Key == guid);
+                        toSubstationCurrent.Status = statusWord;
+                    }
+                }
+                else
+                {
+                    unmappedExtensionCount++;
+                    unmappedExtensionList.AppendLine($"{transformerExtension.StationName}.{transformerExtension.Parent}.{transformerExtension.Id}");
+                }
+            }
+            SpecialStatus = $"Failed to map {unmappedExtensionCount} extension(s).";
+            if (unmappedExtensionCount > 0)
+            {
+                System.Windows.Forms.MessageBox.Show(unmappedExtensionList.ToString());
+            }
         }
 
         #endregion
@@ -4273,8 +4323,8 @@ namespace NetworkModelEditor.ViewModels
             {
                 foreach (RawMeasurementsMeasurement measurement in SelectedMeasurementSample.Items)
                 {
-                    m_network.Model.InputKeyValuePairs.Add(measurement.Key, Convert.ToDouble(measurement.Value));
-                    CommunicationStatus = $"Mapping measurement {measurement.Key} with value {measurement.Value}";
+                    m_network.Model.InputKeyValuePairs.Add(measurement.Key.ToLower(), Convert.ToDouble(measurement.Value));
+                    CommunicationStatus = $"Mapping measurement {measurement.Key.ToLower()} with value {measurement.Value}";
                 }
                 CommunicationStatus = "";
                 m_network.Model.OnNewMeasurements();
@@ -4798,7 +4848,7 @@ namespace NetworkModelEditor.ViewModels
             foreach (KeyValuePair<string, double> keyValuePair in m_network.Model.InputKeyValuePairs)
             {
                 double value = 0;
-                if (!receivedMeasurements.TryGetValue(keyValuePair.Key, out value))
+                if (!receivedMeasurements.TryGetValue(keyValuePair.Key.ToLower(),out value))
                 {
                     stringBuilder.AppendLine(keyValuePair.Key + ", " + keyValuePair.Value.ToString());
                 }

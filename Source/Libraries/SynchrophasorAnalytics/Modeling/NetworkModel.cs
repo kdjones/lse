@@ -405,7 +405,7 @@ namespace SynchrophasorAnalytics.Modeling
 
                 foreach (string key in rawEstimateKeys)
                 {
-                    if (!key.Equals("Undefined"))
+                    if (!key.ToLower().Equals("undefined"))
                     {
                         outputMeasurementKeys += key + ";";
                     }
@@ -3351,14 +3351,14 @@ namespace SynchrophasorAnalytics.Modeling
                 if (m_inputOutputSettings.AcceptsMeasurements)
                 {
                     //                                    Positive Sequence Magnitude Measurement
-                    if (m_rawMeasurementKeyValuePairs.TryGetValue(voltagePhasorGroup.PositiveSequence.Measurement.MagnitudeKey, out value))
+                    if (m_rawMeasurementKeyValuePairs.TryGetValue(voltagePhasorGroup.PositiveSequence.Measurement.MagnitudeKey.ToLower(), out value))
                     {
                         voltagePhasorGroup.PositiveSequence.Measurement.Magnitude = value;
                         value = 0;
                     }
 
                     //                                    Positive Sequence Angle Measurement
-                    if (m_rawMeasurementKeyValuePairs.TryGetValue(voltagePhasorGroup.PositiveSequence.Measurement.AngleKey, out value))
+                    if (m_rawMeasurementKeyValuePairs.TryGetValue(voltagePhasorGroup.PositiveSequence.Measurement.AngleKey.ToLower(), out value))
                     {
                         voltagePhasorGroup.PositiveSequence.Measurement.AngleInDegrees = value;
                         value = 0;
@@ -3367,42 +3367,42 @@ namespace SynchrophasorAnalytics.Modeling
                     if (m_phaseSelection == PhaseSelection.ThreePhase)
                     {
                         //                                    Phase A Magnitude Measurement
-                        if (m_rawMeasurementKeyValuePairs.TryGetValue(voltagePhasorGroup.PhaseA.Measurement.MagnitudeKey, out value))
+                        if (m_rawMeasurementKeyValuePairs.TryGetValue(voltagePhasorGroup.PhaseA.Measurement.MagnitudeKey.ToLower(), out value))
                         {
                             voltagePhasorGroup.PhaseA.Measurement.Magnitude = value;
                             value = 0;
                         }
 
                         //                                    Phase A Angle Measurement
-                        if (m_rawMeasurementKeyValuePairs.TryGetValue(voltagePhasorGroup.PhaseA.Measurement.AngleKey, out value))
+                        if (m_rawMeasurementKeyValuePairs.TryGetValue(voltagePhasorGroup.PhaseA.Measurement.AngleKey.ToLower(), out value))
                         {
                             voltagePhasorGroup.PhaseA.Measurement.AngleInDegrees = value;
                             value = 0;
                         }
 
                         //                                    Phase B Magnitude Measurement
-                        if (m_rawMeasurementKeyValuePairs.TryGetValue(voltagePhasorGroup.PhaseB.Measurement.MagnitudeKey, out value))
+                        if (m_rawMeasurementKeyValuePairs.TryGetValue(voltagePhasorGroup.PhaseB.Measurement.MagnitudeKey.ToLower(), out value))
                         {
                             voltagePhasorGroup.PhaseB.Measurement.Magnitude = value;
                             value = 0;
                         }
 
                         //                                    Phase B Angle Measurement
-                        if (m_rawMeasurementKeyValuePairs.TryGetValue(voltagePhasorGroup.PhaseB.Measurement.AngleKey, out value))
+                        if (m_rawMeasurementKeyValuePairs.TryGetValue(voltagePhasorGroup.PhaseB.Measurement.AngleKey.ToLower(), out value))
                         {
                             voltagePhasorGroup.PhaseB.Measurement.AngleInDegrees = value;
                             value = 0;
                         }
 
                         //                                    Phase C Magnitude Measurement
-                        if (m_rawMeasurementKeyValuePairs.TryGetValue(voltagePhasorGroup.PhaseC.Measurement.MagnitudeKey, out value))
+                        if (m_rawMeasurementKeyValuePairs.TryGetValue(voltagePhasorGroup.PhaseC.Measurement.MagnitudeKey.ToLower(), out value))
                         {
                             voltagePhasorGroup.PhaseC.Measurement.Magnitude = value;
                             value = 0;
                         }
 
                         //                                    Phase C Angle Measurement
-                        if (m_rawMeasurementKeyValuePairs.TryGetValue(voltagePhasorGroup.PhaseC.Measurement.AngleKey, out value))
+                        if (m_rawMeasurementKeyValuePairs.TryGetValue(voltagePhasorGroup.PhaseC.Measurement.AngleKey.ToLower(), out value))
                         {
                             voltagePhasorGroup.PhaseC.Measurement.AngleInDegrees = value;
                             value = 0;
@@ -3413,14 +3413,14 @@ namespace SynchrophasorAnalytics.Modeling
                 if (m_inputOutputSettings.AcceptsEstimates)
                 {
                     //                                    Positive Sequence Magnitude Estimate
-                    if (m_rawMeasurementKeyValuePairs.TryGetValue(voltagePhasorGroup.PositiveSequence.Estimate.MagnitudeKey, out value))
+                    if (m_rawMeasurementKeyValuePairs.TryGetValue(voltagePhasorGroup.PositiveSequence.Estimate.MagnitudeKey.ToLower(), out value))
                     {
                         voltagePhasorGroup.PositiveSequence.Estimate.Magnitude = value;
                         value = 0;
                     }
 
                     //                                    Positive Sequence Angle Estimate
-                    if (m_rawMeasurementKeyValuePairs.TryGetValue(voltagePhasorGroup.PositiveSequence.Estimate.AngleKey, out value))
+                    if (m_rawMeasurementKeyValuePairs.TryGetValue(voltagePhasorGroup.PositiveSequence.Estimate.AngleKey.ToLower(), out value))
                     {
                         voltagePhasorGroup.PositiveSequence.Estimate.AngleInDegrees = value;
                         value = 0;
@@ -3429,7 +3429,7 @@ namespace SynchrophasorAnalytics.Modeling
                     if (m_phaseSelection == PhaseSelection.ThreePhase)
                     {
                         //                                    Phase A Magnitude Estimate
-                        if (m_rawMeasurementKeyValuePairs.TryGetValue(voltagePhasorGroup.PhaseA.Estimate.MagnitudeKey, out value))
+                        if (m_rawMeasurementKeyValuePairs.TryGetValue(voltagePhasorGroup.PhaseA.Estimate.MagnitudeKey.ToLower(), out value))
                         {
                             voltagePhasorGroup.PhaseA.Estimate.Magnitude = value;
                             value = 0;
@@ -3437,7 +3437,7 @@ namespace SynchrophasorAnalytics.Modeling
 
 
                         //                                    Phase A Angle Estimate
-                        if (m_rawMeasurementKeyValuePairs.TryGetValue(voltagePhasorGroup.PhaseA.Estimate.AngleKey, out value))
+                        if (m_rawMeasurementKeyValuePairs.TryGetValue(voltagePhasorGroup.PhaseA.Estimate.AngleKey.ToLower(), out value))
                         {
                             voltagePhasorGroup.PhaseA.Estimate.AngleInDegrees = value;
                             value = 0;
@@ -3445,7 +3445,7 @@ namespace SynchrophasorAnalytics.Modeling
 
 
                         //                                    Phase B Magnitude Estimate
-                        if (m_rawMeasurementKeyValuePairs.TryGetValue(voltagePhasorGroup.PhaseB.Estimate.MagnitudeKey, out value))
+                        if (m_rawMeasurementKeyValuePairs.TryGetValue(voltagePhasorGroup.PhaseB.Estimate.MagnitudeKey.ToLower(), out value))
                         {
                             voltagePhasorGroup.PhaseB.Estimate.Magnitude = value;
                             value = 0;
@@ -3454,7 +3454,7 @@ namespace SynchrophasorAnalytics.Modeling
 
 
                         //                                    Phase B Angle Estimate
-                        if (m_rawMeasurementKeyValuePairs.TryGetValue(voltagePhasorGroup.PhaseB.Estimate.AngleKey, out value))
+                        if (m_rawMeasurementKeyValuePairs.TryGetValue(voltagePhasorGroup.PhaseB.Estimate.AngleKey.ToLower(), out value))
                         {
                             voltagePhasorGroup.PhaseB.Estimate.AngleInDegrees = value;
                             value = 0;
@@ -3462,7 +3462,7 @@ namespace SynchrophasorAnalytics.Modeling
 
 
                         //                                    Phase C Magnitude Estimate
-                        if (m_rawMeasurementKeyValuePairs.TryGetValue(voltagePhasorGroup.PhaseC.Estimate.MagnitudeKey, out value))
+                        if (m_rawMeasurementKeyValuePairs.TryGetValue(voltagePhasorGroup.PhaseC.Estimate.MagnitudeKey.ToLower(), out value))
                         {
                             voltagePhasorGroup.PhaseC.Estimate.Magnitude = value;
                             value = 0;
@@ -3470,7 +3470,7 @@ namespace SynchrophasorAnalytics.Modeling
 
 
                         //                                    Phase C Angle Estimate
-                        if (m_rawMeasurementKeyValuePairs.TryGetValue(voltagePhasorGroup.PhaseC.Estimate.AngleKey, out value))
+                        if (m_rawMeasurementKeyValuePairs.TryGetValue(voltagePhasorGroup.PhaseC.Estimate.AngleKey.ToLower(), out value))
                         {
                             voltagePhasorGroup.PhaseC.Estimate.AngleInDegrees = value;
                             value = 0;
@@ -3492,14 +3492,14 @@ namespace SynchrophasorAnalytics.Modeling
                 if (m_inputOutputSettings.AcceptsMeasurements)
                 {
                     //                                    Positive Sequence Magnitude Measurement
-                    if (m_rawMeasurementKeyValuePairs.TryGetValue(currentPhasorGroup.PositiveSequence.Measurement.MagnitudeKey, out value))
+                    if (m_rawMeasurementKeyValuePairs.TryGetValue(currentPhasorGroup.PositiveSequence.Measurement.MagnitudeKey.ToLower(), out value))
                     {
                         currentPhasorGroup.PositiveSequence.Measurement.Magnitude = value;
                         value = 0;
                     }
 
                     //                                    Positive Sequence Angle Measurement
-                    if (m_rawMeasurementKeyValuePairs.TryGetValue(currentPhasorGroup.PositiveSequence.Measurement.AngleKey, out value))
+                    if (m_rawMeasurementKeyValuePairs.TryGetValue(currentPhasorGroup.PositiveSequence.Measurement.AngleKey.ToLower(), out value))
                     {
                         currentPhasorGroup.PositiveSequence.Measurement.AngleInDegrees = value;
                         value = 0;
@@ -3508,42 +3508,42 @@ namespace SynchrophasorAnalytics.Modeling
                     if (m_phaseSelection == PhaseSelection.ThreePhase)
                     {
                         //                                    Phase A Magnitude Measurement
-                        if (m_rawMeasurementKeyValuePairs.TryGetValue(currentPhasorGroup.PhaseA.Measurement.MagnitudeKey, out value))
+                        if (m_rawMeasurementKeyValuePairs.TryGetValue(currentPhasorGroup.PhaseA.Measurement.MagnitudeKey.ToLower(), out value))
                         {
                             currentPhasorGroup.PhaseA.Measurement.Magnitude = value;
                             value = 0;
                         }
 
                         //                                    Phase A Angle Measurement
-                        if (m_rawMeasurementKeyValuePairs.TryGetValue(currentPhasorGroup.PhaseA.Measurement.AngleKey, out value))
+                        if (m_rawMeasurementKeyValuePairs.TryGetValue(currentPhasorGroup.PhaseA.Measurement.AngleKey.ToLower(), out value))
                         {
                             currentPhasorGroup.PhaseA.Measurement.AngleInDegrees = value;
                             value = 0;
                         }
 
                         //                                    Phase B Magnitude Measurement
-                        if (m_rawMeasurementKeyValuePairs.TryGetValue(currentPhasorGroup.PhaseB.Measurement.MagnitudeKey, out value))
+                        if (m_rawMeasurementKeyValuePairs.TryGetValue(currentPhasorGroup.PhaseB.Measurement.MagnitudeKey.ToLower(), out value))
                         {
                             currentPhasorGroup.PhaseB.Measurement.Magnitude = value;
                             value = 0;
                         }
 
                         //                                    Phase B Angle Measurement
-                        if (m_rawMeasurementKeyValuePairs.TryGetValue(currentPhasorGroup.PhaseB.Measurement.AngleKey, out value))
+                        if (m_rawMeasurementKeyValuePairs.TryGetValue(currentPhasorGroup.PhaseB.Measurement.AngleKey.ToLower(), out value))
                         {
                             currentPhasorGroup.PhaseB.Measurement.AngleInDegrees = value;
                             value = 0;
                         }
 
                         //                                    Phase C Magnitude Measurement
-                        if (m_rawMeasurementKeyValuePairs.TryGetValue(currentPhasorGroup.PhaseC.Measurement.MagnitudeKey, out value))
+                        if (m_rawMeasurementKeyValuePairs.TryGetValue(currentPhasorGroup.PhaseC.Measurement.MagnitudeKey.ToLower(), out value))
                         {
                             currentPhasorGroup.PhaseC.Measurement.Magnitude = value;
                             value = 0;
                         }
 
                         //                                    Phase C Angle Measurement
-                        if (m_rawMeasurementKeyValuePairs.TryGetValue(currentPhasorGroup.PhaseC.Measurement.AngleKey, out value))
+                        if (m_rawMeasurementKeyValuePairs.TryGetValue(currentPhasorGroup.PhaseC.Measurement.AngleKey.ToLower(), out value))
                         {
                             currentPhasorGroup.PhaseC.Measurement.AngleInDegrees = value;
                             value = 0;
@@ -3555,14 +3555,14 @@ namespace SynchrophasorAnalytics.Modeling
                 if (m_inputOutputSettings.AcceptsEstimates)
                 {
                 //                                    Positive Sequence Magnitude Estimate
-                    if (m_rawMeasurementKeyValuePairs.TryGetValue(currentPhasorGroup.PositiveSequence.Estimate.MagnitudeKey, out value))
+                    if (m_rawMeasurementKeyValuePairs.TryGetValue(currentPhasorGroup.PositiveSequence.Estimate.MagnitudeKey.ToLower(), out value))
                     {
                         currentPhasorGroup.PositiveSequence.Estimate.Magnitude = value;
                         value = 0;
                     }
 
                     //                                    Positive Sequence Angle Estimate
-                    if (m_rawMeasurementKeyValuePairs.TryGetValue(currentPhasorGroup.PositiveSequence.Estimate.AngleKey, out value))
+                    if (m_rawMeasurementKeyValuePairs.TryGetValue(currentPhasorGroup.PositiveSequence.Estimate.AngleKey.ToLower(), out value))
                     {
                         currentPhasorGroup.PositiveSequence.Estimate.AngleInDegrees = value;
                         value = 0;
@@ -3572,42 +3572,42 @@ namespace SynchrophasorAnalytics.Modeling
                     if (m_phaseSelection == PhaseSelection.ThreePhase)
                     {
                         //                                    Phase A Magnitude Estimate
-                        if (m_rawMeasurementKeyValuePairs.TryGetValue(currentPhasorGroup.PhaseA.Estimate.MagnitudeKey, out value))
+                        if (m_rawMeasurementKeyValuePairs.TryGetValue(currentPhasorGroup.PhaseA.Estimate.MagnitudeKey.ToLower(), out value))
                         {
                             currentPhasorGroup.PhaseA.Estimate.Magnitude = value;
                             value = 0;
                         }
 
                         //                                    Phase A Angle Estimate
-                        if (m_rawMeasurementKeyValuePairs.TryGetValue(currentPhasorGroup.PhaseA.Estimate.AngleKey, out value))
+                        if (m_rawMeasurementKeyValuePairs.TryGetValue(currentPhasorGroup.PhaseA.Estimate.AngleKey.ToLower(), out value))
                         {
                             currentPhasorGroup.PhaseA.Estimate.AngleInDegrees = value;
                             value = 0;
                         }
 
                         //                                    Phase B Magnitude Estimate
-                        if (m_rawMeasurementKeyValuePairs.TryGetValue(currentPhasorGroup.PhaseB.Estimate.MagnitudeKey, out value))
+                        if (m_rawMeasurementKeyValuePairs.TryGetValue(currentPhasorGroup.PhaseB.Estimate.MagnitudeKey.ToLower(), out value))
                         {
                             currentPhasorGroup.PhaseB.Estimate.Magnitude = value;
                             value = 0;
                         }
 
                         //                                    Phase B Angle Estimate
-                        if (m_rawMeasurementKeyValuePairs.TryGetValue(currentPhasorGroup.PhaseB.Estimate.AngleKey, out value))
+                        if (m_rawMeasurementKeyValuePairs.TryGetValue(currentPhasorGroup.PhaseB.Estimate.AngleKey.ToLower(), out value))
                         {
                             currentPhasorGroup.PhaseB.Estimate.AngleInDegrees = value;
                             value = 0;
                         }
 
                         //                                    Phase C Magnitude Estimate
-                        if (m_rawMeasurementKeyValuePairs.TryGetValue(currentPhasorGroup.PhaseC.Estimate.MagnitudeKey, out value))
+                        if (m_rawMeasurementKeyValuePairs.TryGetValue(currentPhasorGroup.PhaseC.Estimate.MagnitudeKey.ToLower(), out value))
                         {
                             currentPhasorGroup.PhaseC.Estimate.Magnitude = value;
                             value = 0;
                         }
 
                         //                                    Phase C Angle Estimate
-                        if (m_rawMeasurementKeyValuePairs.TryGetValue(currentPhasorGroup.PhaseC.Estimate.AngleKey, out value))
+                        if (m_rawMeasurementKeyValuePairs.TryGetValue(currentPhasorGroup.PhaseC.Estimate.AngleKey.ToLower(), out value))
                         {
                             currentPhasorGroup.PhaseC.Estimate.AngleInDegrees = value;
                             value = 0;
@@ -3629,14 +3629,14 @@ namespace SynchrophasorAnalytics.Modeling
                 if (m_inputOutputSettings.AcceptsMeasurements)
                 {
                     //                                    Positive Sequence Magnitude Measurement
-                    if (m_rawMeasurementKeyValuePairs.TryGetValue(currentPhasorGroup.PositiveSequence.Measurement.MagnitudeKey, out value))
+                    if (m_rawMeasurementKeyValuePairs.TryGetValue(currentPhasorGroup.PositiveSequence.Measurement.MagnitudeKey.ToLower(), out value))
                     {
                         currentPhasorGroup.PositiveSequence.Measurement.Magnitude = value;
                         value = 0;
                     }
 
                     //                                    Positive Sequence Angle Measurement
-                    if (m_rawMeasurementKeyValuePairs.TryGetValue(currentPhasorGroup.PositiveSequence.Measurement.AngleKey, out value))
+                    if (m_rawMeasurementKeyValuePairs.TryGetValue(currentPhasorGroup.PositiveSequence.Measurement.AngleKey.ToLower(), out value))
                     {
                         currentPhasorGroup.PositiveSequence.Measurement.AngleInDegrees = value;
                         value = 0;
@@ -3645,42 +3645,42 @@ namespace SynchrophasorAnalytics.Modeling
                     if (m_phaseSelection == PhaseSelection.ThreePhase)
                     {
                         //                                    Phase A Magnitude Measurement
-                        if (m_rawMeasurementKeyValuePairs.TryGetValue(currentPhasorGroup.PhaseA.Measurement.MagnitudeKey, out value))
+                        if (m_rawMeasurementKeyValuePairs.TryGetValue(currentPhasorGroup.PhaseA.Measurement.MagnitudeKey.ToLower(), out value))
                         {
                             currentPhasorGroup.PhaseA.Measurement.Magnitude = value;
                             value = 0;
                         }
 
                         //                                    Phase A Angle Measurement
-                        if (m_rawMeasurementKeyValuePairs.TryGetValue(currentPhasorGroup.PhaseA.Measurement.AngleKey, out value))
+                        if (m_rawMeasurementKeyValuePairs.TryGetValue(currentPhasorGroup.PhaseA.Measurement.AngleKey.ToLower(), out value))
                         {
                             currentPhasorGroup.PhaseA.Measurement.AngleInDegrees = value;
                             value = 0;
                         }
 
                         //                                    Phase B Magnitude Measurement
-                        if (m_rawMeasurementKeyValuePairs.TryGetValue(currentPhasorGroup.PhaseB.Measurement.MagnitudeKey, out value))
+                        if (m_rawMeasurementKeyValuePairs.TryGetValue(currentPhasorGroup.PhaseB.Measurement.MagnitudeKey.ToLower(), out value))
                         {
                             currentPhasorGroup.PhaseB.Measurement.Magnitude = value;
                             value = 0;
                         }
 
                         //                                    Phase B Angle Measurement
-                        if (m_rawMeasurementKeyValuePairs.TryGetValue(currentPhasorGroup.PhaseB.Measurement.AngleKey, out value))
+                        if (m_rawMeasurementKeyValuePairs.TryGetValue(currentPhasorGroup.PhaseB.Measurement.AngleKey.ToLower(), out value))
                         {
                             currentPhasorGroup.PhaseB.Measurement.AngleInDegrees = value;
                             value = 0;
                         }
 
                         //                                    Phase C Magnitude Measurement
-                        if (m_rawMeasurementKeyValuePairs.TryGetValue(currentPhasorGroup.PhaseC.Measurement.MagnitudeKey, out value))
+                        if (m_rawMeasurementKeyValuePairs.TryGetValue(currentPhasorGroup.PhaseC.Measurement.MagnitudeKey.ToLower(), out value))
                         {
                             currentPhasorGroup.PhaseC.Measurement.Magnitude = value;
                             value = 0;
                         }
 
                         //                                    Phase C Angle Measurement
-                        if (m_rawMeasurementKeyValuePairs.TryGetValue(currentPhasorGroup.PhaseC.Measurement.AngleKey, out value))
+                        if (m_rawMeasurementKeyValuePairs.TryGetValue(currentPhasorGroup.PhaseC.Measurement.AngleKey.ToLower(), out value))
                         {
                             currentPhasorGroup.PhaseC.Measurement.AngleInDegrees = value;
                             value = 0;
@@ -3692,14 +3692,14 @@ namespace SynchrophasorAnalytics.Modeling
                 if (m_inputOutputSettings.AcceptsEstimates)
                 {
                     //                                    Positive Sequence Magnitude Estimate
-                    if (m_rawMeasurementKeyValuePairs.TryGetValue(currentPhasorGroup.PositiveSequence.Estimate.MagnitudeKey, out value))
+                    if (m_rawMeasurementKeyValuePairs.TryGetValue(currentPhasorGroup.PositiveSequence.Estimate.MagnitudeKey.ToLower(), out value))
                     {
                         currentPhasorGroup.PositiveSequence.Estimate.Magnitude = value;
                         value = 0;
                     }
 
                     //                                    Positive Sequence Angle Estimate
-                    if (m_rawMeasurementKeyValuePairs.TryGetValue(currentPhasorGroup.PositiveSequence.Estimate.AngleKey, out value))
+                    if (m_rawMeasurementKeyValuePairs.TryGetValue(currentPhasorGroup.PositiveSequence.Estimate.AngleKey.ToLower(), out value))
                     {
                         currentPhasorGroup.PositiveSequence.Estimate.AngleInDegrees = value;
                         value = 0;
@@ -3709,42 +3709,42 @@ namespace SynchrophasorAnalytics.Modeling
                     if (m_phaseSelection == PhaseSelection.ThreePhase)
                     {
                         //                                    Phase A Magnitude Estimate
-                        if (m_rawMeasurementKeyValuePairs.TryGetValue(currentPhasorGroup.PhaseA.Estimate.MagnitudeKey, out value))
+                        if (m_rawMeasurementKeyValuePairs.TryGetValue(currentPhasorGroup.PhaseA.Estimate.MagnitudeKey.ToLower(), out value))
                         {
                             currentPhasorGroup.PhaseA.Estimate.Magnitude = value;
                             value = 0;
                         }
 
                         //                                    Phase A Angle Estimate
-                        if (m_rawMeasurementKeyValuePairs.TryGetValue(currentPhasorGroup.PhaseA.Estimate.AngleKey, out value))
+                        if (m_rawMeasurementKeyValuePairs.TryGetValue(currentPhasorGroup.PhaseA.Estimate.AngleKey.ToLower(), out value))
                         {
                             currentPhasorGroup.PhaseA.Estimate.AngleInDegrees = value;
                             value = 0;
                         }
 
                         //                                    Phase B Magnitude Estimate
-                        if (m_rawMeasurementKeyValuePairs.TryGetValue(currentPhasorGroup.PhaseB.Estimate.MagnitudeKey, out value))
+                        if (m_rawMeasurementKeyValuePairs.TryGetValue(currentPhasorGroup.PhaseB.Estimate.MagnitudeKey.ToLower(), out value))
                         {
                             currentPhasorGroup.PhaseB.Estimate.Magnitude = value;
                             value = 0;
                         }
 
                         //                                    Phase B Angle Estimate
-                        if (m_rawMeasurementKeyValuePairs.TryGetValue(currentPhasorGroup.PhaseB.Estimate.AngleKey, out value))
+                        if (m_rawMeasurementKeyValuePairs.TryGetValue(currentPhasorGroup.PhaseB.Estimate.AngleKey.ToLower(), out value))
                         {
                             currentPhasorGroup.PhaseB.Estimate.AngleInDegrees = value;
                             value = 0;
                         }
 
                         //                                    Phase C Magnitude Estimate
-                        if (m_rawMeasurementKeyValuePairs.TryGetValue(currentPhasorGroup.PhaseC.Estimate.MagnitudeKey, out value))
+                        if (m_rawMeasurementKeyValuePairs.TryGetValue(currentPhasorGroup.PhaseC.Estimate.MagnitudeKey.ToLower(), out value))
                         {
                             currentPhasorGroup.PhaseC.Estimate.Magnitude = value;
                             value = 0;
                         }
 
                         //                                    Phase C Angle Estimate
-                        if (m_rawMeasurementKeyValuePairs.TryGetValue(currentPhasorGroup.PhaseC.Estimate.AngleKey, out value))
+                        if (m_rawMeasurementKeyValuePairs.TryGetValue(currentPhasorGroup.PhaseC.Estimate.AngleKey.ToLower(), out value))
                         {
                             currentPhasorGroup.PhaseC.Estimate.AngleInDegrees = value;
                             value = 0;
@@ -3763,7 +3763,7 @@ namespace SynchrophasorAnalytics.Modeling
             {
                 double value = 0;
                 // Breaker Statuses
-                if (m_rawMeasurementKeyValuePairs.TryGetValue(breakerStatus.Key, out value))
+                if (m_rawMeasurementKeyValuePairs.TryGetValue(breakerStatus.Key.ToLower(), out value))
                 {
                     breakerStatus.BinaryValue = Convert.ToInt32(value);
                     value = 0;
@@ -3780,7 +3780,7 @@ namespace SynchrophasorAnalytics.Modeling
             {
                 double value = 0;
 
-                if (m_rawMeasurementKeyValuePairs.TryGetValue(statusWord.Key, out value))
+                if (m_rawMeasurementKeyValuePairs.TryGetValue(statusWord.Key.ToLower(), out value))
                 {
                     statusWord.BinaryValue = value;
                     value = 0;
@@ -3797,7 +3797,7 @@ namespace SynchrophasorAnalytics.Modeling
             {
                 double value = 0;
 
-                if (m_rawMeasurementKeyValuePairs.TryGetValue(transformer.TapPositionInputKey, out value))
+                if (m_rawMeasurementKeyValuePairs.TryGetValue(transformer.TapPositionInputKey.ToLower(), out value))
                 {
                     transformer.TapPositionMeasurement = Convert.ToInt32(value);
                 }
@@ -3849,45 +3849,45 @@ namespace SynchrophasorAnalytics.Modeling
             {
                 if (!output.ContainsKey(voltagePhasorGroup.NegativeSequenceToPositiveSequenceRatioMeasurementKey))
                 {
-                    output.Add(voltagePhasorGroup.NegativeSequenceToPositiveSequenceRatioMeasurementKey, voltagePhasorGroup.EstimatedNegativeSequenceToPositiveSequenceRatio);
+                    output.Add(voltagePhasorGroup.NegativeSequenceToPositiveSequenceRatioMeasurementKey.ToLower(),voltagePhasorGroup.EstimatedNegativeSequenceToPositiveSequenceRatio);
                 }
 
                 if (!output.ContainsKey(voltagePhasorGroup.PositiveSequence.Estimate.MagnitudeKey))
                 {
-                    output.Add(voltagePhasorGroup.PositiveSequence.Estimate.MagnitudeKey, voltagePhasorGroup.PositiveSequence.Estimate.Magnitude);
+                    output.Add(voltagePhasorGroup.PositiveSequence.Estimate.MagnitudeKey.ToLower(),voltagePhasorGroup.PositiveSequence.Estimate.Magnitude);
                 }
                 if (!output.ContainsKey(voltagePhasorGroup.PositiveSequence.Estimate.AngleKey))
                 {
-                    output.Add(voltagePhasorGroup.PositiveSequence.Estimate.AngleKey, voltagePhasorGroup.PositiveSequence.Estimate.AngleInDegrees);
+                    output.Add(voltagePhasorGroup.PositiveSequence.Estimate.AngleKey.ToLower(),voltagePhasorGroup.PositiveSequence.Estimate.AngleInDegrees);
                 }
 
                 if (m_phaseSelection == PhaseSelection.ThreePhase)
                 {
                     if (!output.ContainsKey(voltagePhasorGroup.PhaseA.Estimate.MagnitudeKey))
                     {
-                        output.Add(voltagePhasorGroup.PhaseA.Estimate.MagnitudeKey, voltagePhasorGroup.PhaseA.Estimate.Magnitude);
+                        output.Add(voltagePhasorGroup.PhaseA.Estimate.MagnitudeKey.ToLower(),voltagePhasorGroup.PhaseA.Estimate.Magnitude);
                     }
                     if (!output.ContainsKey(voltagePhasorGroup.PhaseA.Estimate.AngleKey))
                     {
-                        output.Add(voltagePhasorGroup.PhaseA.Estimate.AngleKey, voltagePhasorGroup.PhaseA.Estimate.AngleInDegrees);
+                        output.Add(voltagePhasorGroup.PhaseA.Estimate.AngleKey.ToLower(),voltagePhasorGroup.PhaseA.Estimate.AngleInDegrees);
                     }
 
                     if (!output.ContainsKey(voltagePhasorGroup.PhaseB.Estimate.MagnitudeKey))
                     {
-                        output.Add(voltagePhasorGroup.PhaseB.Estimate.MagnitudeKey, voltagePhasorGroup.PhaseB.Estimate.Magnitude);
+                        output.Add(voltagePhasorGroup.PhaseB.Estimate.MagnitudeKey.ToLower(),voltagePhasorGroup.PhaseB.Estimate.Magnitude);
                     }
                     if (!output.ContainsKey(voltagePhasorGroup.PhaseB.Estimate.AngleKey))
                     {
-                        output.Add(voltagePhasorGroup.PhaseB.Estimate.AngleKey, voltagePhasorGroup.PhaseB.Estimate.AngleInDegrees);
+                        output.Add(voltagePhasorGroup.PhaseB.Estimate.AngleKey.ToLower(),voltagePhasorGroup.PhaseB.Estimate.AngleInDegrees);
                     }
 
                     if (!output.ContainsKey(voltagePhasorGroup.PhaseC.Estimate.MagnitudeKey))
                     {
-                        output.Add(voltagePhasorGroup.PhaseC.Estimate.MagnitudeKey, voltagePhasorGroup.PhaseC.Estimate.Magnitude);
+                        output.Add(voltagePhasorGroup.PhaseC.Estimate.MagnitudeKey.ToLower(),voltagePhasorGroup.PhaseC.Estimate.Magnitude);
                     }
                     if (!output.ContainsKey(voltagePhasorGroup.PhaseC.Estimate.AngleKey))
                     {
-                        output.Add(voltagePhasorGroup.PhaseC.Estimate.AngleKey, voltagePhasorGroup.PhaseC.Estimate.AngleInDegrees);
+                        output.Add(voltagePhasorGroup.PhaseC.Estimate.AngleKey.ToLower(),voltagePhasorGroup.PhaseC.Estimate.AngleInDegrees);
                     }
                 }
             }
@@ -3938,45 +3938,45 @@ namespace SynchrophasorAnalytics.Modeling
             {
                 if (!output.ContainsKey(currentFlowPhasorGroup.NegativeSequenceToPositiveSequenceRatioMeasurementKey))
                 {
-                    output.Add(currentFlowPhasorGroup.NegativeSequenceToPositiveSequenceRatioMeasurementKey, currentFlowPhasorGroup.EstimatedNegativeSequenceToPositiveSequenceRatio);
+                    output.Add(currentFlowPhasorGroup.NegativeSequenceToPositiveSequenceRatioMeasurementKey.ToLower(),currentFlowPhasorGroup.EstimatedNegativeSequenceToPositiveSequenceRatio);
                 }
 
                 if (!output.ContainsKey(currentFlowPhasorGroup.PositiveSequence.Estimate.MagnitudeKey))
                 {
-                    output.Add(currentFlowPhasorGroup.PositiveSequence.Estimate.MagnitudeKey, currentFlowPhasorGroup.PositiveSequence.Estimate.Magnitude);
+                    output.Add(currentFlowPhasorGroup.PositiveSequence.Estimate.MagnitudeKey.ToLower(),currentFlowPhasorGroup.PositiveSequence.Estimate.Magnitude);
                 }
                 if (!output.ContainsKey(currentFlowPhasorGroup.PositiveSequence.Estimate.AngleKey))
                 {
-                    output.Add(currentFlowPhasorGroup.PositiveSequence.Estimate.AngleKey, currentFlowPhasorGroup.PositiveSequence.Estimate.AngleInDegrees);
+                    output.Add(currentFlowPhasorGroup.PositiveSequence.Estimate.AngleKey.ToLower(),currentFlowPhasorGroup.PositiveSequence.Estimate.AngleInDegrees);
                 }
 
                 if (m_phaseSelection == PhaseSelection.ThreePhase)
                 {
                     if (!output.ContainsKey(currentFlowPhasorGroup.PhaseA.Estimate.MagnitudeKey))
                     {
-                        output.Add(currentFlowPhasorGroup.PhaseA.Estimate.MagnitudeKey, currentFlowPhasorGroup.PhaseA.Estimate.Magnitude);
+                        output.Add(currentFlowPhasorGroup.PhaseA.Estimate.MagnitudeKey.ToLower(),currentFlowPhasorGroup.PhaseA.Estimate.Magnitude);
                     }
                     if (!output.ContainsKey(currentFlowPhasorGroup.PhaseA.Estimate.AngleKey))
                     {
-                        output.Add(currentFlowPhasorGroup.PhaseA.Estimate.AngleKey, currentFlowPhasorGroup.PhaseA.Estimate.AngleInDegrees);
+                        output.Add(currentFlowPhasorGroup.PhaseA.Estimate.AngleKey.ToLower(),currentFlowPhasorGroup.PhaseA.Estimate.AngleInDegrees);
                     }
 
                     if (!output.ContainsKey(currentFlowPhasorGroup.PhaseB.Estimate.MagnitudeKey))
                     {
-                        output.Add(currentFlowPhasorGroup.PhaseB.Estimate.MagnitudeKey, currentFlowPhasorGroup.PhaseB.Estimate.Magnitude);
+                        output.Add(currentFlowPhasorGroup.PhaseB.Estimate.MagnitudeKey.ToLower(),currentFlowPhasorGroup.PhaseB.Estimate.Magnitude);
                     }
                     if (!output.ContainsKey(currentFlowPhasorGroup.PhaseB.Estimate.AngleKey))
                     {
-                        output.Add(currentFlowPhasorGroup.PhaseB.Estimate.AngleKey, currentFlowPhasorGroup.PhaseB.Estimate.AngleInDegrees);
+                        output.Add(currentFlowPhasorGroup.PhaseB.Estimate.AngleKey.ToLower(),currentFlowPhasorGroup.PhaseB.Estimate.AngleInDegrees);
                     }
 
                     if (!output.ContainsKey(currentFlowPhasorGroup.PhaseC.Estimate.MagnitudeKey))
                     {
-                        output.Add(currentFlowPhasorGroup.PhaseC.Estimate.MagnitudeKey, currentFlowPhasorGroup.PhaseC.Estimate.Magnitude);
+                        output.Add(currentFlowPhasorGroup.PhaseC.Estimate.MagnitudeKey.ToLower(),currentFlowPhasorGroup.PhaseC.Estimate.Magnitude);
                     }
                     if (!output.ContainsKey(currentFlowPhasorGroup.PhaseC.Estimate.AngleKey))
                     {
-                        output.Add(currentFlowPhasorGroup.PhaseC.Estimate.AngleKey, currentFlowPhasorGroup.PhaseC.Estimate.AngleInDegrees);
+                        output.Add(currentFlowPhasorGroup.PhaseC.Estimate.AngleKey.ToLower(),currentFlowPhasorGroup.PhaseC.Estimate.AngleInDegrees);
                     }
                 }
             }
@@ -4027,45 +4027,45 @@ namespace SynchrophasorAnalytics.Modeling
             {
                 if (!output.ContainsKey(currentInjectionPhasorGroup.NegativeSequenceToPositiveSequenceRatioMeasurementKey))
                 {
-                    output.Add(currentInjectionPhasorGroup.NegativeSequenceToPositiveSequenceRatioMeasurementKey, currentInjectionPhasorGroup.EstimatedNegativeSequenceToPositiveSequenceRatio);
+                    output.Add(currentInjectionPhasorGroup.NegativeSequenceToPositiveSequenceRatioMeasurementKey.ToLower(),currentInjectionPhasorGroup.EstimatedNegativeSequenceToPositiveSequenceRatio);
                 }
 
                 if (!output.ContainsKey(currentInjectionPhasorGroup.PositiveSequence.Estimate.MagnitudeKey))
                 {
-                    output.Add(currentInjectionPhasorGroup.PositiveSequence.Estimate.MagnitudeKey, currentInjectionPhasorGroup.PositiveSequence.Estimate.Magnitude);
+                    output.Add(currentInjectionPhasorGroup.PositiveSequence.Estimate.MagnitudeKey.ToLower(),currentInjectionPhasorGroup.PositiveSequence.Estimate.Magnitude);
                 }
                 if (!output.ContainsKey(currentInjectionPhasorGroup.PositiveSequence.Estimate.AngleKey))
                 {
-                    output.Add(currentInjectionPhasorGroup.PositiveSequence.Estimate.AngleKey, currentInjectionPhasorGroup.PositiveSequence.Estimate.AngleInDegrees);
+                    output.Add(currentInjectionPhasorGroup.PositiveSequence.Estimate.AngleKey.ToLower(),currentInjectionPhasorGroup.PositiveSequence.Estimate.AngleInDegrees);
                 }
 
                 if (m_phaseSelection == PhaseSelection.ThreePhase)
                 {
                     if (!output.ContainsKey(currentInjectionPhasorGroup.PhaseA.Estimate.MagnitudeKey))
                     {
-                        output.Add(currentInjectionPhasorGroup.PhaseA.Estimate.MagnitudeKey, currentInjectionPhasorGroup.PhaseA.Estimate.Magnitude);
+                        output.Add(currentInjectionPhasorGroup.PhaseA.Estimate.MagnitudeKey.ToLower(),currentInjectionPhasorGroup.PhaseA.Estimate.Magnitude);
                     }
                     if (!output.ContainsKey(currentInjectionPhasorGroup.PhaseA.Estimate.AngleKey))
                     {
-                        output.Add(currentInjectionPhasorGroup.PhaseA.Estimate.AngleKey, currentInjectionPhasorGroup.PhaseA.Estimate.AngleInDegrees);
+                        output.Add(currentInjectionPhasorGroup.PhaseA.Estimate.AngleKey.ToLower(),currentInjectionPhasorGroup.PhaseA.Estimate.AngleInDegrees);
                     }
 
                     if (!output.ContainsKey(currentInjectionPhasorGroup.PhaseB.Estimate.MagnitudeKey))
                     {
-                        output.Add(currentInjectionPhasorGroup.PhaseB.Estimate.MagnitudeKey, currentInjectionPhasorGroup.PhaseB.Estimate.Magnitude);
+                        output.Add(currentInjectionPhasorGroup.PhaseB.Estimate.MagnitudeKey.ToLower(),currentInjectionPhasorGroup.PhaseB.Estimate.Magnitude);
                     }
                     if (!output.ContainsKey(currentInjectionPhasorGroup.PhaseB.Estimate.AngleKey))
                     {
-                        output.Add(currentInjectionPhasorGroup.PhaseB.Estimate.AngleKey, currentInjectionPhasorGroup.PhaseB.Estimate.AngleInDegrees);
+                        output.Add(currentInjectionPhasorGroup.PhaseB.Estimate.AngleKey.ToLower(),currentInjectionPhasorGroup.PhaseB.Estimate.AngleInDegrees);
                     }
 
                     if (!output.ContainsKey(currentInjectionPhasorGroup.PhaseC.Estimate.MagnitudeKey))
                     {
-                        output.Add(currentInjectionPhasorGroup.PhaseC.Estimate.MagnitudeKey, currentInjectionPhasorGroup.PhaseC.Estimate.Magnitude);
+                        output.Add(currentInjectionPhasorGroup.PhaseC.Estimate.MagnitudeKey.ToLower(),currentInjectionPhasorGroup.PhaseC.Estimate.Magnitude);
                     }
                     if (!output.ContainsKey(currentInjectionPhasorGroup.PhaseC.Estimate.AngleKey))
                     {
-                        output.Add(currentInjectionPhasorGroup.PhaseC.Estimate.AngleKey, currentInjectionPhasorGroup.PhaseC.Estimate.AngleInDegrees);
+                        output.Add(currentInjectionPhasorGroup.PhaseC.Estimate.AngleKey.ToLower(),currentInjectionPhasorGroup.PhaseC.Estimate.AngleInDegrees);
                     }
                 }
             }
@@ -4125,40 +4125,40 @@ namespace SynchrophasorAnalytics.Modeling
             {
                 if (!output.ContainsKey(voltagePhasorGroup.PositiveSequence.MagnitudeResidualKey))
                 {
-                    output.Add(voltagePhasorGroup.PositiveSequence.MagnitudeResidualKey, voltagePhasorGroup.PositiveSequence.MagnitudeResidual);
+                    output.Add(voltagePhasorGroup.PositiveSequence.MagnitudeResidualKey.ToLower(),voltagePhasorGroup.PositiveSequence.MagnitudeResidual);
                 }
                 if (!output.ContainsKey(voltagePhasorGroup.PositiveSequence.AngleResidualKey))
                 {
-                    output.Add(voltagePhasorGroup.PositiveSequence.AngleResidualKey, voltagePhasorGroup.PositiveSequence.AngleResidualInDegrees);
+                    output.Add(voltagePhasorGroup.PositiveSequence.AngleResidualKey.ToLower(),voltagePhasorGroup.PositiveSequence.AngleResidualInDegrees);
                 }
 
                 if (m_phaseSelection == PhaseSelection.ThreePhase)
                 {
                     if (!output.ContainsKey(voltagePhasorGroup.PhaseA.MagnitudeResidualKey))
                     {
-                        output.Add(voltagePhasorGroup.PhaseA.MagnitudeResidualKey, voltagePhasorGroup.PhaseA.MagnitudeResidual);
+                        output.Add(voltagePhasorGroup.PhaseA.MagnitudeResidualKey.ToLower(),voltagePhasorGroup.PhaseA.MagnitudeResidual);
                     }
                     if (!output.ContainsKey(voltagePhasorGroup.PhaseA.AngleResidualKey))
                     {
-                        output.Add(voltagePhasorGroup.PhaseA.AngleResidualKey, voltagePhasorGroup.PhaseA.AngleResidualInDegrees);
+                        output.Add(voltagePhasorGroup.PhaseA.AngleResidualKey.ToLower(),voltagePhasorGroup.PhaseA.AngleResidualInDegrees);
                     }
 
                     if (!output.ContainsKey(voltagePhasorGroup.PhaseB.MagnitudeResidualKey))
                     {
-                        output.Add(voltagePhasorGroup.PhaseB.MagnitudeResidualKey, voltagePhasorGroup.PhaseB.MagnitudeResidual);
+                        output.Add(voltagePhasorGroup.PhaseB.MagnitudeResidualKey.ToLower(),voltagePhasorGroup.PhaseB.MagnitudeResidual);
                     }
                     if (!output.ContainsKey(voltagePhasorGroup.PhaseB.AngleResidualKey))
                     {
-                        output.Add(voltagePhasorGroup.PhaseB.AngleResidualKey, voltagePhasorGroup.PhaseB.AngleResidualInDegrees);
+                        output.Add(voltagePhasorGroup.PhaseB.AngleResidualKey.ToLower(),voltagePhasorGroup.PhaseB.AngleResidualInDegrees);
                     }
 
                     if (!output.ContainsKey(voltagePhasorGroup.PhaseC.MagnitudeResidualKey))
                     {
-                        output.Add(voltagePhasorGroup.PhaseC.MagnitudeResidualKey, voltagePhasorGroup.PhaseC.MagnitudeResidual);
+                        output.Add(voltagePhasorGroup.PhaseC.MagnitudeResidualKey.ToLower(),voltagePhasorGroup.PhaseC.MagnitudeResidual);
                     }
                     if (!output.ContainsKey(voltagePhasorGroup.PhaseC.AngleResidualKey))
                     {
-                        output.Add(voltagePhasorGroup.PhaseC.AngleResidualKey, voltagePhasorGroup.PhaseC.AngleResidualInDegrees);
+                        output.Add(voltagePhasorGroup.PhaseC.AngleResidualKey.ToLower(),voltagePhasorGroup.PhaseC.AngleResidualInDegrees);
                     }
                 }
             }
@@ -4245,40 +4245,40 @@ namespace SynchrophasorAnalytics.Modeling
             {
                 if (!output.ContainsKey(currentPhasorGroup.PositiveSequence.MagnitudeResidualKey))
                 {
-                    output.Add(currentPhasorGroup.PositiveSequence.MagnitudeResidualKey, currentPhasorGroup.PositiveSequence.MagnitudeResidual);
+                    output.Add(currentPhasorGroup.PositiveSequence.MagnitudeResidualKey.ToLower(),currentPhasorGroup.PositiveSequence.MagnitudeResidual);
                 }
                 if (!output.ContainsKey(currentPhasorGroup.PositiveSequence.AngleResidualKey))
                 {
-                    output.Add(currentPhasorGroup.PositiveSequence.AngleResidualKey, currentPhasorGroup.PositiveSequence.AngleResidualInDegrees);
+                    output.Add(currentPhasorGroup.PositiveSequence.AngleResidualKey.ToLower(),currentPhasorGroup.PositiveSequence.AngleResidualInDegrees);
                 }
 
                 if (m_phaseSelection == PhaseSelection.ThreePhase)
                 {
                     if (!output.ContainsKey(currentPhasorGroup.PhaseA.MagnitudeResidualKey))
                     {
-                        output.Add(currentPhasorGroup.PhaseA.MagnitudeResidualKey, currentPhasorGroup.PhaseA.MagnitudeResidual);
+                        output.Add(currentPhasorGroup.PhaseA.MagnitudeResidualKey.ToLower(),currentPhasorGroup.PhaseA.MagnitudeResidual);
                     }
                     if (!output.ContainsKey(currentPhasorGroup.PhaseA.AngleResidualKey))
                     {
-                        output.Add(currentPhasorGroup.PhaseA.AngleResidualKey, currentPhasorGroup.PhaseA.AngleResidualInDegrees);
+                        output.Add(currentPhasorGroup.PhaseA.AngleResidualKey.ToLower(),currentPhasorGroup.PhaseA.AngleResidualInDegrees);
                     }
 
                     if (!output.ContainsKey(currentPhasorGroup.PhaseB.MagnitudeResidualKey))
                     {
-                        output.Add(currentPhasorGroup.PhaseB.MagnitudeResidualKey, currentPhasorGroup.PhaseB.MagnitudeResidual);
+                        output.Add(currentPhasorGroup.PhaseB.MagnitudeResidualKey.ToLower(),currentPhasorGroup.PhaseB.MagnitudeResidual);
                     }
                     if (!output.ContainsKey(currentPhasorGroup.PhaseB.AngleResidualKey))
                     {
-                        output.Add(currentPhasorGroup.PhaseB.AngleResidualKey, currentPhasorGroup.PhaseB.AngleResidualInDegrees);
+                        output.Add(currentPhasorGroup.PhaseB.AngleResidualKey.ToLower(),currentPhasorGroup.PhaseB.AngleResidualInDegrees);
                     }
 
                     if (!output.ContainsKey(currentPhasorGroup.PhaseC.MagnitudeResidualKey))
                     {
-                        output.Add(currentPhasorGroup.PhaseC.MagnitudeResidualKey, currentPhasorGroup.PhaseC.MagnitudeResidual);
+                        output.Add(currentPhasorGroup.PhaseC.MagnitudeResidualKey.ToLower(),currentPhasorGroup.PhaseC.MagnitudeResidual);
                     }
                     if (!output.ContainsKey(currentPhasorGroup.PhaseC.AngleResidualKey))
                     {
-                        output.Add(currentPhasorGroup.PhaseC.AngleResidualKey, currentPhasorGroup.PhaseC.AngleResidualInDegrees);
+                        output.Add(currentPhasorGroup.PhaseC.AngleResidualKey.ToLower(),currentPhasorGroup.PhaseC.AngleResidualInDegrees);
                     }
                 }
             }
@@ -4325,7 +4325,7 @@ namespace SynchrophasorAnalytics.Modeling
                 {
                     if (!output.ContainsKey(switchingDevice.MeasurementKey))
                     {
-                        output.Add(switchingDevice.MeasurementKey, (int)switchingDevice.ActualState);
+                        output.Add(switchingDevice.MeasurementKey.ToLower(),(int)switchingDevice.ActualState);
                     }
                 }
             }
@@ -4374,7 +4374,7 @@ namespace SynchrophasorAnalytics.Modeling
                 {
                     if (!output.ContainsKey(switchingDevice.MeasurementKey))
                     {
-                        output.Add(switchingDevice.MeasurementKey, (int)switchingDevice.ActualState);
+                        output.Add(switchingDevice.MeasurementKey.ToLower(),(int)switchingDevice.ActualState);
                     }
                 }
             }
@@ -4537,20 +4537,20 @@ namespace SynchrophasorAnalytics.Modeling
         private void AddPerformanceMetricsToOutput(Dictionary<string, double> output)
         {
             PerformanceMetrics metrics = m_parentNetwork.PerformanceMetrics;
-            output.Add(metrics.ActiveVoltageCountKey, metrics.ActiveVoltageCount);
-            output.Add(metrics.ActiveCurrentFlowCountKey, metrics.ActiveCurrentFlowCount);
-            output.Add(metrics.ActiveCurrentInjectionCountKey, metrics.ActiveCurrentInjectionCount);
-            output.Add(metrics.ObservedBusCountKey, metrics.ObservedBusCount);
-            output.Add(metrics.RefreshExecutionTimeKey, metrics.RefreshExecutionTime);
-            output.Add(metrics.ParsingExecutionTimeKey, metrics.ParsingExecutionTime);
-            output.Add(metrics.MeasurementMappingExecutionTimeKey, metrics.MeasurementMappingExecutionTime);
-            output.Add(metrics.ObservabilityAnalysisExecutionTimeKey, metrics.ObservabilityAnalysisExecutionTime);
-            output.Add(metrics.ActiveCurrentPhasorDeterminationExecutionTimeKey, metrics.ActiveCurrentPhasorDeterminationExecutionTime);
-            output.Add(metrics.StateComputationExecutionTimeKey, metrics.StateComputationExecutionTime);
-            output.Add(metrics.SolutionRetrievalExecutionTimeKey, metrics.SolutionRetrievalExecutionTime);
-            output.Add(metrics.OutputPreparationExecutionTimeKey, metrics.OutputPreparationExecutionTime);
-            output.Add(metrics.TotalExecutionTimeInTicksKey, metrics.TotalExecutionTimeInTicks);
-            output.Add(metrics.TotalExecutionTimeInMillisecondsKey, metrics.TotalExecutionTimeInMilliseconds);
+            output.Add(metrics.ActiveVoltageCountKey.ToLower(),metrics.ActiveVoltageCount);
+            output.Add(metrics.ActiveCurrentFlowCountKey.ToLower(),metrics.ActiveCurrentFlowCount);
+            output.Add(metrics.ActiveCurrentInjectionCountKey.ToLower(),metrics.ActiveCurrentInjectionCount);
+            output.Add(metrics.ObservedBusCountKey.ToLower(),metrics.ObservedBusCount);
+            output.Add(metrics.RefreshExecutionTimeKey.ToLower(),metrics.RefreshExecutionTime);
+            output.Add(metrics.ParsingExecutionTimeKey.ToLower(),metrics.ParsingExecutionTime);
+            output.Add(metrics.MeasurementMappingExecutionTimeKey.ToLower(),metrics.MeasurementMappingExecutionTime);
+            output.Add(metrics.ObservabilityAnalysisExecutionTimeKey.ToLower(),metrics.ObservabilityAnalysisExecutionTime);
+            output.Add(metrics.ActiveCurrentPhasorDeterminationExecutionTimeKey.ToLower(),metrics.ActiveCurrentPhasorDeterminationExecutionTime);
+            output.Add(metrics.StateComputationExecutionTimeKey.ToLower(),metrics.StateComputationExecutionTime);
+            output.Add(metrics.SolutionRetrievalExecutionTimeKey.ToLower(),metrics.SolutionRetrievalExecutionTime);
+            output.Add(metrics.OutputPreparationExecutionTimeKey.ToLower(),metrics.OutputPreparationExecutionTime);
+            output.Add(metrics.TotalExecutionTimeInTicksKey.ToLower(),metrics.TotalExecutionTimeInTicks);
+            output.Add(metrics.TotalExecutionTimeInMillisecondsKey.ToLower(),metrics.TotalExecutionTimeInMilliseconds);
         }
 
         private List<OutputMeasurement> GetTopologyProfilingInformationOutput()
@@ -4616,11 +4616,11 @@ namespace SynchrophasorAnalytics.Modeling
         {
             foreach (Substation substation in m_substations)
             {
-                output.Add(substation.ObservedBusCountKey, substation.ObservedBusCount);
+                output.Add(substation.ObservedBusCountKey.ToLower(),substation.ObservedBusCount);
                 foreach (Node node in substation.Nodes)
                 {
-                    output.Add(node.ObservationStateKey, Convert.ToDouble(node.Observability));
-                    output.Add(node.ObservedBusIdKey, node.ObservedBusId);
+                    output.Add(node.ObservationStateKey.ToLower(),Convert.ToDouble(node.Observability));
+                    output.Add(node.ObservedBusIdKey.ToLower(),node.ObservedBusId);
                 }
             }
         }
@@ -4684,33 +4684,33 @@ namespace SynchrophasorAnalytics.Modeling
             {
                 if (m_phaseSelection == PhaseSelection.PositiveSequence)
                 {
-                    output.Add(voltage.MeasurementIsIncludedKey, Convert.ToDouble(voltage.IncludeInPositiveSequenceEstimator));
+                    output.Add(voltage.MeasurementIsIncludedKey.ToLower(),Convert.ToDouble(voltage.IncludeInPositiveSequenceEstimator));
                 }
                 else if (m_phaseSelection == PhaseSelection.ThreePhase)
                 {
-                    output.Add(voltage.MeasurementIsIncludedKey, Convert.ToDouble(voltage.IncludeInEstimator));
+                    output.Add(voltage.MeasurementIsIncludedKey.ToLower(),Convert.ToDouble(voltage.IncludeInEstimator));
                 }
             }
             foreach (CurrentFlowPhasorGroup currentFlow in m_currentFlows)
             {
                 if (m_phaseSelection == PhaseSelection.PositiveSequence)
                 {
-                    output.Add(currentFlow.MeasurementIsIncludedKey, Convert.ToDouble(currentFlow.IncludeInPositiveSequenceEstimator));
+                    output.Add(currentFlow.MeasurementIsIncludedKey.ToLower(),Convert.ToDouble(currentFlow.IncludeInPositiveSequenceEstimator));
                 }
                 else if (m_phaseSelection == PhaseSelection.ThreePhase)
                 {
-                    output.Add(currentFlow.MeasurementIsIncludedKey, Convert.ToDouble(currentFlow.IncludeInEstimator));
+                    output.Add(currentFlow.MeasurementIsIncludedKey.ToLower(),Convert.ToDouble(currentFlow.IncludeInEstimator));
                 }
             }
             foreach (CurrentInjectionPhasorGroup currentInjection in m_currentInjections)
             {
                 if (m_phaseSelection == PhaseSelection.PositiveSequence)
                 {
-                    output.Add(currentInjection.MeasurementIsIncludedKey, Convert.ToDouble(currentInjection.IncludeInPositiveSequenceEstimator));
+                    output.Add(currentInjection.MeasurementIsIncludedKey.ToLower(),Convert.ToDouble(currentInjection.IncludeInPositiveSequenceEstimator));
                 }
                 else if (m_phaseSelection == PhaseSelection.ThreePhase)
                 {
-                    output.Add(currentInjection.MeasurementIsIncludedKey, Convert.ToDouble(currentInjection.IncludeInEstimator));
+                    output.Add(currentInjection.MeasurementIsIncludedKey.ToLower(),Convert.ToDouble(currentInjection.IncludeInEstimator));
                 }
             }
         }
@@ -4747,38 +4747,38 @@ namespace SynchrophasorAnalytics.Modeling
                 {
                     if (voltagePhasorGroup.PositiveSequence.Measurement.MagnitudeValueWasReported)
                     {
-                        receivedMeasurements.Add(voltagePhasorGroup.PositiveSequence.Measurement.MagnitudeKey, voltagePhasorGroup.PositiveSequence.Measurement.Magnitude);
+                        receivedMeasurements.Add(voltagePhasorGroup.PositiveSequence.Measurement.MagnitudeKey.ToLower(), voltagePhasorGroup.PositiveSequence.Measurement.Magnitude);
                     }
                     if (voltagePhasorGroup.PositiveSequence.Measurement.AngleValueWasReported)
                     {
-                        receivedMeasurements.Add(voltagePhasorGroup.PositiveSequence.Measurement.AngleKey, voltagePhasorGroup.PositiveSequence.Measurement.AngleInDegrees);
+                        receivedMeasurements.Add(voltagePhasorGroup.PositiveSequence.Measurement.AngleKey.ToLower(), voltagePhasorGroup.PositiveSequence.Measurement.AngleInDegrees);
                     }
                 }
                 else if (m_phaseSelection == PhaseSelection.ThreePhase)
                 {
                     if (voltagePhasorGroup.PhaseA.Measurement.MagnitudeValueWasReported)
                     {
-                        receivedMeasurements.Add(voltagePhasorGroup.PositiveSequence.Measurement.MagnitudeKey, voltagePhasorGroup.PositiveSequence.Measurement.Magnitude);
+                        receivedMeasurements.Add(voltagePhasorGroup.PositiveSequence.Measurement.MagnitudeKey.ToLower(), voltagePhasorGroup.PositiveSequence.Measurement.Magnitude);
                     }
                     if (voltagePhasorGroup.PhaseA.Measurement.AngleValueWasReported)
                     {
-                        receivedMeasurements.Add(voltagePhasorGroup.PositiveSequence.Measurement.AngleKey, voltagePhasorGroup.PositiveSequence.Measurement.AngleInDegrees);
+                        receivedMeasurements.Add(voltagePhasorGroup.PositiveSequence.Measurement.AngleKey.ToLower(), voltagePhasorGroup.PositiveSequence.Measurement.AngleInDegrees);
                     }
                     if (voltagePhasorGroup.PhaseB.Measurement.MagnitudeValueWasReported)
                     {
-                        receivedMeasurements.Add(voltagePhasorGroup.PositiveSequence.Measurement.MagnitudeKey, voltagePhasorGroup.PositiveSequence.Measurement.Magnitude);
+                        receivedMeasurements.Add(voltagePhasorGroup.PositiveSequence.Measurement.MagnitudeKey.ToLower(), voltagePhasorGroup.PositiveSequence.Measurement.Magnitude);
                     }
                     if (voltagePhasorGroup.PhaseB.Measurement.AngleValueWasReported)
                     {
-                        receivedMeasurements.Add(voltagePhasorGroup.PositiveSequence.Measurement.AngleKey, voltagePhasorGroup.PositiveSequence.Measurement.AngleInDegrees);
+                        receivedMeasurements.Add(voltagePhasorGroup.PositiveSequence.Measurement.AngleKey.ToLower(), voltagePhasorGroup.PositiveSequence.Measurement.AngleInDegrees);
                     }
                     if (voltagePhasorGroup.PhaseC.Measurement.MagnitudeValueWasReported)
                     {
-                        receivedMeasurements.Add(voltagePhasorGroup.PositiveSequence.Measurement.MagnitudeKey, voltagePhasorGroup.PositiveSequence.Measurement.Magnitude);
+                        receivedMeasurements.Add(voltagePhasorGroup.PositiveSequence.Measurement.MagnitudeKey.ToLower(), voltagePhasorGroup.PositiveSequence.Measurement.Magnitude);
                     }
                     if (voltagePhasorGroup.PhaseC.Measurement.AngleValueWasReported)
                     {
-                        receivedMeasurements.Add(voltagePhasorGroup.PositiveSequence.Measurement.AngleKey, voltagePhasorGroup.PositiveSequence.Measurement.AngleInDegrees);
+                        receivedMeasurements.Add(voltagePhasorGroup.PositiveSequence.Measurement.AngleKey.ToLower(), voltagePhasorGroup.PositiveSequence.Measurement.AngleInDegrees);
                     }
                 }
             }
@@ -4792,38 +4792,38 @@ namespace SynchrophasorAnalytics.Modeling
                 {
                     if (currentFlowPhasorGroup.PositiveSequence.Measurement.MagnitudeValueWasReported)
                     {
-                        receivedMeasurements.Add(currentFlowPhasorGroup.PositiveSequence.Measurement.MagnitudeKey, currentFlowPhasorGroup.PositiveSequence.Measurement.Magnitude);
+                        receivedMeasurements.Add(currentFlowPhasorGroup.PositiveSequence.Measurement.MagnitudeKey.ToLower(), currentFlowPhasorGroup.PositiveSequence.Measurement.Magnitude);
                     }
                     if (currentFlowPhasorGroup.PositiveSequence.Measurement.AngleValueWasReported)
                     {
-                        receivedMeasurements.Add(currentFlowPhasorGroup.PositiveSequence.Measurement.AngleKey, currentFlowPhasorGroup.PositiveSequence.Measurement.AngleInDegrees);
+                        receivedMeasurements.Add(currentFlowPhasorGroup.PositiveSequence.Measurement.AngleKey.ToLower(), currentFlowPhasorGroup.PositiveSequence.Measurement.AngleInDegrees);
                     }
                 }
                 else if (m_phaseSelection == PhaseSelection.ThreePhase)
                 {
                     if (currentFlowPhasorGroup.PhaseA.Measurement.MagnitudeValueWasReported)
                     {
-                        receivedMeasurements.Add(currentFlowPhasorGroup.PositiveSequence.Measurement.MagnitudeKey, currentFlowPhasorGroup.PositiveSequence.Measurement.Magnitude);
+                        receivedMeasurements.Add(currentFlowPhasorGroup.PositiveSequence.Measurement.MagnitudeKey.ToLower(), currentFlowPhasorGroup.PositiveSequence.Measurement.Magnitude);
                     }
                     if (currentFlowPhasorGroup.PhaseA.Measurement.AngleValueWasReported)
                     {
-                        receivedMeasurements.Add(currentFlowPhasorGroup.PositiveSequence.Measurement.AngleKey, currentFlowPhasorGroup.PositiveSequence.Measurement.AngleInDegrees);
+                        receivedMeasurements.Add(currentFlowPhasorGroup.PositiveSequence.Measurement.AngleKey.ToLower(), currentFlowPhasorGroup.PositiveSequence.Measurement.AngleInDegrees);
                     }
                     if (currentFlowPhasorGroup.PhaseB.Measurement.MagnitudeValueWasReported)
                     {
-                        receivedMeasurements.Add(currentFlowPhasorGroup.PositiveSequence.Measurement.MagnitudeKey, currentFlowPhasorGroup.PositiveSequence.Measurement.Magnitude);
+                        receivedMeasurements.Add(currentFlowPhasorGroup.PositiveSequence.Measurement.MagnitudeKey.ToLower(), currentFlowPhasorGroup.PositiveSequence.Measurement.Magnitude);
                     }
                     if (currentFlowPhasorGroup.PhaseB.Measurement.AngleValueWasReported)
                     {
-                        receivedMeasurements.Add(currentFlowPhasorGroup.PositiveSequence.Measurement.AngleKey, currentFlowPhasorGroup.PositiveSequence.Measurement.AngleInDegrees);
+                        receivedMeasurements.Add(currentFlowPhasorGroup.PositiveSequence.Measurement.AngleKey.ToLower(), currentFlowPhasorGroup.PositiveSequence.Measurement.AngleInDegrees);
                     }
                     if (currentFlowPhasorGroup.PhaseC.Measurement.MagnitudeValueWasReported)
                     {
-                        receivedMeasurements.Add(currentFlowPhasorGroup.PositiveSequence.Measurement.MagnitudeKey, currentFlowPhasorGroup.PositiveSequence.Measurement.Magnitude);
+                        receivedMeasurements.Add(currentFlowPhasorGroup.PositiveSequence.Measurement.MagnitudeKey.ToLower(), currentFlowPhasorGroup.PositiveSequence.Measurement.Magnitude);
                     }
                     if (currentFlowPhasorGroup.PhaseC.Measurement.AngleValueWasReported)
                     {
-                        receivedMeasurements.Add(currentFlowPhasorGroup.PositiveSequence.Measurement.AngleKey, currentFlowPhasorGroup.PositiveSequence.Measurement.AngleInDegrees);
+                        receivedMeasurements.Add(currentFlowPhasorGroup.PositiveSequence.Measurement.AngleKey.ToLower(), currentFlowPhasorGroup.PositiveSequence.Measurement.AngleInDegrees);
                     }
                 }
             }
@@ -4837,38 +4837,38 @@ namespace SynchrophasorAnalytics.Modeling
                 {
                     if (currentInjectionPhasorGroup.PositiveSequence.Measurement.MagnitudeValueWasReported)
                     {
-                        receivedMeasurements.Add(currentInjectionPhasorGroup.PositiveSequence.Measurement.MagnitudeKey, currentInjectionPhasorGroup.PositiveSequence.Measurement.Magnitude);
+                        receivedMeasurements.Add(currentInjectionPhasorGroup.PositiveSequence.Measurement.MagnitudeKey.ToLower(),currentInjectionPhasorGroup.PositiveSequence.Measurement.Magnitude);
                     }
                     if (currentInjectionPhasorGroup.PositiveSequence.Measurement.AngleValueWasReported)
                     {
-                        receivedMeasurements.Add(currentInjectionPhasorGroup.PositiveSequence.Measurement.AngleKey, currentInjectionPhasorGroup.PositiveSequence.Measurement.AngleInDegrees);
+                        receivedMeasurements.Add(currentInjectionPhasorGroup.PositiveSequence.Measurement.AngleKey.ToLower(),currentInjectionPhasorGroup.PositiveSequence.Measurement.AngleInDegrees);
                     }
                 }
                 else if (m_phaseSelection == PhaseSelection.ThreePhase)
                 {
                     if (currentInjectionPhasorGroup.PhaseA.Measurement.MagnitudeValueWasReported)
                     {
-                        receivedMeasurements.Add(currentInjectionPhasorGroup.PositiveSequence.Measurement.MagnitudeKey, currentInjectionPhasorGroup.PositiveSequence.Measurement.Magnitude);
+                        receivedMeasurements.Add(currentInjectionPhasorGroup.PositiveSequence.Measurement.MagnitudeKey.ToLower(),currentInjectionPhasorGroup.PositiveSequence.Measurement.Magnitude);
                     }
                     if (currentInjectionPhasorGroup.PhaseA.Measurement.AngleValueWasReported)
                     {
-                        receivedMeasurements.Add(currentInjectionPhasorGroup.PositiveSequence.Measurement.AngleKey, currentInjectionPhasorGroup.PositiveSequence.Measurement.AngleInDegrees);
+                        receivedMeasurements.Add(currentInjectionPhasorGroup.PositiveSequence.Measurement.AngleKey.ToLower(),currentInjectionPhasorGroup.PositiveSequence.Measurement.AngleInDegrees);
                     }
                     if (currentInjectionPhasorGroup.PhaseB.Measurement.MagnitudeValueWasReported)
                     {
-                        receivedMeasurements.Add(currentInjectionPhasorGroup.PositiveSequence.Measurement.MagnitudeKey, currentInjectionPhasorGroup.PositiveSequence.Measurement.Magnitude);
+                        receivedMeasurements.Add(currentInjectionPhasorGroup.PositiveSequence.Measurement.MagnitudeKey.ToLower(),currentInjectionPhasorGroup.PositiveSequence.Measurement.Magnitude);
                     }
                     if (currentInjectionPhasorGroup.PhaseB.Measurement.AngleValueWasReported)
                     {
-                        receivedMeasurements.Add(currentInjectionPhasorGroup.PositiveSequence.Measurement.AngleKey, currentInjectionPhasorGroup.PositiveSequence.Measurement.AngleInDegrees);
+                        receivedMeasurements.Add(currentInjectionPhasorGroup.PositiveSequence.Measurement.AngleKey.ToLower(),currentInjectionPhasorGroup.PositiveSequence.Measurement.AngleInDegrees);
                     }
                     if (currentInjectionPhasorGroup.PhaseC.Measurement.MagnitudeValueWasReported)
                     {
-                        receivedMeasurements.Add(currentInjectionPhasorGroup.PositiveSequence.Measurement.MagnitudeKey, currentInjectionPhasorGroup.PositiveSequence.Measurement.Magnitude);
+                        receivedMeasurements.Add(currentInjectionPhasorGroup.PositiveSequence.Measurement.MagnitudeKey.ToLower(),currentInjectionPhasorGroup.PositiveSequence.Measurement.Magnitude);
                     }
                     if (currentInjectionPhasorGroup.PhaseC.Measurement.AngleValueWasReported)
                     {
-                        receivedMeasurements.Add(currentInjectionPhasorGroup.PositiveSequence.Measurement.AngleKey, currentInjectionPhasorGroup.PositiveSequence.Measurement.AngleInDegrees);
+                        receivedMeasurements.Add(currentInjectionPhasorGroup.PositiveSequence.Measurement.AngleKey.ToLower(),currentInjectionPhasorGroup.PositiveSequence.Measurement.AngleInDegrees);
                     }
                 }
             }

@@ -1,0 +1,27 @@
+LSE Input Input {
+    Digitals: AllDigitals 
+    StatusWords: AllStatusWords 
+    VoltagePhasors: AllVoltagePhasors 
+    CurrentPhasors: AllCurrentPhasors 
+}
+
+ECA Digitals AllDigitals {
+    Values: { FILTER ActiveMeasurements WHERE SignalType='DIGI' } 
+}
+
+ECA StatusWords AllStatusWords {
+    Values: { FILTER ActiveMeasurements WHERE SignalType='FLAG' } 
+}
+
+ECA PhasorCollection AllVoltagePhasors {
+    Phasors: { FILTER Mappings WHERE TypeCategory='ECA' AND TypeIdentifier='Phasor' AND MappingIdentifier LIKE '%_V' } 
+}
+
+ECA PhasorCollection AllCurrentPhasors {
+    Phasors: { FILTER Mappings WHERE TypeCategory='ECA' AND TypeIdentifier='Phasor' AND MappingIdentifier LIKE '%_I' } 
+}
+
+LSE NullOutput NullOutput {
+    Value: LSE_NullOutput:Value 
+}
+
