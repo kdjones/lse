@@ -42,6 +42,31 @@ namespace SynchrophasorAnalytics.Measurements
             }
         }
 
+        public bool GroupAWasReported
+        {
+            get
+            {
+                return m_groupA.PositiveSequence.Measurement.MeasurementWasReported;
+            }
+        }
+
+        public bool GroupBWasReported
+        {
+            get
+            {
+                return m_groupB.PositiveSequence.Measurement.MeasurementWasReported;
+            }
+        }
+
+        public bool MeasurementPairWasReported
+        {
+            get
+            {
+                return GroupAWasReported && GroupBWasReported;
+            }
+
+        }
+
         public PhasorGroup GroupA
         {
             get

@@ -45,10 +45,23 @@ namespace SynchrophasorAnalytics.Graphs
         private VertexAdjacencyList m_adjacencyList;
         private List<ObservedBus> m_observedBuses;
         private TopologyEstimationLevel m_topologyLevel;
+        private bool m_topologyErrorDetected;
 
         #endregion 
 
         #region [ Properties ]
+
+        public bool TopologyErrorDetected
+        {
+            get
+            {
+                return m_topologyErrorDetected;
+            }
+            set
+            {
+                m_topologyErrorDetected = value;
+            }
+        }
 
         /// <summary>
         /// The set of <see cref="LinearStateEstimator.Modeling.Node"/> vertices.
@@ -152,6 +165,8 @@ namespace SynchrophasorAnalytics.Graphs
 
         public void ResolveAdjacencies()
         {
+            TopologyErrorDetected = false;
+
             if (TopologyLevel == TopologyEstimationLevel.Zero)
             {
                 ExecuteLevelZeroAdjacencyResolution();
@@ -171,7 +186,50 @@ namespace SynchrophasorAnalytics.Graphs
             else if (TopologyLevel == TopologyEstimationLevel.Four)
             {
                 ExecuteLevelFourAdjacencyResolution();
+                TopologyErrorDetected = CheckForTopologyErrors();
             }
+            else if (TopologyLevel == TopologyEstimationLevel.Five)
+            {
+                ExecuteLevelFiveAdjacencyResolution();
+                TopologyErrorDetected = CheckForTopologyErrors();
+            }
+        }
+
+        private bool CheckForEdgeConnectionError(SwitchingDeviceBase edge)
+        {
+            foreach (VertexAdjacencyRow row in m_adjacencyList.Rows)
+            {
+                int fromVertex = edge.FromNodeID;
+                int toVertex = edge.ToNodeID;
+                if (row.Header.Vertices.Contains(fromVertex) && !row.Header.Vertices.Contains(toVertex))
+                {
+                    return true;
+                }
+                else if (!row.Header.Vertices.Contains(fromVertex) && row.Header.Vertices.Contains(toVertex))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private bool CheckForTopologyErrors()
+        {
+            foreach (SwitchingDeviceBase edge in m_edgeSet)
+            {
+                if (edge is CircuitBreaker)
+                {
+                    CircuitBreaker circuitBreaker = (CircuitBreaker)edge;
+                    if (circuitBreaker.IsMeasuredClosed || circuitBreaker.IsInferredClosed)
+                    {
+                        if (CheckForEdgeConnectionError(edge))
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
         }
 
         private void ExecuteLevelZeroAdjacencyResolution()
@@ -279,6 +337,47 @@ namespace SynchrophasorAnalytics.Graphs
         {
             while (ExecutingLevelThreeAdjacencyResolution()) { }
             while (ExecutingLevelTwoAdjacencyResolution()) { }
+        }
+
+        private void ExecuteLevelFiveAdjacencyResolution()
+        {
+            while (ExecutingLevelThreeAdjacencyResolution()) { }
+            while (ExecutingLevelFourAdjacencyResolution()) { }
+        }
+
+        private bool ExecutingLevelFourAdjacencyResolution()
+        {
+            foreach (VertexAdjacencyRow row in m_adjacencyList.Rows)
+            {
+                foreach (VertexCluster adjacency in row.Adjacencies)
+                {
+                    SwitchingDeviceBase connectingEdge = ConnectingEdgeBetween(row.Header, adjacency);
+
+                    if (!connectingEdge.CrossDevicePhasors.MeasurementPairWasReported)
+                    {
+                        if (connectingEdge is CircuitBreaker)
+                        {
+                            CircuitBreaker circuitBreaker = (CircuitBreaker)connectingEdge;
+                            if (circuitBreaker.IsMeasuredClosed)
+                            {
+                                ConnectionEstablished(row.Header, adjacency);
+                                return true;
+                            }
+                        }
+                        else if (connectingEdge is Switch)
+                        {
+                            Switch circuitSwitch = (Switch)connectingEdge;
+                            if (circuitSwitch.IsClosed)
+                            {
+                                ConnectionEstablished(row.Header, adjacency);
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return false;
         }
 
         /// <summary>

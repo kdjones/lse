@@ -435,11 +435,7 @@ namespace SynchrophasorAnalytics.Modeling
             {
                 if (m_crossDevicePhasors == null)
                 {
-                    if (m_fromNode != null && m_toNode != null)
-                    {
-                        m_crossDevicePhasors = new PhasorGroupPair(m_fromNode.Voltage, m_toNode.Voltage);
-                    }
-                    return m_crossDevicePhasors = new PhasorGroupPair(null, null);
+                    InitializeCrossDevicePhasors();
                 }
                 return m_crossDevicePhasors;
             }
@@ -539,6 +535,7 @@ namespace SynchrophasorAnalytics.Modeling
             }
         }
 
+
         #endregion
 
         #region [ Constructors ]
@@ -593,6 +590,18 @@ namespace SynchrophasorAnalytics.Modeling
         #endregion
 
         #region [ Public Methods ]
+
+        public void InitializeCrossDevicePhasors()
+        {
+            if (m_fromNode != null && m_toNode != null)
+            {
+                m_crossDevicePhasors = new PhasorGroupPair(m_fromNode.Voltage, m_toNode.Voltage);
+            }
+            else
+            {
+                m_crossDevicePhasors = new PhasorGroupPair(null, null);
+            }
+        }
 
         /// <summary>
         /// Sets the MeasurementKey to its default value of "Undefined" 
@@ -681,6 +690,7 @@ namespace SynchrophasorAnalytics.Modeling
             stringBuilder.AppendFormat("          Manual: " + InManualOverrideMode.ToString() + "{0}", Environment.NewLine);
             stringBuilder.AppendFormat("        FromNode: " + FromNode.ToString() + "{0}", Environment.NewLine);
             stringBuilder.AppendFormat("          ToNode: " + ToNode.ToString() + "{0}", Environment.NewLine);
+            stringBuilder.AppendFormat(" Can Infer State: " + CanInferState.ToString() + "{0}", Environment.NewLine);
             stringBuilder.AppendLine();
             return stringBuilder.ToString();
         }

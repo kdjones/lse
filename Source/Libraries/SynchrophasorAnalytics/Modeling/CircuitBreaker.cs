@@ -356,6 +356,9 @@ namespace SynchrophasorAnalytics.Modeling
             stringBuilder.AppendFormat("          Number: " + Number.ToString() + "{0}", Environment.NewLine);
             stringBuilder.AppendFormat("            Name: " + Name + "{0}", Environment.NewLine);
             stringBuilder.AppendFormat("     Description: " + Description + "{0}", Environment.NewLine);
+            stringBuilder.AppendFormat(" Can Infer State: " + CanInferState.ToString() + "{0}", Environment.NewLine);
+            stringBuilder.AppendFormat("Group A Reported: " + CrossDevicePhasors.GroupAWasReported + "{0}", Environment.NewLine);
+            stringBuilder.AppendFormat("Group B Reported: " + CrossDevicePhasors.GroupBWasReported + "{0}", Environment.NewLine);
             stringBuilder.AppendFormat("          Normal: " + NormalState.ToString() + "{0}", Environment.NewLine);
             stringBuilder.AppendFormat("          Actual: " + ActualState.ToString() + "{0}", Environment.NewLine);
             stringBuilder.AppendFormat("        Measured: " + MeasuredState.ToString() + "{0}", Environment.NewLine);

@@ -56,9 +56,19 @@ namespace SynchrophasorAnalytics.Graphs
 
         /// <summary>
         /// Encompasses behavior in Level Three but supplements with availalble breaker telemetry
-        /// and angle-across breaker pseudo telemetry to provide a more complete picture. This level
+        /// and angle-across breaker pseudo telemetry to provide a more complete picture. This level will
+        /// let breaker telemetry override group separation from Level Three. This level
         /// enables detection of bad topology telemetry and topology errors.
         /// </summary>
         Four,
+
+        /// <summary>
+        /// Encompasses behavior in Level Three but supplements with available breaker telemetry
+        /// as long as the breaker telemetry is not inconsistent with the Level Three grouping.
+        /// The net effect of this level is to extend observability across breakers where telemetry is
+        /// available to nodes that were not included in an observed group through Level Three grouping.
+        /// This level also enables detection of bad topology telemetry and topology errors.
+        /// </summary>
+        Five
     }
 }

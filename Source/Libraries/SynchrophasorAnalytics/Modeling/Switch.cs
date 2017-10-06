@@ -23,6 +23,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Xml.Serialization;
+using SynchrophasorAnalytics.Measurements;
+using SynchrophasorAnalytics.Networks;
+
 
 namespace SynchrophasorAnalytics.Modeling
 {
@@ -210,6 +213,59 @@ namespace SynchrophasorAnalytics.Modeling
 
         #region [ Public Methods ]
 
+        public void PropagateMeasurements()
+        {
+            if (IsClosed)
+            {
+                if (CrossDevicePhasors.GroupAWasReported && !CrossDevicePhasors.GroupBWasReported)
+                {
+                    PropagateGroupAToB();
+
+                }
+                else if (CrossDevicePhasors.GroupBWasReported && !CrossDevicePhasors.GroupAWasReported)
+                {
+                    PropagateGroupBToA();
+                }
+            }
+        }
+
+        private void PropagateGroupAToB()
+        {
+            PhasorGroup A = CrossDevicePhasors.GroupA;
+            PhasorGroup B = CrossDevicePhasors.GroupB;
+            B.Status.BinaryValue = A.Status.BinaryValue;
+            B.PositiveSequence.Measurement.Magnitude = A.PositiveSequence.Measurement.Magnitude;
+            B.PositiveSequence.Measurement.AngleInDegrees = A.PositiveSequence.Measurement.AngleInDegrees;
+            if (ParentSubstation.ParentDivision.ParentCompany.ParentModel.PhaseConfiguration == PhaseSelection.ThreePhase) 
+            {
+
+                B.PhaseA.Measurement.Magnitude = A.PhaseA.Measurement.Magnitude;
+                B.PhaseA.Measurement.AngleInDegrees = A.PhaseA.Measurement.AngleInDegrees;
+                B.PhaseB.Measurement.Magnitude = A.PhaseB.Measurement.Magnitude;
+                B.PhaseB.Measurement.AngleInDegrees = A.PhaseB.Measurement.AngleInDegrees;
+                B.PhaseC.Measurement.Magnitude = A.PhaseC.Measurement.Magnitude;
+                B.PhaseC.Measurement.AngleInDegrees = A.PhaseC.Measurement.AngleInDegrees;
+            }
+        }
+
+        private void PropagateGroupBToA()
+        {
+            PhasorGroup A = CrossDevicePhasors.GroupA;
+            PhasorGroup B = CrossDevicePhasors.GroupB;
+            A.Status.BinaryValue = B.Status.BinaryValue;
+            A.PositiveSequence.Measurement.Magnitude = B.PositiveSequence.Measurement.Magnitude;
+            A.PositiveSequence.Measurement.AngleInDegrees = B.PositiveSequence.Measurement.AngleInDegrees;
+            if (ParentSubstation.ParentDivision.ParentCompany.ParentModel.PhaseConfiguration == PhaseSelection.ThreePhase)
+            {
+
+                A.PhaseA.Measurement.Magnitude = B.PhaseA.Measurement.Magnitude;
+                A.PhaseA.Measurement.AngleInDegrees = B.PhaseA.Measurement.AngleInDegrees;
+                A.PhaseB.Measurement.Magnitude = B.PhaseB.Measurement.Magnitude;
+                A.PhaseB.Measurement.AngleInDegrees = B.PhaseB.Measurement.AngleInDegrees;
+                A.PhaseC.Measurement.Magnitude = B.PhaseC.Measurement.Magnitude;
+                A.PhaseC.Measurement.AngleInDegrees = B.PhaseC.Measurement.AngleInDegrees;
+            }
+        }
         /// <summary>
         /// A string representation of the <see cref="Switch"/>.
         /// </summary>
@@ -233,6 +289,9 @@ namespace SynchrophasorAnalytics.Modeling
             stringBuilder.AppendFormat("          Number: " + Number.ToString() + "{0}", Environment.NewLine);
             stringBuilder.AppendFormat("            Name: " + Name + "{0}", Environment.NewLine);
             stringBuilder.AppendFormat("     Description: " + Description + "{0}", Environment.NewLine);
+            stringBuilder.AppendFormat(" Can Infer State: " + CanInferState.ToString() + "{0}", Environment.NewLine);
+            stringBuilder.AppendFormat("Group A Reported: " + CrossDevicePhasors.GroupAWasReported + "{0}", Environment.NewLine);
+            stringBuilder.AppendFormat("Group B Reported: " + CrossDevicePhasors.GroupBWasReported + "{0}", Environment.NewLine);
             stringBuilder.AppendFormat("        Normally: " + NormalState.ToString() + "{0}", Environment.NewLine);
             stringBuilder.AppendFormat("        Actually: " + ActualState.ToString() + "{0}", Environment.NewLine); stringBuilder.AppendFormat("   Inferred Open: " + IsInferredOpen.ToString() + "{0}", Environment.NewLine);
             stringBuilder.AppendFormat(" Inferred Closed: " + IsInferredClosed.ToString() + "{0}", Environment.NewLine);

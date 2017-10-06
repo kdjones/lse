@@ -1301,6 +1301,7 @@ namespace SynchrophasorAnalytics.Modeling
             LinkVoltageLevelsToPhasorGroups();
             InitializeComplexPowerCalculations();
             InitializeSubstationVoltageLevelGroups();
+            InitializeCrossDevicePhasors();
             m_observedBuses = new List<ObservedBus>();
             m_potentiallyObservedBuses = new List<ObservedBus>();
             m_activeCurrentFlows = new List<CurrentFlowPhasorGroup>();
@@ -1476,36 +1477,6 @@ namespace SynchrophasorAnalytics.Modeling
             return receivedMeasurements;
         }
 
-        //public void ResolveToLevelZeroObservedBuses()
-        //{
-
-        //}
-
-        //public void ResolveToLevelOneObservedBuses()
-        //{
-
-        //}
-
-        //public void ResolveToLevelTwoObservedBuses()
-        //{
-
-        //}
-
-        //public void ResolveToLevelThreeObservedBuses()
-        //{
-
-        //}
-
-        //public void ResolveToLevelFourObservedBuses()
-        //{
-
-        //}
-
-        //private void OriginalResolveToObservedBuses()
-        //{
-
-        //}
-
         /// <summary>
         /// Resolves the network from breaker/switch/node to bus/branch.
         /// </summary>
@@ -1518,6 +1489,7 @@ namespace SynchrophasorAnalytics.Modeling
 
             foreach (Substation substation in m_substations)
             {
+                substation.PropagateSwitchMeasurements();
                 substation.InitializeSubstationGraph();
                 substation.Graph.ResolveAdjacencies();
                 List<ObservedBus> observedBuses = substation.Graph.ResolveToObservedBuses();
@@ -3254,6 +3226,14 @@ namespace SynchrophasorAnalytics.Modeling
             }
         }
 
+        private void InitializeCrossDevicePhasors()
+        {
+            foreach (SwitchingDeviceBase device in m_switchingDevices)
+            {
+                device.InitializeCrossDevicePhasors();
+            }
+        }
+
         public void InitializeSubstationVoltageLevelGroups()
         {
             foreach (Substation substation in m_substations)
@@ -4569,11 +4549,26 @@ namespace SynchrophasorAnalytics.Modeling
                         SubstationName = substation.Name,
                         MeasuredDeviceType = MeasuredDeviceType.Substation,
                         OutputType = OutputType.TopologyProfiling,
-                        DeviceId = $"{substation.Name}",
+                        DeviceId = $"{substation.Name}_BUS_COUNT",
                         DeviceSuffix = substation.Name,
                         Key = substation.ObservedBusCountKey,
                         Value = substation.ObservedBusCount,
                         Description = $"{substation.Name} Observed Bus Count"
+                    });
+                }
+                if (!keys.Contains(substation.TopologyErrorDetectionKey))
+                {
+                    output.Add(new OutputMeasurement()
+                    {
+                        InternalId = substation.InternalID,
+                        SubstationName = substation.Name,
+                        MeasuredDeviceType = MeasuredDeviceType.Substation,
+                        OutputType = OutputType.TopologyProfiling,
+                        DeviceId = $"{substation.Name}_TOPOLOGY_ERROR",
+                        DeviceSuffix = substation.Name,
+                        Key = substation.TopologyErrorDetectionKey,
+                        Value = Convert.ToDouble(substation.ObservedBusCount),
+                        Description = $"{substation.Name} Topology Error Detection Flag"
                     });
                 }
                 foreach (Node node in substation.Nodes)
@@ -4588,7 +4583,7 @@ namespace SynchrophasorAnalytics.Modeling
                             SubstationName = substation.Name,
                             MeasuredDeviceType = MeasuredDeviceType.Node,
                             OutputType = OutputType.TopologyProfiling,
-                            DeviceId = $"{node.Name}_TOPOOGY_STATE",
+                            DeviceId = $"{node.Name}_TOPOLOGY_STATE",
                             DeviceSuffix = substation.Name,
                             Key = node.ObservationStateKey,
                             Value = (double)node.Observability,
@@ -4617,6 +4612,7 @@ namespace SynchrophasorAnalytics.Modeling
             foreach (Substation substation in m_substations)
             {
                 output.Add(substation.ObservedBusCountKey.ToLower(),substation.ObservedBusCount);
+                output.Add(substation.TopologyErrorDetectionKey.ToLower(), Convert.ToDouble(substation.TopologyErrorDetected));
                 foreach (Node node in substation.Nodes)
                 {
                     output.Add(node.ObservationStateKey.ToLower(),Convert.ToDouble(node.Observability));

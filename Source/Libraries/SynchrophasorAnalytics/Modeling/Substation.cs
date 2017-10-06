@@ -68,6 +68,7 @@ namespace SynchrophasorAnalytics.Modeling
         private string m_name;
         private string m_description;
         private string m_observedBusCountKey;
+        private string m_topologyErrorDetectionKey;
 
         /// <summary>
         /// Parent
@@ -205,6 +206,32 @@ namespace SynchrophasorAnalytics.Modeling
             set
             {
                 m_observedBusCountKey = value;
+            }
+        }
+
+        [XmlAttribute("TopologyErrorDetectionKey")]
+        public string TopologyErrorDetectionKey
+        {
+            get
+            {
+                return m_topologyErrorDetectionKey;
+            }
+            set
+            {
+                m_topologyErrorDetectionKey = value;
+            }
+        }
+
+        [XmlIgnore()]
+        public bool TopologyErrorDetected
+        {
+            get
+            {
+                if (Graph != null)
+                {
+                    return Graph.TopologyErrorDetected;
+                }
+                return false;
             }
         }
 
@@ -541,6 +568,22 @@ namespace SynchrophasorAnalytics.Modeling
 
         #region [ Public Methods ]
 
+        public void PropagateSwitchMeasurements()
+        {
+            if (TopologyLevel != TopologyEstimationLevel.Zero)
+            {
+                foreach (Switch device in Switches)
+                {
+                    device.PropagateMeasurements();
+                }
+
+                //foreach (Switch device in Switches)
+                //{
+                //    device.PropagateMeasurements();
+                //}
+            }
+        }
+
         /// <summary>
         /// Initializes the <see cref="LinearStateEstimator.Modeling.Substation.Graph"/>.
         /// </summary>
@@ -726,6 +769,7 @@ namespace SynchrophasorAnalytics.Modeling
         {
             m_observedBusCountKey = "Undefined";
         }
+        
         #endregion
     }
 }
