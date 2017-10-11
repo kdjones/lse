@@ -27,7 +27,27 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MeasurementSampler", "Measu
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D131BBAE-FE04-499F-9F84-E6C57A80AE26}"
 	ProjectSection(SolutionItems) = preProject
+		LseUserDefinedMappings.ecamap.txt = LseUserDefinedMappings.ecamap.txt
+		LseUserDefinedTypes.ecaidl = LseUserDefinedTypes.ecaidl
 		move_build_output.bat = move_build_output.bat
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dependencies", "Dependencies", "{E3B25C82-0E73-4B9D-8C99-B3F99F494517}"
+	ProjectSection(SolutionItems) = preProject
+		Dependencies\Antlr3.Runtime.dll = Dependencies\Antlr3.Runtime.dll
+		Dependencies\ECAClientFramework.dll = Dependencies\ECAClientFramework.dll
+		Dependencies\ECAClientUtilities.dll = Dependencies\ECAClientUtilities.dll
+		Dependencies\ECACommonUtilities.dll = Dependencies\ECACommonUtilities.dll
+		Dependencies\ExpressionEvaluator.dll = Dependencies\ExpressionEvaluator.dll
+		Dependencies\GSF.Communication.dll = Dependencies\GSF.Communication.dll
+		Dependencies\GSF.Core.dll = Dependencies\GSF.Core.dll
+		Dependencies\GSF.PhasorProtocols.dll = Dependencies\GSF.PhasorProtocols.dll
+		Dependencies\GSF.Security.dll = Dependencies\GSF.Security.dll
+		Dependencies\GSF.ServiceProcess.dll = Dependencies\GSF.ServiceProcess.dll
+		Dependencies\GSF.TimeSeries.dll = Dependencies\GSF.TimeSeries.dll
+		Dependencies\MathNet.Numerics.Data.Matlab.dll = Dependencies\MathNet.Numerics.Data.Matlab.dll
+		Dependencies\MathNet.Numerics.dll = Dependencies\MathNet.Numerics.dll
+		Dependencies\ZeroMQ.dll = Dependencies\ZeroMQ.dll
 	EndProjectSection
 EndProject
 Global

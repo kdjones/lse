@@ -32,33 +32,33 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ECAClientFramework, Version=0.8.42.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="ECAClientFramework, Version=1.0.11.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\openLSE\Dependencies\openECA\ECAClientFramework.dll</HintPath>
+      <HintPath>..\Dependencies\ECAClientFramework.dll</HintPath>
     </Reference>
     <Reference Include="ECAClientUtilities, Version=1.0.11.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\openLSE\Dependencies\openECA\ECAClientUtilities.dll</HintPath>
+      <HintPath>..\Dependencies\ECAClientUtilities.dll</HintPath>
     </Reference>
     <Reference Include="ECACommonUtilities, Version=1.0.11.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\openLSE\Dependencies\openECA\ECACommonUtilities.dll</HintPath>
+      <HintPath>..\Dependencies\ECACommonUtilities.dll</HintPath>
     </Reference>
     <Reference Include="ExpressionEvaluator, Version=2.0.4.0, Culture=neutral, PublicKeyToken=90d9f15d622e2348, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\Program Files\openECA\Client\ExpressionEvaluator.dll</HintPath>
+      <HintPath>..\Dependencies\ExpressionEvaluator.dll</HintPath>
     </Reference>
-    <Reference Include="GSF.Communication, Version=2.2.44.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="GSF.Communication, Version=2.2.67.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\Program Files\openECA\Client\GSF.Communication.dll</HintPath>
+      <HintPath>..\Dependencies\GSF.Communication.dll</HintPath>
     </Reference>
-    <Reference Include="GSF.Core, Version=2.2.44.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="GSF.Core, Version=2.2.67.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\Program Files\openECA\Client\GSF.Core.dll</HintPath>
+      <HintPath>..\Dependencies\GSF.Core.dll</HintPath>
     </Reference>
-    <Reference Include="GSF.TimeSeries, Version=2.2.44.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="GSF.TimeSeries, Version=2.2.67.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\Program Files\openECA\Client\GSF.TimeSeries.dll</HintPath>
+      <HintPath>..\Dependencies\GSF.TimeSeries.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />

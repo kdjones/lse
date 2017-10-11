@@ -39,17 +39,17 @@
     <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="GSF.Core, Version=2.0.110.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="GSF.Core, Version=2.1.312.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Dependencies\GSF\GSF.Core.dll</HintPath>
+      <HintPath>..\..\Dependencies\GSF.Core.dll</HintPath>
     </Reference>
-    <Reference Include="GSF.PhasorProtocols, Version=2.0.110.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="GSF.PhasorProtocols, Version=2.1.312.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Dependencies\GSF\GSF.PhasorProtocols.dll</HintPath>
+      <HintPath>..\..\Dependencies\GSF.PhasorProtocols.dll</HintPath>
     </Reference>
-    <Reference Include="GSF.TimeSeries, Version=2.0.110.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="GSF.TimeSeries, Version=2.1.312.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Dependencies\GSF\GSF.TimeSeries.dll</HintPath>
+      <HintPath>..\..\Dependencies\GSF.TimeSeries.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
