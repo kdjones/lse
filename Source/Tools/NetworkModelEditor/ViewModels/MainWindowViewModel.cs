@@ -3743,6 +3743,8 @@ namespace NetworkModelEditor.ViewModels
             if (OpenEcaConnection != null && OpenEcaConnection.IsConnected)
             {
                 DataRow[] statusFlagData = OpenEcaConnection.Metadata.Tables["MeasurementDetail"].Select("SignalAcronym = 'FLAG'");
+                DataTable pmuDevices = OpenEcaConnection.Metadata.Tables["DeviceDetail"];
+
                 if (m_network != null && m_network.Model != null)
                 {
                     foreach (DataRow statusFlag in statusFlagData)
@@ -3757,6 +3759,9 @@ namespace NetworkModelEditor.ViewModels
 
                         StatusWord existingStatusWord = m_network.Model.StatusWords.Find(x => x.UniqueId.ToString() == signalID.ToString());
 
+                        Guid uniqueId = Guid.Empty;
+                        Guid.TryParse(signalID.ToString(), out uniqueId);
+
                         if (existingStatusWord != null)
                         {
                             existingStatusWord.Acronym = (string)pointTag;
@@ -3767,18 +3772,26 @@ namespace NetworkModelEditor.ViewModels
                         }
                         else
                         {
-                            StatusWord newStatusWord = new StatusWord()
+                            if (uniqueId != Guid.Empty)
                             {
-                                UniqueId = (Guid)signalID,
-                                InternalID = Convert.ToInt32(id.ToString().Split(':')[1]),
-                                Number = Convert.ToInt32(id.ToString().Split(':')[1]),
-                                Acronym = (string)pointTag,
-                                Description = (string)description,
-                                IsEnabled = (bool)enabled,
-                                Key = signalID.ToString(),
-                                Name = (string)signalReference,
-                            };
-                            m_network.Model.StatusWords.Add(newStatusWord);
+                                string deviceAcronym = statusFlag["DeviceAcronym"].ToString();
+                                DataRow device = pmuDevices.Select($"Acronym = {deviceAcronym}").First();
+                                if ((bool)device["Enabled"])
+                                {
+                                    StatusWord newStatusWord = new StatusWord()
+                                    {
+                                        UniqueId = uniqueId,
+                                        InternalID = Convert.ToInt32(id.ToString().Split(':')[1]),
+                                        Number = Convert.ToInt32(id.ToString().Split(':')[1]),
+                                        Acronym = (string)pointTag,
+                                        Description = (string)description,
+                                        IsEnabled = (bool)enabled,
+                                        Key = signalID.ToString(),
+                                        Name = (string)signalReference,
+                                    };
+                                    m_network.Model.StatusWords.Add(newStatusWord);
+                                }
+                            }
                         }
                     }
                     m_networkTreeViewModel.Network = m_network;
