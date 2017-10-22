@@ -46,6 +46,8 @@ namespace SynchrophasorAnalytics.Modeling
 
         #endregion
 
+        public static string CSV_HEADER = $"InternalID,Number,Name,Description,Can Infer State,Group A Reported,Group B Reported,Normal,Actual,Inferred Open,Inferred Closed,Open,Closed,Pruning Mode,Manual,From Node,To Node,Substation,Trasmission Line,Default Mode{Environment.NewLine}";
+
         #region [ Properties ]
 
         /// <summary>
@@ -312,6 +314,46 @@ namespace SynchrophasorAnalytics.Modeling
             stringBuilder.AppendFormat("   InDefaultMode: " + m_isInDefaultMode.ToString() + "{0}", Environment.NewLine);
             stringBuilder.AppendLine();
             return stringBuilder.ToString();
+        }
+
+        public new string ToCsvLineString()
+        {
+            StringBuilder csvLine = new StringBuilder();
+            csvLine.AppendFormat($"{InternalID.ToString()},");
+            csvLine.AppendFormat($"{Number.ToString()},");
+            csvLine.AppendFormat($"{Name},");
+            csvLine.AppendFormat($"{Description},");
+            csvLine.AppendFormat($"{CanInferState.ToString()},");
+            csvLine.AppendFormat($"{CrossDevicePhasors.GroupAWasReported},");
+            csvLine.AppendFormat($"{CrossDevicePhasors.GroupBWasReported},");
+            csvLine.AppendFormat($"{NormalState.ToString()},");
+            csvLine.AppendFormat($"{ActualState.ToString()},"); 
+            csvLine.AppendFormat($"{IsInferredOpen.ToString()},");
+            csvLine.AppendFormat($"{IsInferredClosed.ToString()},");
+            csvLine.AppendFormat($"{IsOpen.ToString()},");
+            csvLine.AppendFormat($"{IsClosed.ToString()},");
+            csvLine.AppendFormat($"{InPruningMode.ToString()},");
+            csvLine.AppendFormat($"{InManualOverrideMode.ToString()},");
+            csvLine.AppendFormat($"{FromNode.ToString()},");
+            csvLine.AppendFormat($"{ToNode.ToString()},");
+            if (ParentSubstation != null)
+            {
+                csvLine.AppendFormat($"{ParentSubstation.Name},");
+            }
+            else
+            {
+                csvLine.AppendFormat("None,");
+            }
+            if (m_parentTransmissionLine != null)
+            {
+                csvLine.AppendFormat($"{ParentTransmissionLine.Name},");
+            }
+            else
+            {
+                csvLine.AppendFormat("None,");
+            }
+            csvLine.AppendFormat($"{IsInDefaultMode}{Environment.NewLine}");
+            return csvLine.ToString();
         }
 
         #endregion

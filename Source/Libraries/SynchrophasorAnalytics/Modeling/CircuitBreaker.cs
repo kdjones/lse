@@ -56,7 +56,9 @@ namespace SynchrophasorAnalytics.Modeling
         private int m_parentSubstationID;
 
         #endregion
-        
+
+        public static string CSV_HEADER = $"InternalID,Number,Name,Description,Can Infer State,Group A Reported, Group B Reported,Normal,Actual,Measured,Measured Open,Measured Closed,Inferred Open,Inferred Closed,Open,Closed,Pruning Mode,From Node,To Node,Manual,Substation,Status{Environment.NewLine}";
+
         #region [ Properties ]
 
         /// <summary>
@@ -377,6 +379,34 @@ namespace SynchrophasorAnalytics.Modeling
             stringBuilder.AppendFormat(m_breakerStatus.ToStatusString() + "{0}", Environment.NewLine);
             stringBuilder.AppendLine();
             return stringBuilder.ToString();
+        }
+
+        public new string ToCsvLineString()
+        {
+            StringBuilder csvLine = new StringBuilder();
+            csvLine.AppendFormat($"{InternalID},");
+            csvLine.AppendFormat($"{Number},");
+            csvLine.AppendFormat($"{Name},");
+            csvLine.AppendFormat($"{Description},");
+            csvLine.AppendFormat($"{CanInferState},");
+            csvLine.AppendFormat($"{CrossDevicePhasors.GroupAWasReported},");
+            csvLine.AppendFormat($"{CrossDevicePhasors.GroupBWasReported},");
+            csvLine.AppendFormat($"{NormalState},");
+            csvLine.AppendFormat($"{ActualState},");
+            csvLine.AppendFormat($"{MeasuredState},");
+            csvLine.AppendFormat($"{IsMeasuredOpen},");
+            csvLine.AppendFormat($"{IsMeasuredClosed},");
+            csvLine.AppendFormat($"{IsInferredOpen},");
+            csvLine.AppendFormat($"{IsInferredClosed},");
+            csvLine.AppendFormat($"{IsOpen},");
+            csvLine.AppendFormat($"{IsClosed},");
+            csvLine.AppendFormat($"{InPruningMode},");
+            csvLine.AppendFormat($"{InManualOverrideMode},");
+            csvLine.AppendFormat($"{FromNode.Name},");
+            csvLine.AppendFormat($"{ToNode.Name},");
+            csvLine.AppendFormat($"{ParentSubstation.Name},");
+            csvLine.AppendFormat($"{Status}{Environment.NewLine}");
+            return csvLine.ToString();
         }
 
         #endregion

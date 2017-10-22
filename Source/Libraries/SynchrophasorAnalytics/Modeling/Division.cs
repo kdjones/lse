@@ -49,6 +49,8 @@ namespace SynchrophasorAnalytics.Modeling
 
         #endregion
 
+        public static string CSV_HEADER = $"InternalID,Number,Acronym,Name,Description,Parent Company,Substations,Transmission Lines{Environment.NewLine}";
+
         #region [ Private Members ]
 
         /// <summary>
@@ -369,6 +371,20 @@ namespace SynchrophasorAnalytics.Modeling
                 stringBuilder.AppendFormat("        " + transmissionLine.ToString() + "{0}", Environment.NewLine);
             }
             stringBuilder.AppendLine();
+            return stringBuilder.ToString();
+        }
+
+        public string ToCsvLineString()
+        {
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.AppendFormat(InternalID.ToString() + ",");
+            stringBuilder.AppendFormat(Number.ToString() + ",");
+            stringBuilder.AppendFormat(Acronym + ",");
+            stringBuilder.AppendFormat(Name + ",");
+            stringBuilder.AppendFormat(Description + ",");
+            stringBuilder.AppendFormat(ParentCompany.Name + ",");
+            stringBuilder.AppendFormat(Substations.Count.ToString() + ",");
+            stringBuilder.AppendFormat(TransmissionLines.Count.ToString() + "{0}", Environment.NewLine);
             return stringBuilder.ToString();
         }
 

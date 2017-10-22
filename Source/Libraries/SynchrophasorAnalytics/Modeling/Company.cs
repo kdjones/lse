@@ -49,6 +49,8 @@ namespace SynchrophasorAnalytics.Modeling
 
         #endregion
 
+        public static string CSV_HEADER = $"InternalID,Number,Acronym,Name,Description,Divisions{Environment.NewLine}";
+
         #region [ Private Members ]
 
         /// <summary>
@@ -74,7 +76,7 @@ namespace SynchrophasorAnalytics.Modeling
         #endregion
 
         #region [ Properties ]
-
+        
         /// <summary>
         /// A statistically unique identifier for the instance of the class.
         /// </summary>
@@ -334,6 +336,18 @@ namespace SynchrophasorAnalytics.Modeling
                 stringBuilder.AppendFormat("        " + division.ToString() + "{0}", Environment.NewLine);
             }
             stringBuilder.AppendLine();
+            return stringBuilder.ToString();
+        }
+
+        public string ToCsvLineString()
+        {
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.AppendFormat(InternalID.ToString() + ",");
+            stringBuilder.AppendFormat(Number.ToString() + ",");
+            stringBuilder.AppendFormat(Acronym + ",");
+            stringBuilder.AppendFormat(Name + ",");
+            stringBuilder.AppendFormat(Description + ",");
+            stringBuilder.AppendFormat(Divisions.Count.ToString() + "{0}", Environment.NewLine);
             return stringBuilder.ToString();
         }
 

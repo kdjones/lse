@@ -44,11 +44,27 @@ namespace SynchrophasorAnalytics.Modeling
         #region [ Private Members ]
 
         private int m_internalID;
+        private Guid m_uniqueId;
         private List<Node> m_observedNodes;
 
         #endregion
 
+        public static string CSV_HEADER = $"Observed Bus Unique ID,";
+
         #region [ Properties ]
+
+        
+        public Guid UniqueId
+        {
+            get
+            {
+                if (m_uniqueId == Guid.Empty)
+                {
+                    m_uniqueId = Guid.NewGuid();
+                }
+                return m_uniqueId;
+            }
+        }
 
         /// <summary>
         /// An integer identifier for each <see cref="LinearStateEstimator.Modeling.ObservedBus"/> which is intended to be unique among other objects of the same type.
@@ -369,6 +385,17 @@ namespace SynchrophasorAnalytics.Modeling
             
             stringBuilder.AppendLine();
             return stringBuilder.ToString();
+        }
+
+        public string ToCsvLineString()
+        {
+            StringBuilder csvLine = new StringBuilder();
+            foreach (Node node in m_observedNodes)
+            {
+                csvLine.AppendFormat($"{UniqueId},");
+                csvLine.AppendFormat($"{node.ToCsvLineString()}");
+            }
+            return csvLine.ToString();
         }
 
         #endregion

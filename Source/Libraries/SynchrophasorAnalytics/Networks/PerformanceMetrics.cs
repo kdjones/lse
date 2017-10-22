@@ -127,9 +127,9 @@ namespace SynchrophasorAnalytics.Networks
         {
             get
             {
-                if (m_network.Model.ObservedBusses != null)
+                if (m_network.Model.ObservedBuses != null)
                 {
-                    return m_network.Model.ObservedBusses.Count;
+                    return m_network.Model.ObservedBuses.Count;
                 }
                 return 0;
             }

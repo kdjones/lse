@@ -132,14 +132,14 @@ namespace SynchrophasorAnalytics.Matrices
             m_csvColumnHeaders = new List<string>();
             m_csvColumnHeaders.Add("II Matrix");
 
-            // Resolve the Network into a list of ObservedBusses
-            List<ObservedBus> observedBusses = network.Model.ObservedBusses;
+            // Resolve the Network into a list of ObservedBuses
+            List<ObservedBus> observedBusses = network.Model.ObservedBuses;
 
             if (observedBusses.Count > 0)
             {
                 m_matrixIsValid = true;
 
-                // Create a list of directly measured nodes from the set of ObservedBusses
+                // Create a list of directly measured nodes from the set of ObservedBuses
                 List<Node> measuredNodes = new List<Node>();
                 foreach (ObservedBus observedBus in observedBusses)
                 {
@@ -187,14 +187,14 @@ namespace SynchrophasorAnalytics.Matrices
             m_csvColumnHeaders = new List<string>();
             m_csvColumnHeaders.Add("II Matrix");
 
-            // Resolve the Network into a list of ObservedBusses
-            List<ObservedBus> observedBusses = network.Model.ObservedBusses;
+            // Resolve the Network into a list of ObservedBuses
+            List<ObservedBus> observedBusses = network.Model.ObservedBuses;
 
             if (observedBusses.Count > 0)
             {
                 m_matrixIsValid = true;
 
-                // Create a list of directly measured nodes from the set of ObservedBusses
+                // Create a list of directly measured nodes from the set of ObservedBuses
                 List<Node> measuredNodes = new List<Node>();
                 foreach (ObservedBus observedBus in observedBusses)
                 {

@@ -989,7 +989,7 @@ namespace SynchrophasorAnalytics.Modeling
         /// A list of the present observed busses (collections of nodes) in the network based on topology processing and observability analysis.
         /// </summary>
         [XmlIgnore()]
-        public List<ObservedBus> ObservedBusses
+        public List<ObservedBus> ObservedBuses
         {
             get
             {
@@ -3787,32 +3787,57 @@ namespace SynchrophasorAnalytics.Modeling
         private List<OutputMeasurement> GetVoltageEstimatesOutput()
         {
             List<OutputMeasurement> output = new List<OutputMeasurement>();
+            List<Node> reportableNodes = new List<Node>();
 
-            foreach (VoltagePhasorGroup voltage in m_voltages)
+            foreach (TransmissionLine transmissionLine in m_transmissionLines)
+            {
+                if (!reportableNodes.Contains(transmissionLine.FromNode))
+                {
+                    reportableNodes.Add(transmissionLine.FromNode);
+                }
+                if (!reportableNodes.Contains(transmissionLine.ToNode))
+                {
+                    reportableNodes.Add(transmissionLine.ToNode);
+                }
+            }
+
+            foreach (Transformer transformer in m_transformers)
+            {
+                if (!reportableNodes.Contains(transformer.FromNode))
+                {
+                    reportableNodes.Add(transformer.FromNode);
+                }
+                if (!reportableNodes.Contains(transformer.ToNode))
+                {
+                    reportableNodes.Add(transformer.ToNode);
+                }
+            }
+
+            foreach (Node node in reportableNodes)
             {
                 output.Add(new OutputMeasurement()
                 {
-                    InternalId = voltage.InternalID,
-                    SubstationName = voltage.MeasuredNode.ParentSubstation.Name,
+                    InternalId = node.Voltage.InternalID,
+                    SubstationName = node.ParentSubstation.Name,
                     MeasuredDeviceType = MeasuredDeviceType.Node,
                     OutputType = OutputType.VoltageMagnitudeEstimate,
-                    DeviceId = voltage.MeasuredNode.Name,
-                    DeviceSuffix = voltage.MeasuredNode.ParentSubstation.Name,
-                    Key = voltage.PositiveSequence.Estimate.MagnitudeKey,
-                    Value = voltage.PositiveSequence.Estimate.Magnitude,
-                    Description = $"{voltage.Description} Positive Sequence Magnitude"
+                    DeviceId = node.Name,
+                    DeviceSuffix = node.ParentSubstation.Name,
+                    Key = node.Voltage.PositiveSequence.Estimate.MagnitudeKey,
+                    Value = node.Voltage.PositiveSequence.Estimate.Magnitude,
+                    Description = $"{node.Voltage.Description} Positive Sequence Magnitude"
                 });
                 output.Add(new OutputMeasurement()
                 {
-                    InternalId = voltage.InternalID,
-                    SubstationName = voltage.MeasuredNode.ParentSubstation.Name,
+                    InternalId = node.Voltage.InternalID,
+                    SubstationName = node.ParentSubstation.Name,
                     MeasuredDeviceType = MeasuredDeviceType.Node,
                     OutputType = OutputType.VoltageAngleEstimate,
-                    DeviceId = voltage.MeasuredNode.Name,
-                    DeviceSuffix = voltage.MeasuredNode.ParentSubstation.Name,
-                    Key = voltage.PositiveSequence.Estimate.AngleKey,
-                    Value = voltage.PositiveSequence.Estimate.AngleInDegrees,
-                    Description = $"{voltage.Description} Positive Sequence Angle In Degrees"
+                    DeviceId = node.Name,
+                    DeviceSuffix = node.ParentSubstation.Name,
+                    Key = node.Voltage.PositiveSequence.Estimate.AngleKey,
+                    Value = node.Voltage.PositiveSequence.Estimate.AngleInDegrees,
+                    Description = $"{node.Voltage.Description} Positive Sequence Angle In Degrees"
                 });
             }
 

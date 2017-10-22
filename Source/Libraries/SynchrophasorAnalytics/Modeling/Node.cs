@@ -91,6 +91,8 @@ namespace SynchrophasorAnalytics.Modeling
 
         #endregion
 
+        public static string CSV_HEADER = $"InternalID,Number,Name,Description,Base KV,Observation State,Substation,Transmission Line,{VoltagePhasorGroup.CSV_HEADER}";
+
         #region [ Properties ]
 
         /// <summary>
@@ -556,6 +558,36 @@ namespace SynchrophasorAnalytics.Modeling
             stringBuilder.AppendFormat(m_voltage.ToVerboseString());
             stringBuilder.AppendLine();
             return stringBuilder.ToString();
+        }
+
+        public string ToCsvLineString()
+        {
+            StringBuilder csvLine = new StringBuilder();
+            csvLine.AppendFormat($"{InternalID},");
+            csvLine.AppendFormat($"{Number},");
+            csvLine.AppendFormat($"{Name},");
+            csvLine.AppendFormat($"{Description},");
+            csvLine.AppendFormat($"{BaseKV.Value},");
+            csvLine.AppendFormat($"{Observability},");
+            if (m_parentSubstation != null)
+            {
+                csvLine.AppendFormat($"{ParentSubstation.Name},");
+            }
+            else
+            {
+                csvLine.AppendFormat("None,");
+            }
+            if (m_parentTransmissionLine != null)
+            {
+                csvLine.AppendFormat($"{ParentTransmissionLine.Name},");
+            }
+            else
+            {
+                csvLine.AppendFormat("None,");
+            }
+
+            csvLine.AppendFormat(Voltage.ToCsvLineString());
+            return csvLine.ToString();
         }
 
         public void Keyify()

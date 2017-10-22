@@ -127,7 +127,7 @@ namespace SynchrophasorAnalytics.Matrices
         /// <param name="network">The virtualized <see cref="LinearStateEstimator.Networks.Network"/> model.</param>
         private void BuildPositiveSequenceMatrix(Network network)
         {
-            List<ObservedBus> observedBusses = network.Model.ObservedBusses;
+            List<ObservedBus> observedBusses = network.Model.ObservedBuses;
             //List<CurrentFlowPhasorGroup> measuredCurrents = network.Model.ActiveCurrentPhasors;
             List<CurrentFlowPhasorGroup> measuredCurrents = network.Model.IncludedCurrentFlows;
 
@@ -186,7 +186,7 @@ namespace SynchrophasorAnalytics.Matrices
         /// <param name="network">The virtualized <see cref="LinearStateEstimator.Networks.Network"/> model.</param>
         private void BuildThreePhaseMatrix(Network network)
         {
-            List<ObservedBus> observedBusses = network.Model.ObservedBusses;
+            List<ObservedBus> observedBusses = network.Model.ObservedBuses;
             //List<CurrentFlowPhasorGroup> measuredCurrents = network.Model.ActiveCurrentPhasors;
             List<CurrentFlowPhasorGroup> measuredCurrents = network.Model.IncludedCurrentFlows;
 

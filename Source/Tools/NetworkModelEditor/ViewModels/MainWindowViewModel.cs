@@ -99,6 +99,7 @@ namespace NetworkModelEditor.ViewModels
         private RelayCommand m_openBreakerExtensionFileCommand;
         private RelayCommand m_openShuntExtensionFileCommand;
         private RelayCommand m_openTransformerExtensionFileCommand;
+        private RelayCommand m_openBatchAnalysisFileCommand;
 
         #endregion
 
@@ -156,6 +157,7 @@ namespace NetworkModelEditor.ViewModels
         private RelayCommand m_computeInjectionsCommand;
         private RelayCommand m_computePowerFlowsCommand;
         private RelayCommand m_computeSequenceComponentsCommand;
+        private RelayCommand m_runCompleteAnalysisCommand;
 
         #endregion
 
@@ -397,6 +399,8 @@ namespace NetworkModelEditor.ViewModels
         private MenuItemViewModel m_computeInjectionsMenuItem;
         private MenuItemViewModel m_computePowerFlowsMenuItem;
         private MenuItemViewModel m_computeSequenceComponentsMenuItem;
+        private MenuItemViewModel m_runCompleteAnalysisMenuItem;
+        private MenuItemViewModel m_runBatchAnalysisMenuItem;
 
         private MenuItemViewModel m_viewComponentSummaryMenuItem;
 
@@ -783,6 +787,18 @@ namespace NetworkModelEditor.ViewModels
                     m_openTransformerExtensionFileCommand = new RelayCommand(param => this.OpenTransformerExtensionFile(), param => true);
                 }
                 return m_openTransformerExtensionFileCommand;
+            }
+        }
+
+        public ICommand OpenBatchAnalysisFileCommand
+        {
+            get
+            {
+                if (m_openBatchAnalysisFileCommand == null)
+                {
+                    m_openBatchAnalysisFileCommand = new RelayCommand(param => this.OpenBatchAnalysisFile(), param => true);
+                }
+                return m_openBatchAnalysisFileCommand;
             }
         }
 
@@ -1560,6 +1576,18 @@ namespace NetworkModelEditor.ViewModels
             }
         }
 
+        public ICommand RunCompleteAnalysisCommand
+        {
+            get
+            {
+                if (m_runCompleteAnalysisCommand == null)
+                {
+                    m_computeSequenceComponentsCommand = new RelayCommand(param => this.RunCompleteAnalysis(), param => true);
+                }
+                return m_computeSequenceComponentsCommand;
+            }
+        }
+
         #endregion
 
         #region [ View Matrix Commands ]
@@ -2229,6 +2257,22 @@ namespace NetworkModelEditor.ViewModels
             m_stateWasComputed = false;
 
             DisableControls();
+            AnalysisReport report = new AnalysisReport()
+            {
+                Path = "\\report"
+            };
+
+            AnalysisRun analysis = new AnalysisRun()
+            {
+                ModelFile = "\\model-file",
+                SampleFile = "\\sample-file",
+            };
+            analysis.Reports.Add(report);
+
+            BatchAnalysisFile batchFile = new BatchAnalysisFile();
+            batchFile.Analyses.Add(analysis);
+
+            batchFile.SerializeToXml(@"C:\Users\kevin\Desktop\LseBatchRun.xml");
         }
 
         #endregion
@@ -2731,11 +2775,15 @@ namespace NetworkModelEditor.ViewModels
 
             #region [ MENU BAR --> OFFLINE ANALYSIS ]
             m_offlineAnalysisMenuItem = new MenuItemViewModel("Offline Analysis", null);
+            m_runCompleteAnalysisMenuItem = new MenuItemViewModel("Run Complete Analysis", RunCompleteAnalysisCommand);
+            m_runBatchAnalysisMenuItem = new MenuItemViewModel("Run Batch Analysis from File", OpenBatchAnalysisFileCommand);
             m_offlineAnalysisMenuItem.AddMenuItem(m_setupMenuItem);
             m_offlineAnalysisMenuItem.AddMenuItem(m_observabilityMenuItem);
             m_offlineAnalysisMenuItem.AddMenuItem(m_matricesMenuItem);
             m_offlineAnalysisMenuItem.AddMenuItem(m_computationMenuItem);
             m_offlineAnalysisMenuItem.AddMenuItem(m_inspectMenuItem);
+            m_offlineAnalysisMenuItem.AddMenuItem(m_runCompleteAnalysisMenuItem);
+            m_offlineAnalysisMenuItem.AddMenuItem(m_runBatchAnalysisMenuItem);
             #endregion
 
             #region [ MENU BAR --> UTILITIES --> MODEL ACTIONS ]
@@ -2924,6 +2972,15 @@ namespace NetworkModelEditor.ViewModels
 
         #region [ File Opening ] 
 
+        private void LoadNetworkModel(string fileName)
+        {
+            m_network = Network.DeserializeFromXml(fileName);
+            ActionStatus = $"Opened network model from {fileName}";
+
+            m_networkTreeViewModel.Network = m_network;
+            EnableControls();
+        }
+
         private void OpenFile()
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
@@ -2935,11 +2992,7 @@ namespace NetworkModelEditor.ViewModels
             {
                 try
                 {
-                    m_network = Network.DeserializeFromXml(openFileDialog.FileName);
-                    ActionStatus = $"Opened network model from {openFileDialog.FileName}";
-
-                    m_networkTreeViewModel.Network = m_network;
-                    EnableControls();
+                    LoadNetworkModel(openFileDialog.FileName);
                 }
                 catch (Exception exception)
                 {
@@ -3379,6 +3432,32 @@ namespace NetworkModelEditor.ViewModels
             }
         }
 
+        private void OpenBatchAnalysisFile()
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+
+            openFileDialog.DefaultExt = ".xml";
+            openFileDialog.Filter = "Batch Analysis File (.xml)|*.xml";
+
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    BatchAnalysisFile batch = BatchAnalysisFile.DeserializeFromXml(openFileDialog.FileName);
+                    ActionStatus = $"Opened batch analysis file from {openFileDialog.FileName}";
+
+                    RunBatchAnalysis(batch);
+                }
+                catch (Exception exception)
+                {
+                    if (exception != null)
+                    {
+                        System.Windows.MessageBox.Show(exception.ToString(), "Failed to load selected file.");
+                    }
+                }
+            }
+        }
+        
         #endregion
 
         #region [ User Interface ]
@@ -3677,7 +3756,7 @@ namespace NetworkModelEditor.ViewModels
             ActionStatus = "Pruning Model...";
             m_network.Model.Prune();
             m_network.Model.InPruningMode = wasInPruningMode;
-            ActionStatus = $"Exited Pruning Mode.{m_network.Model.ObservedBusses.Count}";
+            ActionStatus = $"Exited Pruning Mode.{m_network.Model.ObservedBuses.Count}";
         }
 
         private void PruneModelByVoltageLevel()
@@ -3729,7 +3808,7 @@ namespace NetworkModelEditor.ViewModels
             m_network.Model.InPruningMode = false;
             m_network.Model.EnableInferredStateAsActualProxy();
         }
-
+        
         #region [ Measurement Creation ]
 
         private void ConnectToOpenEca()
@@ -3775,7 +3854,7 @@ namespace NetworkModelEditor.ViewModels
                             if (uniqueId != Guid.Empty)
                             {
                                 string deviceAcronym = statusFlag["DeviceAcronym"].ToString();
-                                DataRow device = pmuDevices.Select($"Acronym = {deviceAcronym}").First();
+                                DataRow device = pmuDevices.Select($"Acronym = '{deviceAcronym}'").First();
                                 if ((bool)device["Enabled"])
                                 {
                                     StatusWord newStatusWord = new StatusWord()
@@ -4293,7 +4372,273 @@ namespace NetworkModelEditor.ViewModels
 
         #endregion
 
+        public void RunCompleteAnalysis()
+        {
+            InitializeModel();
+            MapMeasurementsToModel();
+            DetermineActiveCurrentFlows();
+            DetermineActiveCurrentInjections();
+            ResolveToObservedBuses();
+            ResolveToSingleFlowBranches();
+            ComputeSystemState();
+            ComputeLineFlows();
+        }
+
+        public void RunBatchAnalysis(BatchAnalysisFile batch)
+        {
+            foreach (AnalysisRun analysis in batch.Analyses)
+            {
+                LoadNetworkModel(analysis.ModelFile);
+                LoadMeasurementSampleForBatchRun(analysis.SampleFile);
+                RunCompleteAnalysis();
+                RunBatchReport(analysis.Reports);
+                ClearMeasurementsFromModel();
+            }
+        }
+
+        public void RunBatchReport(List<AnalysisReport> reports)
+        {
+            foreach (AnalysisReport report in reports)
+            {
+                if (report.Type == AnalysisReportType.AMatrix)
+                {
+                    // Do nothing
+                }
+                else if (report.Type == AnalysisReportType.IIMatrix)
+                {
+                    // Do nothing
+                }
+                else if (report.Type == AnalysisReportType.YMatrix)
+                {
+                    // Do nothing
+                }
+                else if (report.Type == AnalysisReportType.YsMatrix)
+                {
+                    // Do nothing
+                }
+                else if (report.Type == AnalysisReportType.YshMatrix)
+                {
+                    // Do nothing
+                }
+                else if (report.Type == AnalysisReportType.ModeledStatusWords)
+                {
+                    SaveStatusWordsReport(report.Path);
+                }
+                else if (report.Type == AnalysisReportType.MappedStatusWords)
+                {
+                    SaveMappedStatusWordsReport(report.Path);
+                }
+                else if (report.Type == AnalysisReportType.MappedLSEInvalidStatusWords)
+                {
+                    SaveMappedLSEInvalidStatusWordsReport(report.Path);
+                }
+                else if (report.Type == AnalysisReportType.ActiveStatusWords)
+                {
+                    SaveActiveStatusWordsReport(report.Path);
+                }
+                else if (report.Type == AnalysisReportType.ReceivedMeasurements)
+                {
+                    SaveReceivedMeasurementsReport(report.Path);
+                }
+                else if (report.Type == AnalysisReportType.UnreceivedMeasurements)
+                {
+                    SaveUnreceivedMeasurementsReport(report.Path);
+                }
+                else if (report.Type == AnalysisReportType.OutputMeasurements)
+                {
+                    SaveOutputMeasurementsReport(report.Path);
+                }
+                else if (report.Type == AnalysisReportType.PerformanceMetrics)
+                {
+                    SavePerformanceMetricsReport(report.Path);
+                }
+                else if (report.Type == AnalysisReportType.StateEstimateOutput)
+                {
+                    SaveVoltageEstimatesReport(report.Path);
+                }
+                else if (report.Type == AnalysisReportType.CurrentFlowEstimateOutput)
+                {
+                    SaveCurrentFlowEstimatesReport(report.Path);
+                }
+                else if (report.Type == AnalysisReportType.CurrentInjectionEstimateOutput)
+                {
+                    SaveCurrentInjectionEstimatesReport(report.Path);
+                }
+                else if (report.Type == AnalysisReportType.VoltageResidualOutput)
+                {
+                    SaveVoltageResidualsReport(report.Path);
+                }
+                else if (report.Type == AnalysisReportType.CurrentResidualOutput)
+                {
+                    SaveCurrentFlowResidualsReport(report.Path);
+                }
+                else if (report.Type == AnalysisReportType.CircuitBreakerStatusOutput)
+                {
+                    SaveCircuitBreakerStatusesReport(report.Path);
+                }
+                else if (report.Type == AnalysisReportType.SwitchStatusOutput)
+                {
+                    SaveSwitchStatusesReport(report.Path);
+                }
+                else if (report.Type == AnalysisReportType.TopologyProfilingOutput)
+                {
+                    SaveTopologyProfilingReport(report.Path);
+                }
+                else if (report.Type == AnalysisReportType.MeasurementValidationFlagOutput)
+                {
+                    SaveMeasurementValidationFlagsReport(report.Path);
+                }
+                else if (report.Type == AnalysisReportType.ObservedBuses)
+                {
+                    SaveObservableNodesReport(report.Path);
+                }
+                else if (report.Type == AnalysisReportType.ModeledVoltages)
+                {
+                    SaveModeledVoltagesReport(report.Path);
+                }
+                else if (report.Type == AnalysisReportType.ExpectedVoltages)
+                {
+                    SaveExpectedVoltagesReport(report.Path);
+                }
+                else if (report.Type == AnalysisReportType.ActiveVoltages)
+                {
+                    SaveActiveVoltagesReport(report.Path);
+                }
+                else if (report.Type == AnalysisReportType.InactiveVoltages)
+                {
+                    SaveInactiveVoltagesReport(report.Path);
+                }
+                else if (report.Type == AnalysisReportType.ReportedVoltages)
+                {
+                    SaveReportedVoltagesReport(report.Path);
+                }
+                else if (report.Type == AnalysisReportType.UnreportedVoltages)
+                {
+                    SaveUnreportedVoltagesReport(report.Path);
+                }
+                else if (report.Type == AnalysisReportType.ActiveVoltagesByStatusWord)
+                {
+                    SaveActiveVoltagesByStatusWordReport(report.Path);
+                }
+                else if (report.Type == AnalysisReportType.InactiveVoltagesByStatusWord)
+                {
+                    SaveInactiveVoltagesByStatusWordReport(report.Path);
+                }
+                else if (report.Type == AnalysisReportType.InactiveVoltagesByMeasurement)
+                {
+                    SaveInactiveVoltagesByMeasurementReport(report.Path);
+                }
+                else if (report.Type == AnalysisReportType.ModeledCurrentFlows)
+                {
+                    SaveModeledCurrentFlowsReport(report.Path);
+                }
+                else if (report.Type == AnalysisReportType.ExpectedCurrentFlows)
+                {
+                    SaveExpectedCurrentFlowsReport(report.Path);
+                }
+                else if (report.Type == AnalysisReportType.InactiveCurrentFlows)
+                {
+                    SaveInactiveCurrentFlowsReport(report.Path);
+                }
+                else if (report.Type == AnalysisReportType.IncludedCurrentFlows)
+                {
+                    SaveIncludedCurrentFlowsReport(report.Path);
+                }
+                else if (report.Type == AnalysisReportType.ExcludedCurrentFlows)
+                {
+                    SaveExcludedCurrentFlowsReport(report.Path);
+                }
+                else if (report.Type == AnalysisReportType.ActiveCurrentFlows)
+                {
+                    SaveActiveCurrentFlowsReport(report.Path);
+                }
+                else if (report.Type == AnalysisReportType.ReportedCurrentFlows)
+                {
+                    SaveReportedCurrentFlowsReport(report.Path);
+                }
+                else if (report.Type == AnalysisReportType.UnreporedCurrentFlows)
+                {
+                    SaveUnreportedCurrentFlowsReport(report.Path);
+                }
+                else if (report.Type == AnalysisReportType.ActiveCurrentFlowsByStatusWord)
+                {
+                    SaveActiveCurrentFlowsByStatusWordReport(report.Path);
+                }
+                else if (report.Type == AnalysisReportType.InactiveCurrentFlowsByStatusWord)
+                {
+                    SaveInactiveCurrentFlowsByStatusWordReport(report.Path);
+                }
+                else if (report.Type == AnalysisReportType.InactiveCurrentFlowsByMeasurement)
+                {
+                    SaveInactiveCurrentFlowsByMeasurementReport(report.Path);
+                }
+                else if (report.Type == AnalysisReportType.ModeledCurrentInjections)
+                {
+                    SaveModeledCurrentInjectionsReport(report.Path);
+                }
+                else if (report.Type == AnalysisReportType.ExpectedCurrentInjections)
+                {
+                    SaveExpectedCurrentInjectionsReport(report.Path);
+                }
+                else if (report.Type == AnalysisReportType.ActiveCurrentInjections)
+                {
+                    SaveActiveCurrentInjectionsReport(report.Path);
+                }
+                else if (report.Type == AnalysisReportType.InactiveCurrentInjections)
+                {
+                    SaveInactiveCurrentInjectionsReport(report.Path);
+                }
+                else if (report.Type == AnalysisReportType.ReportedCurrentInjections)
+                {
+                    SaveReportedCurrentInjectionsReport(report.Path);
+                }
+                else if (report.Type == AnalysisReportType.UnreporedCurrentInjections)
+                {
+                    SaveUnreportedCurrentInjectionsReport(report.Path);
+                }
+                else if (report.Type == AnalysisReportType.ActiveCurrentInjectionsByStatusWord)
+                {
+                    SaveActiveCurrentInjectionsByStatusWordReport(report.Path);
+                }
+                else if (report.Type == AnalysisReportType.InactiveCurrentInjectionsByStatusWord)
+                {
+                    SaveInactiveCurrentInjectionsByStatusWordReport(report.Path);
+                }
+                else if (report.Type == AnalysisReportType.InactiveCurrentInjectionsByMeasurement)
+                {
+                    SaveInactiveCurrentInjectionsByMeasurementReport(report.Path);
+                }
+                else if (report.Type == AnalysisReportType.ModeledBreakerStatuses)
+                {
+                    SaveModeledBreakerStatusesReport(report.Path);
+                }
+                else if (report.Type == AnalysisReportType.ExpectedBreakerStatuses)
+                {
+                    SaveExpectedBreakerStatusesReport(report.Path);
+                }
+                else if (report.Type == AnalysisReportType.ReportedBreakerStatuses)
+                {
+                    SaveReportedBreakerStatusesReport(report.Path);
+                }
+                else if (report.Type == AnalysisReportType.CircuitBreakers)
+                {
+                    SaveCircuitBreakersReport(report.Path);
+                }
+                else if (report.Type == AnalysisReportType.Switches)
+                {
+                    SaveSwitchesReport(report.Path);
+                }
+            }
+        }
+
         #region [ Setup ]
+
+        private void LoadMeasurementSampleForBatchRun(string fileName)
+        {
+            SelectedMeasurementSample = RawMeasurements.DeserializeFromXml(fileName);
+            EnableControls();
+            ActionStatus = "Loaded measurement sample for computation.";
+        }
 
         private void SelectMeasurementSample()
         {
@@ -4426,11 +4771,11 @@ namespace NetworkModelEditor.ViewModels
             {
                 CurrentFlowMeasurementBusIncidenceMatrix A = new CurrentFlowMeasurementBusIncidenceMatrix(m_network);
 
-                StringBuilder stringBuilder = new StringBuilder();
+                StringBuilder matrix = new StringBuilder();
 
-                stringBuilder.AppendFormat(A.ToCsvString());
+                matrix.AppendFormat(A.ToCsvString());
 
-                File.WriteAllText(Directory.GetCurrentDirectory() + "/A Matrix.csv", stringBuilder.ToString());
+                File.WriteAllText(Directory.GetCurrentDirectory() + "/A Matrix.csv", matrix.ToString());
                 ActionStatus = "Wrote to " + Directory.GetCurrentDirectory() + "/A Matrix.csv";
                 Process.Start(Directory.GetCurrentDirectory() + "/A Matrix.csv");
             }
@@ -4446,11 +4791,11 @@ namespace NetworkModelEditor.ViewModels
             {
                 VoltageMeasurementBusIncidenceMatrix II = new VoltageMeasurementBusIncidenceMatrix(m_network);
 
-                StringBuilder stringBuilder = new StringBuilder();
+                StringBuilder matrix = new StringBuilder();
 
-                stringBuilder.AppendFormat(II.ToCsvString());
+                matrix.AppendFormat(II.ToCsvString());
 
-                File.WriteAllText(Directory.GetCurrentDirectory() + "/II Matrix.csv", stringBuilder.ToString());
+                File.WriteAllText(Directory.GetCurrentDirectory() + "/II Matrix.csv", matrix.ToString());
                 ActionStatus = "Wrote to " + Directory.GetCurrentDirectory() + "/II Matrix.csv";
                 Process.Start(Directory.GetCurrentDirectory() + "/II Matrix.csv");
             }
@@ -4466,11 +4811,11 @@ namespace NetworkModelEditor.ViewModels
             {
                 SeriesAdmittanceMatrix Y = new SeriesAdmittanceMatrix(m_network);
 
-                StringBuilder stringBuilder = new StringBuilder();
+                StringBuilder matrix = new StringBuilder();
 
-                stringBuilder.AppendFormat(Y.ToCsvString());
+                matrix.AppendFormat(Y.ToCsvString());
 
-                File.WriteAllText(Directory.GetCurrentDirectory() + "/Y Matrix.csv", stringBuilder.ToString());
+                File.WriteAllText(Directory.GetCurrentDirectory() + "/Y Matrix.csv", matrix.ToString());
                 ActionStatus = "Wrote to " + Directory.GetCurrentDirectory() + "/Y Matrix.csv";
                 Process.Start(Directory.GetCurrentDirectory() + "/Y Matrix.csv");
             }
@@ -4486,11 +4831,11 @@ namespace NetworkModelEditor.ViewModels
             {
                 LineShuntSusceptanceMatrix Ys = new LineShuntSusceptanceMatrix(m_network);
 
-                StringBuilder stringBuilder = new StringBuilder();
+                StringBuilder matrix = new StringBuilder();
 
-                stringBuilder.AppendFormat(Ys.ToCsvString());
+                matrix.AppendFormat(Ys.ToCsvString());
 
-                File.WriteAllText(Directory.GetCurrentDirectory() + "/Ys Matrix.csv", stringBuilder.ToString());
+                File.WriteAllText(Directory.GetCurrentDirectory() + "/Ys Matrix.csv", matrix.ToString());
                 ActionStatus = "Wrote to " + Directory.GetCurrentDirectory() + "/Ys Matrix.csv";
                 Process.Start(Directory.GetCurrentDirectory() + "/Ys Matrix.csv");
             }
@@ -4506,11 +4851,11 @@ namespace NetworkModelEditor.ViewModels
             {
                 ShuntDeviceSusceptanceMatrix Ysh = new ShuntDeviceSusceptanceMatrix(m_network);
 
-                StringBuilder stringBuilder = new StringBuilder();
+                StringBuilder matrix = new StringBuilder();
 
-                stringBuilder.AppendFormat(Ysh.ToCsvString());
+                matrix.AppendFormat(Ysh.ToCsvString());
 
-                File.WriteAllText(Directory.GetCurrentDirectory() + "/Ysh Matrix.csv", stringBuilder.ToString());
+                File.WriteAllText(Directory.GetCurrentDirectory() + "/Ysh Matrix.csv", matrix.ToString());
                 ActionStatus = "Wrote to " + Directory.GetCurrentDirectory() + "/Ysh Matrix.csv";
                 Process.Start(Directory.GetCurrentDirectory() + "/Ysh Matrix.csv");
             }
@@ -4591,33 +4936,192 @@ namespace NetworkModelEditor.ViewModels
 
         #region [ Inpsect ] 
 
+        #region [ Components ]
+
         private void ViewComponents()
         {
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.AppendLine(m_network.Model.ComponentList());
-            File.WriteAllText(Directory.GetCurrentDirectory() + "/ComponentList.txt", stringBuilder.ToString());
-            ActionStatus = "Wrote to " + Directory.GetCurrentDirectory() + "/ComponentList.txt";
-            Process.Start(Directory.GetCurrentDirectory() + "/ComponentList.txt", stringBuilder.ToString());
+            ShowTextReport("ComponentsList.txt", m_network.Model.ComponentList());
         }
+
+        private void ViewCalculatedImpedances()
+        {
+            StringBuilder stringBuilder = new StringBuilder();
+            foreach (TransmissionLine transmissionLine in m_network.Model.TransmissionLines)
+            {
+                stringBuilder.AppendFormat(transmissionLine.ToVerboseString() + "{0}", Environment.NewLine);
+                stringBuilder.AppendLine("Modeled Impedance Values");
+                stringBuilder.AppendFormat(transmissionLine.Graph.ResolveToSingleSeriesBranch().RawImpedanceParameters.ToVerboseString() + "{0}", Environment.NewLine);
+                stringBuilder.AppendLine("Calculated Impedance Values");
+                stringBuilder.AppendFormat(transmissionLine.RealTimeCalculatedImpedance.ToVerboseString() + "{0}", Environment.NewLine);
+            }
+            ShowTextReport("CalculatedImpedances.txt", stringBuilder.ToString());
+        }
+
+        private void ViewSeriesCompensatorInferenceData()
+        {
+            StringBuilder stringBuilder = new StringBuilder();
+            foreach (TransmissionLine transmissionLine in m_network.Model.TransmissionLines)
+            {
+                if (transmissionLine.WillPerformSeriesCompensatorStatusInference)
+                {
+                    stringBuilder.AppendFormat(transmissionLine.ToVerboseString() + "{0}", Environment.NewLine);
+                    stringBuilder.AppendFormat("Directly Connected Adjacency List{0}", Environment.NewLine);
+                    stringBuilder.AppendFormat(transmissionLine.Graph.DirectlyConnectedAdjacencyList.ToString() + "{0}", Environment.NewLine);
+                    stringBuilder.AppendFormat("Series Impedance Connected Adjacency List{0}", Environment.NewLine);
+                    stringBuilder.AppendFormat(transmissionLine.Graph.SeriesImpedanceConnectedAdjacencyList.ToString() + "{0}", Environment.NewLine);
+                    stringBuilder.AppendFormat("Transmission Line Tree{0}", Environment.NewLine);
+                    stringBuilder.AppendFormat(transmissionLine.Graph.RootNode.ToSubtreeString() + "{0}", Environment.NewLine);
+                    stringBuilder.AppendFormat("Number of Possible Impedance States: " + transmissionLine.NumberOfPossibleSeriesImpedanceStates.ToString() + "{0}", Environment.NewLine);
+                    stringBuilder.AppendFormat("Possible Impedance States:{0}", Environment.NewLine);
+                    foreach (Impedance impedance in transmissionLine.PossibleImpedanceValues)
+                    {
+                        stringBuilder.AppendFormat(impedance.ToVerboseString() + "{0}", Environment.NewLine);
+                    }
+                    stringBuilder.AppendFormat("Inferred Total Impedance:{0}", Environment.NewLine);
+                    stringBuilder.AppendFormat(transmissionLine.InferredTotalImpedance.ToVerboseString());
+                    stringBuilder.AppendFormat("Single Flow Branch Resolution:{0}", Environment.NewLine);
+                    stringBuilder.AppendFormat(transmissionLine.Graph.ResolveToSingleSeriesBranch().RawImpedanceParameters.ToVerboseString() + "{0}", Environment.NewLine);
+                    stringBuilder.AppendFormat("Asserted Total Branch Impedance:{0}", Environment.NewLine);
+                    stringBuilder.AppendFormat(transmissionLine.FromSideImpedanceToDeepestObservability.ToVerboseString() + "{0}", Environment.NewLine);
+                }
+
+            }
+            ShowTextReport("SeriesCompensatorStatusInferencingData.txt", stringBuilder.ToString());
+        }
+
+        private void ViewSeriesCompensators()
+        {
+            StringBuilder stringBuilder = new StringBuilder();
+            foreach (TransmissionLine transmissionLine in m_network.Model.TransmissionLines)
+            {
+                if (transmissionLine.WillPerformSeriesCompensatorStatusInference)
+                {
+                    foreach (SeriesCompensator seriesCompensator in transmissionLine.SeriesCompensators)
+                    {
+                        stringBuilder.AppendFormat(seriesCompensator.ToVerboseString() + "{0}", Environment.NewLine);
+                    }
+                }
+            }
+            ShowTextReport("SeriesCompensators.txt", stringBuilder.ToString());
+        }
+
+        private void ViewTransformers()
+        {
+            StringBuilder stringBuilder = new StringBuilder();
+            foreach (Transformer transformer in m_network.Model.Transformers)
+            {
+                stringBuilder.AppendFormat(transformer.ToVerboseString() + "{0}", Environment.NewLine);
+            }
+            ShowTextReport("Transformers.txt", stringBuilder.ToString());
+        }
+
+        #region [ Circuit Breakers ] 
+
+        private string CreateCircuitBreakersReport()
+        {
+            StringBuilder report = new StringBuilder();
+            report.AppendFormat(CircuitBreaker.CSV_HEADER);
+            foreach (CircuitBreaker breaker in m_network.Model.CircuitBreakers)
+            {
+                report.AppendFormat(breaker.ToCsvLineString());
+            }
+            return report.ToString();
+        }
+
+        private void SaveCircuitBreakersReport(string absolutePath)
+        {
+            SaveTextReport(absolutePath, CreateCircuitBreakersReport());
+        }
+
+        public void ViewCircuitBreakers()
+        {
+            ShowTextReport("CircuitBreakers.csv", CreateCircuitBreakersReport());
+        }
+
+        #endregion
+
+        #region [ Switches ]
+
+        private string CreateSwitchesReport()
+        {
+            StringBuilder report = new StringBuilder();
+            report.AppendFormat(SynchrophasorAnalytics.Modeling.Switch.CSV_HEADER);
+            foreach (SynchrophasorAnalytics.Modeling.Switch circuitSwitch in m_network.Model.Switches)
+            {
+                report.AppendFormat(circuitSwitch.ToCsvLineString());
+            }
+            return report.ToString();
+        }
+
+        private void SaveSwitchesReport(string absolutePath)
+        {
+            SaveTextReport(absolutePath, CreateSwitchesReport());
+        }
+
+        public void ViewSwitches()
+        {
+            ShowTextReport("Switches.csv", CreateSwitchesReport());
+        }
+
+        #endregion
+
+        #region [ All Switching Devices ]
+
+        public void ViewAllSwitchingDevices()
+        {
+            StringBuilder report = new StringBuilder();
+            int count = m_network.Model.CircuitBreakers.Count + m_network.Model.Switches.Count;
+            report.AppendFormat(count.ToString() + " Switching Devices");
+
+            foreach (CircuitBreaker breaker in m_network.Model.CircuitBreakers)
+            {
+                report.AppendFormat(breaker.ToVerboseString() + "{0}", Environment.NewLine);
+            }
+
+            foreach (SynchrophasorAnalytics.Modeling.Switch circuitSwitch in m_network.Model.Switches)
+            {
+                report.AppendFormat(circuitSwitch.ToVerboseString() + "{0}", Environment.NewLine);
+            }
+
+            ShowTextReport("SwitchingDevices.txt", report.ToString());
+        }
+
+        #endregion
+
+        #endregion
 
         #region [ View Status Words ]
 
-        private void ViewStatusWords()
+        #region [ All ]
+
+        private string CreateStatusWordsReport()
         {
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.AppendFormat(m_network.Model.StatusWords.Count.ToString() + " Modeled Status Words");
+            StringBuilder report = new StringBuilder();
+            report.AppendFormat(StatusWord.CSV_HEADER);
             foreach (StatusWord statusWord in m_network.Model.StatusWords)
             {
-                stringBuilder.AppendLine(statusWord.ToVerboseString());
+                report.Append(statusWord.ToCsvLineString());
             }
-            File.WriteAllText(Directory.GetCurrentDirectory() + "/ModeledStatusWords.txt", stringBuilder.ToString());
-            ActionStatus = "Wrote to " + Directory.GetCurrentDirectory() + "/ModeledStatusWords.txt";
-            Process.Start(Directory.GetCurrentDirectory() + "/ModeledStatusWords.txt");
+            return report.ToString();
         }
 
-        private void ViewMappedStatusWords()
+        private void SaveStatusWordsReport(string absolutePath)
         {
-            StringBuilder stringBuilder = new StringBuilder();
+            SaveTextReport(absolutePath, CreateStatusWordsReport());
+        }
+
+        private void ViewStatusWords()
+        {
+            ShowTextReport("ModeledStatusWords.csv", CreateStatusWordsReport());
+        }
+
+        #endregion
+
+        #region [ Mapped ]
+
+        private string CreateMappedStatusWordsReport()
+        {
+            StringBuilder report = new StringBuilder();
             List<StatusWord> mappedStatusWords = new List<StatusWord>();
             foreach (VoltagePhasorGroup voltage in m_network.Model.Voltages)
             {
@@ -4649,26 +5153,38 @@ namespace NetworkModelEditor.ViewModels
                     }
                 }
             }
-            stringBuilder.AppendFormat(mappedStatusWords.Count.ToString() + " Mapped Status Words");
+            report.AppendFormat(StatusWord.CSV_HEADER);
             foreach (StatusWord statusWord in mappedStatusWords)
             {
-                stringBuilder.AppendLine(statusWord.ToVerboseString());
+                report.Append(statusWord.ToCsvLineString());
             }
-            File.WriteAllText(Directory.GetCurrentDirectory() + "/MappedStatusWords.txt", stringBuilder.ToString());
-            ActionStatus = "Wrote to " + Directory.GetCurrentDirectory() + "/MappedStatusWords.txt";
-            Process.Start(Directory.GetCurrentDirectory() + "/MappedStatusWords.txt");
+            return report.ToString();
         }
 
-        private void ViewMappedLSEInvalidStatusWords()
+        private void SaveMappedStatusWordsReport(string absolutePath)
         {
-            StringBuilder stringBuilder = new StringBuilder();
+            SaveTextReport(absolutePath, CreateMappedStatusWordsReport());
+        }
+
+        private void ViewMappedStatusWords()
+        {
+            ShowTextReport("MappedStatusWords.csv", CreateMappedStatusWordsReport());
+        }
+
+        #endregion
+
+        #region [ Mapped LSE Invalid ]
+
+        private string CreateMappedLSEInvalidStatusWordsReport()
+        {
+            StringBuilder report = new StringBuilder();
             List<StatusWord> mappedStatusWords = new List<StatusWord>();
             foreach (VoltagePhasorGroup voltage in m_network.Model.Voltages)
             {
                 if (voltage.Status != null && m_network.Model.StatusWords.Contains(voltage.Status))
                 {
                     StatusWord status = voltage.Status;
-                    if (status.DataIsValid || status.SynchronizationIsValid )
+                    if (status.DataIsValid || status.SynchronizationIsValid)
                     {
                         if (!mappedStatusWords.Contains(voltage.Status))
                         {
@@ -4705,19 +5221,31 @@ namespace NetworkModelEditor.ViewModels
                     }
                 }
             }
-            stringBuilder.AppendFormat(mappedStatusWords.Count.ToString() + " Mapped LSE Invalid Status Words");
+            report.AppendFormat(StatusWord.CSV_HEADER);
             foreach (StatusWord statusWord in mappedStatusWords)
             {
-                stringBuilder.AppendLine(statusWord.ToVerboseString());
+                report.Append(statusWord.ToCsvLineString());
             }
-            File.WriteAllText(Directory.GetCurrentDirectory() + "/MappedLSEInvalidStatusWords.txt", stringBuilder.ToString());
-            ActionStatus = "Wrote to " + Directory.GetCurrentDirectory() + "/MappedLSEInvalidStatusWords.txt";
-            Process.Start(Directory.GetCurrentDirectory() + "/MappedLSEInvalidStatusWords.txt");
+            return report.ToString();
         }
 
-        private void ViewMappedMissingStatusWords()
+        private void SaveMappedLSEInvalidStatusWordsReport(string absolutePath)
         {
-            StringBuilder stringBuilder = new StringBuilder();
+            SaveTextReport(absolutePath, CreateMappedLSEInvalidStatusWordsReport());
+        }
+
+        private void ViewMappedLSEInvalidStatusWords()
+        {
+            ShowTextReport("MappedLSEInvalidStatusWords.csv", CreateMappedLSEInvalidStatusWordsReport());
+        }
+
+        #endregion
+
+        #region [ Mapped Missing ]
+
+        private string CreateMappedMissingStatusWordsReport()
+        {
+            StringBuilder report = new StringBuilder();
             List<StatusWord> mappedStatusWords = new List<StatusWord>();
             foreach (VoltagePhasorGroup voltage in m_network.Model.Voltages)
             {
@@ -4760,19 +5288,31 @@ namespace NetworkModelEditor.ViewModels
                     }
                 }
             }
-            stringBuilder.AppendFormat(mappedStatusWords.Count.ToString() + " Mapped Missing Status Words");
+            report.AppendFormat(StatusWord.CSV_HEADER);
             foreach (StatusWord statusWord in mappedStatusWords)
             {
-                stringBuilder.AppendLine(statusWord.ToVerboseString());
+                report.Append(statusWord.ToCsvLineString());
             }
-            File.WriteAllText(Directory.GetCurrentDirectory() + "/MappedMissingStatusWords.txt", stringBuilder.ToString());
-            ActionStatus = "Wrote to " + Directory.GetCurrentDirectory() + "/MappedMissingStatusWords.txt";
-            Process.Start(Directory.GetCurrentDirectory() + "/MappedMissingStatusWords.txt");
+            return report.ToString();
         }
 
-        private void ViewActiveStatusWords()
+        private void SaveMappedMissingStatusWordsReport(string absolutePath)
         {
-            StringBuilder stringBuilder = new StringBuilder();
+            SaveTextReport(absolutePath, CreateMappedMissingStatusWordsReport());
+        }
+
+        private void ViewMappedMissingStatusWords()
+        {
+            ShowTextReport("MappedMissingStatusWords.csv", CreateMappedMissingStatusWordsReport());
+        }
+
+        #endregion
+
+        #region [ Active ]
+
+        private string CreateActiveStatusWordsReport()
+        {
+            StringBuilder report = new StringBuilder();
             List<StatusWord> activeStatusWords = new List<StatusWord>();
             foreach (VoltagePhasorGroup voltage in m_network.Model.Voltages)
             {
@@ -4825,105 +5365,221 @@ namespace NetworkModelEditor.ViewModels
                     }
                 }
             }
-            stringBuilder.AppendFormat(activeStatusWords.Count.ToString() + " Active Status Words");
+
+            report.AppendFormat(StatusWord.CSV_HEADER);
             foreach (StatusWord statusWord in activeStatusWords)
             {
-                stringBuilder.AppendLine(statusWord.ToVerboseString());
+                report.Append(statusWord.ToCsvLineString());
             }
-            File.WriteAllText(Directory.GetCurrentDirectory() + "/ActiveStatusWords.txt", stringBuilder.ToString());
-            ActionStatus = "Wrote to " + Directory.GetCurrentDirectory() + "/ActiveStatusWords.txt";
-            Process.Start(Directory.GetCurrentDirectory() + "/ActiveStatusWords.txt");
+            return report.ToString();
         }
+
+        private void SaveActiveStatusWordsReport(string absolutePath)
+        {
+            SaveTextReport(absolutePath, CreateActiveStatusWordsReport());
+        }
+
+        private void ViewActiveStatusWords()
+        {
+            ShowTextReport("ActiveStatusWords.csv", CreateActiveStatusWordsReport());
+        }
+
+        #endregion
 
         #endregion
 
         #region [ View Measurements ] 
 
-        private void ViewReceivedMeasurements()
+        #region [ Received ]
+
+        private string CreateReceivedMeasurementsReport()
         {
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.AppendLine("Received Measurements Key Value Pairs");
+            StringBuilder measurements = new StringBuilder();
+            measurements.AppendLine("Key,Value");
             Dictionary<string, double> receivedMeasurements = m_network.Model.GetReceivedMeasurements();
             foreach (KeyValuePair<string, double> keyValuePair in receivedMeasurements)
             {
-                stringBuilder.AppendLine(keyValuePair.Key + ", " + keyValuePair.Value.ToString());
+                measurements.AppendLine(keyValuePair.Key + ", " + keyValuePair.Value.ToString());
             }
-            File.WriteAllText(Directory.GetCurrentDirectory() + "/ReceivedMeasurements.txt", stringBuilder.ToString());
-            ActionStatus = "Wrote to " + Directory.GetCurrentDirectory() + "/ReceivedMeasurements.txt";
-            Process.Start(Directory.GetCurrentDirectory() + "/ReceivedMeasurements.txt");
+            return measurements.ToString();
         }
 
-        private void ViewUnreceivedMeasurements()
+        private void SaveReceivedMeasurementsReport(string absolutePath)
         {
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.AppendLine("Unreceived Measurements Key Value Pairs");
+            SaveTextReport(absolutePath, CreateReceivedMeasurementsReport());
+        }
+
+        private void ViewReceivedMeasurements()
+        {
+            ShowTextReport("ReceivedMeasurements.csv", CreateReceivedMeasurementsReport());
+        }
+
+        #endregion
+
+        #region [ Unreceived ]
+
+        private string CreateUnreceivedMeasurementsReport()
+        {
+            StringBuilder measurements = new StringBuilder();
+            measurements.AppendLine("Key,Value");
             Dictionary<string, double> receivedMeasurements = m_network.Model.GetReceivedMeasurements();
             foreach (KeyValuePair<string, double> keyValuePair in m_network.Model.InputKeyValuePairs)
             {
                 double value = 0;
-                if (!receivedMeasurements.TryGetValue(keyValuePair.Key.ToLower(),out value))
+                if (!receivedMeasurements.TryGetValue(keyValuePair.Key.ToLower(), out value))
                 {
-                    stringBuilder.AppendLine(keyValuePair.Key + ", " + keyValuePair.Value.ToString());
+                    measurements.AppendLine(keyValuePair.Key + ", " + keyValuePair.Value.ToString());
                 }
             }
-            File.WriteAllText(Directory.GetCurrentDirectory() + "/UnreceivedMeasurements.txt", stringBuilder.ToString());
-            ActionStatus = "Wrote to " + Directory.GetCurrentDirectory() + "/UnreceivedMeasurements.txt";
-            Process.Start(Directory.GetCurrentDirectory() + "/UnreceivedMeasurements.txt");
+            return measurements.ToString();
+        }
+
+        private void SaveUnreceivedMeasurementsReport(string absolutePath)
+        {
+            SaveTextReport(absolutePath, CreateUnreceivedMeasurementsReport());
+        }
+
+        private void ViewUnreceivedMeasurements()
+        {
+            ShowTextReport("UnreceivedMeasurements.csv", CreateUnreceivedMeasurementsReport());
+        }
+
+        #endregion
+
+        #region [ Output ]
+
+        private string CreateOutputMeasurementsReport()
+        {
+            StringBuilder measurements = new StringBuilder();
+            measurements.AppendLine("Key,Value");
+            foreach (KeyValuePair<string, double> outputMeasurement in m_network.Model.OutputKeyValuePairs)
+            {
+                measurements.AppendFormat($"{outputMeasurement.Key},{outputMeasurement.Value}{Environment.NewLine}");
+            }
+            return measurements.ToString();
+        }
+
+        private void SaveOutputMeasurementsReport(string absolutePath)
+        {
+            ShowTextReport(absolutePath, CreateOutputMeasurementsReport());
         }
 
         private void ViewOutputMeasurements()
         {
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.AppendFormat(m_network.Model.OutputKeyValuePairs.Count.ToString() + " Output Measurements");
+            ShowTextReport("OutputMeasurements.csv", CreateOutputMeasurementsReport());
+        }
 
-            foreach (KeyValuePair<string, double> outputMeasurement in m_network.Model.OutputKeyValuePairs)
+        #endregion
+
+        private string CreateOutputMeasurementReport(List<OutputMeasurement> output)
+        {
+            StringBuilder measurements = new StringBuilder();
+            foreach (OutputMeasurement measurement in output)
             {
-                stringBuilder.AppendFormat(outputMeasurement.Key + "\t" + outputMeasurement.Value.ToString() + "{0}", Environment.NewLine);
+                measurements.Append(measurement.ToCsvLineString());
             }
+            return measurements.ToString();
+        }
 
-            File.WriteAllText(Directory.GetCurrentDirectory() + "/OutputMeasurements.txt", stringBuilder.ToString());
-            ActionStatus = "Wrote to " + Directory.GetCurrentDirectory() + "/OutputMeasurements.txt";
-            Process.Start(Directory.GetCurrentDirectory() + "/OutputMeasurements.txt");
+        private void SaveOutputMeasurementReport(string absolutePath, List<OutputMeasurement> output)
+        {
+            SaveTextReport(absolutePath, CreateOutputMeasurementReport(output));
         }
 
         private void ShowOutputMeasurementReport(string fileName, List<OutputMeasurement> output)
         {
-            StringBuilder stringBuilder = new StringBuilder();
-            foreach (OutputMeasurement measurement in output)
-            {
-                stringBuilder.Append($"{measurement.ToVerboseString()}{Environment.NewLine}");
-            }
-            ShowTextReport(fileName, stringBuilder.ToString());
+            ShowTextReport(fileName, CreateOutputMeasurementReport(output));
+        }
+
+        #region [ Performance Metrics ]
+
+        private void SavePerformanceMetricsReport(string absolutePath)
+        {
+            SaveOutputMeasurementReport(absolutePath, m_network.Model.PerformanceMetricOutput);
         }
 
         private void ViewPerformanceMetrics()
         {
-            ShowOutputMeasurementReport("PerformanceMetricOutput.txt", m_network.Model.PerformanceMetricOutput);
+            ShowOutputMeasurementReport("PerformanceMetricOutput.csv", m_network.Model.PerformanceMetricOutput);
+        }
+
+        #endregion
+
+        #region [ Voltage Estimates ]
+        
+        private void SaveVoltageEstimatesReport(string absolutePath)
+        {
+            SaveOutputMeasurementReport(absolutePath, m_network.Model.StateEstimateOutput);
         }
 
         private void ViewVoltageEstimates()
         {
-            ShowOutputMeasurementReport("VoltageEstimateOutput.txt", m_network.Model.StateEstimateOutput);
+            ShowOutputMeasurementReport("VoltageEstimateOutput.csv", m_network.Model.StateEstimateOutput);
+        }
+
+        #endregion
+
+        #region [ Current Flow Estimates ]
+        
+        private void SaveCurrentFlowEstimatesReport(string absolutePath)
+        {
+            SaveOutputMeasurementReport(absolutePath, m_network.Model.CurrentFlowEstimateOutput);
         }
 
         private void ViewCurrentFlowEstimates()
         {
-            ShowOutputMeasurementReport("CurrentFlowEstimateOutput.txt", m_network.Model.CurrentFlowEstimateOutput);
+            ShowOutputMeasurementReport("CurrentFlowEstimateOutput.csv", m_network.Model.CurrentFlowEstimateOutput);
+        }
+
+        #endregion
+
+        #region [ Current Injection Estimates ]
+        
+        private void SaveCurrentInjectionEstimatesReport(string absolutePath)
+        {
+            SaveOutputMeasurementReport(absolutePath, m_network.Model.CurrentInjectionEstimateOutput);
         }
 
         private void ViewCurrentInjectionEstimates()
         {
-            ShowOutputMeasurementReport("CurrentInjectionEstimateOutput.txt", m_network.Model.CurrentInjectionEstimateOutput);
+            ShowOutputMeasurementReport("CurrentInjectionEstimateOutput.csv", m_network.Model.CurrentInjectionEstimateOutput);
+        }
+
+        #endregion
+
+        #region [ Voltage Residuals ]
+        
+        private void SaveVoltageResidualsReport(string absolutePath)
+        {
+            SaveOutputMeasurementReport(absolutePath, m_network.Model.VoltageResidualOutput);
         }
 
         private void ViewVoltageResiduals()
         {
-            ShowOutputMeasurementReport("VoltageResidualOutput.txt", m_network.Model.VoltageResidualOutput);
+            ShowOutputMeasurementReport("VoltageResidualOutput.csv", m_network.Model.VoltageResidualOutput);
+        }
+
+        #endregion
+
+        #region [ Current Flow Residuals ]
+        
+        private void SaveCurrentFlowResidualsReport(string absolutePath)
+        {
+            SaveOutputMeasurementReport(absolutePath, m_network.Model.CurrentResidualOutput);
         }
 
         private void ViewCurrentFlowResiduals()
         {
-            ShowOutputMeasurementReport("CurrentFlowResidualOutput.txt", m_network.Model.CurrentResidualOutput);
+            ShowOutputMeasurementReport("CurrentFlowResidualOutput.csv", m_network.Model.CurrentResidualOutput);
+        }
+
+        #endregion
+
+        #region [ Current Injection Residuals ]
+        
+        private void SaveCurrentInjectionResidualsReport(string absolutePath)
+        {
+            //SaveOutputMeasurementReport(absolutePath, m_network.Model.CurrentInjectionResidualOutput);
         }
 
         private void ViewCurrentInjectionResiduals()
@@ -4931,46 +5587,93 @@ namespace NetworkModelEditor.ViewModels
             //ShowOutputMeasurementReport("CurrentInjectionResidualOutput.txt", m_network.Model.CurrentInjectionResidualOutput);
         }
 
+        #endregion
+
+        #region [ Circuit Breaker Statuses ]
+        
+        private void SaveCircuitBreakerStatusesReport(string absolutePath)
+        {
+            SaveOutputMeasurementReport(absolutePath, m_network.Model.CircuitBreakerStatusOutput);
+        }
+
         private void ViewCircuitBreakerStatuses()
         {
-            ShowOutputMeasurementReport("CircuitBreakerStatusOutput.txt", m_network.Model.CircuitBreakerStatusOutput);
+            ShowOutputMeasurementReport("CircuitBreakerStatusOutput.csv", m_network.Model.CircuitBreakerStatusOutput);
+        }
+
+        #endregion
+
+        #region [ Switch Statuses ]
+        
+        private void SaveSwitchStatusesReport(string absolutePath)
+        {
+            SaveOutputMeasurementReport(absolutePath, m_network.Model.SwitchStatusOutput);
         }
 
         private void ViewSwitchStatuses()
         {
-            ShowOutputMeasurementReport("SwitchStatusOutput.txt", m_network.Model.SwitchStatusOutput);
+            ShowOutputMeasurementReport("SwitchStatusOutput.csv", m_network.Model.SwitchStatusOutput);
+        }
+
+        #endregion
+
+        #region [ Topology Profiling ]
+        
+        private void SaveTopologyProfilingReport(string absolutePath)
+        {
+            SaveOutputMeasurementReport(absolutePath, m_network.Model.TopologyProfilingOutput);
         }
 
         private void ViewTopologyProfiling()
         {
-            ShowOutputMeasurementReport("TopologyProfilingOutput.txt", m_network.Model.TopologyProfilingOutput);
+            ShowOutputMeasurementReport("TopologyProfilingOutput.csv", m_network.Model.TopologyProfilingOutput);
+        }
+
+        #endregion
+
+        #region [ Measurement Validation Flags ]
+        
+        private void SaveMeasurementValidationFlagsReport(string absolutePath)
+        {
+            SaveOutputMeasurementReport(absolutePath, m_network.Model.MeasurementValidationFlagOutput);
         }
 
         private void ViewMeasurementValidationFlags()
         {
-            ShowOutputMeasurementReport("MeasurementValidationFlagOutput.txt", m_network.Model.MeasurementValidationFlagOutput);
+            ShowOutputMeasurementReport("MeasurementValidationFlagOutput.csv", m_network.Model.MeasurementValidationFlagOutput);
         }
 
-
+        #endregion
+        
         #endregion
 
         #region [ View Observability Analysis Data ] 
 
+        private string CreateObservableNodesReport()
+        {
+            StringBuilder report = new StringBuilder();
+            report.AppendFormat(ObservedBus.CSV_HEADER + Node.CSV_HEADER);
+            foreach (ObservedBus observedBus in m_network.Model.ObservedBuses)
+            {
+                report.AppendFormat(observedBus.ToCsvLineString());
+            }
+            return report.ToString();
+        }
+
+        private void SaveObservableNodesReport(string absolutePath)
+        {
+            SaveTextReport(absolutePath, CreateObservableNodesReport());
+        }
+
         private void ViewObservableNodes()
         {
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.AppendFormat(m_network.Model.ObservedBusses.Count.ToString() + " Observed Busses");
-            foreach (ObservedBus observedBus in m_network.Model.ObservedBusses)
-            {
-                stringBuilder.AppendFormat(observedBus.ToVerboseString() + "{0}", Environment.NewLine);
-            }
 
-            ShowTextReport("ObservedBusses.txt", stringBuilder.ToString());
+            ShowTextReport("ObservedBuses.csv", CreateObservableNodesReport());
         }
         
         private void ViewSubstationAdjacencyList()
         {
-            StringBuilder stringBuilder = new StringBuilder();
+            StringBuilder report = new StringBuilder();
 
             foreach (Company company in m_network.Model.Companies)
             {
@@ -4978,43 +5681,39 @@ namespace NetworkModelEditor.ViewModels
                 {
                     foreach (Substation substation in division.Substations)
                     {
-                        stringBuilder.AppendFormat(substation.ToString() + "{0}", Environment.NewLine);
-                        stringBuilder.AppendFormat(substation.Graph.AdjacencyList.ToString() + "{0}", Environment.NewLine);
-                        stringBuilder.AppendLine();
+                        report.AppendFormat(substation.ToString() + "{0}", Environment.NewLine);
+                        report.AppendFormat(substation.Graph.AdjacencyList.ToString() + "{0}", Environment.NewLine);
+                        report.AppendLine();
                     }
                 }
             }
 
-            File.WriteAllText(Directory.GetCurrentDirectory() + "/SubstationAdjacencyLists.txt", stringBuilder.ToString());
-            ActionStatus = "Wrote to " + Directory.GetCurrentDirectory() + "/SubstationAdjacencyLists.txt";
-            Process.Start(Directory.GetCurrentDirectory() + "/SubstationAdjacencyLists.txt");
+            ShowTextReport("SubstationAdjacencyLists.txt", report.ToString());
         }
         
         private void ViewTransmissionLineAdjacencyLists()
         {
-            StringBuilder stringBuilder = new StringBuilder();
+            StringBuilder report = new StringBuilder();
             foreach (TransmissionLine transmissionLine in m_network.Model.TransmissionLines)
             {
-                stringBuilder.AppendFormat(transmissionLine.ToVerboseString() + "{0}", Environment.NewLine);
-                stringBuilder.AppendFormat("Directly Connected Adjacency List{0}", Environment.NewLine);
-                stringBuilder.AppendFormat(transmissionLine.Graph.DirectlyConnectedAdjacencyList.ToString() + "{0}", Environment.NewLine);
-                stringBuilder.AppendFormat("Series Impedance Connected Adjacency List{0}", Environment.NewLine);
-                stringBuilder.AppendFormat(transmissionLine.Graph.SeriesImpedanceConnectedAdjacencyList.ToString() + "{0}", Environment.NewLine);
-                stringBuilder.AppendFormat("Transmission Line Tree{0}", Environment.NewLine);
-                stringBuilder.AppendFormat(transmissionLine.Graph.RootNode.ToSubtreeString() + "{0}", Environment.NewLine);
-                stringBuilder.AppendFormat("Single Flow Branch Resolution{0}", Environment.NewLine);
-                stringBuilder.AppendFormat("Number of Possible Impedance States: " + transmissionLine.NumberOfPossibleSeriesImpedanceStates.ToString() + "{0}", Environment.NewLine);
-                stringBuilder.AppendFormat("Possible Impedance States:{0}", Environment.NewLine);
+                report.AppendFormat(transmissionLine.ToVerboseString() + "{0}", Environment.NewLine);
+                report.AppendFormat("Directly Connected Adjacency List{0}", Environment.NewLine);
+                report.AppendFormat(transmissionLine.Graph.DirectlyConnectedAdjacencyList.ToString() + "{0}", Environment.NewLine);
+                report.AppendFormat("Series Impedance Connected Adjacency List{0}", Environment.NewLine);
+                report.AppendFormat(transmissionLine.Graph.SeriesImpedanceConnectedAdjacencyList.ToString() + "{0}", Environment.NewLine);
+                report.AppendFormat("Transmission Line Tree{0}", Environment.NewLine);
+                report.AppendFormat(transmissionLine.Graph.RootNode.ToSubtreeString() + "{0}", Environment.NewLine);
+                report.AppendFormat("Single Flow Branch Resolution{0}", Environment.NewLine);
+                report.AppendFormat("Number of Possible Impedance States: " + transmissionLine.NumberOfPossibleSeriesImpedanceStates.ToString() + "{0}", Environment.NewLine);
+                report.AppendFormat("Possible Impedance States:{0}", Environment.NewLine);
 
                 foreach (Impedance impedance in transmissionLine.PossibleImpedanceValues)
                 {
-                    stringBuilder.AppendFormat(impedance.ToVerboseString() + "{0}", Environment.NewLine);
+                    report.AppendFormat(impedance.ToVerboseString() + "{0}", Environment.NewLine);
                 }
-                stringBuilder.AppendFormat(transmissionLine.Graph.ResolveToSingleSeriesBranch().RawImpedanceParameters.ToVerboseString() + "{0}", Environment.NewLine);
+                report.AppendFormat(transmissionLine.Graph.ResolveToSingleSeriesBranch().RawImpedanceParameters.ToVerboseString() + "{0}", Environment.NewLine);
             }
-            File.WriteAllText(Directory.GetCurrentDirectory() + "/TransmissionLineAdjacencyLists.txt", stringBuilder.ToString());
-            ActionStatus = "Wrote to " + Directory.GetCurrentDirectory() + "/TransmissionLineAdjacencyLists.txt";
-            Process.Start(Directory.GetCurrentDirectory() + "/TransmissionLineAdjacencyLists.txt");
+            ShowTextReport("TransmissionLineAdjacencyLists.txt", report.ToString());
         }
 
         private void ViewObservableSubstations()
@@ -5022,7 +5721,7 @@ namespace NetworkModelEditor.ViewModels
             StringBuilder stringBuilder = new StringBuilder();
             List<Substation> observableSubstations = new List<Substation>();
 
-            foreach (ObservedBus observedBus in m_network.Model.ObservedBusses)
+            foreach (ObservedBus observedBus in m_network.Model.ObservedBuses)
             {
                 foreach (Node node in observedBus.Nodes)
                 {
@@ -5038,7 +5737,7 @@ namespace NetworkModelEditor.ViewModels
             {
                 stringBuilder.AppendFormat(substation.ToVerboseString());
                 List<ObservedBus> substationBuses = new List<ObservedBus>();
-                foreach (ObservedBus observedBus in m_network.Model.ObservedBusses)
+                foreach (ObservedBus observedBus in m_network.Model.ObservedBuses)
                 {
                     foreach (Node node in observedBus.Nodes)
                     {
@@ -5061,133 +5760,88 @@ namespace NetworkModelEditor.ViewModels
         
         #endregion
 
-        private void ViewCalculatedImpedances()
-        {
-            StringBuilder stringBuilder = new StringBuilder();
-            foreach (TransmissionLine transmissionLine in m_network.Model.TransmissionLines)
-            {
-                stringBuilder.AppendFormat(transmissionLine.ToVerboseString() + "{0}", Environment.NewLine);
-                stringBuilder.AppendLine("Modeled Impedance Values");
-                stringBuilder.AppendFormat(transmissionLine.Graph.ResolveToSingleSeriesBranch().RawImpedanceParameters.ToVerboseString() + "{0}", Environment.NewLine);
-                stringBuilder.AppendLine("Calculated Impedance Values");
-                stringBuilder.AppendFormat(transmissionLine.RealTimeCalculatedImpedance.ToVerboseString() + "{0}", Environment.NewLine);
-            }
-            File.WriteAllText(Directory.GetCurrentDirectory() + "/CalculatedImpedances.txt", stringBuilder.ToString());
-            ActionStatus = "Wrote to " + Directory.GetCurrentDirectory() + "/CalculatedImpedances.txt";
-            Process.Start(Directory.GetCurrentDirectory() + "/CalculatedImpedances.txt");
-        }
-        
-        private void ViewSeriesCompensatorInferenceData()
-        {
-            StringBuilder stringBuilder = new StringBuilder();
-            foreach (TransmissionLine transmissionLine in m_network.Model.TransmissionLines)
-            {
-                if (transmissionLine.WillPerformSeriesCompensatorStatusInference)
-                {
-                    stringBuilder.AppendFormat(transmissionLine.ToVerboseString() + "{0}", Environment.NewLine);
-                    stringBuilder.AppendFormat("Directly Connected Adjacency List{0}", Environment.NewLine);
-                    stringBuilder.AppendFormat(transmissionLine.Graph.DirectlyConnectedAdjacencyList.ToString() + "{0}", Environment.NewLine);
-                    stringBuilder.AppendFormat("Series Impedance Connected Adjacency List{0}", Environment.NewLine);
-                    stringBuilder.AppendFormat(transmissionLine.Graph.SeriesImpedanceConnectedAdjacencyList.ToString() + "{0}", Environment.NewLine);
-                    stringBuilder.AppendFormat("Transmission Line Tree{0}", Environment.NewLine);
-                    stringBuilder.AppendFormat(transmissionLine.Graph.RootNode.ToSubtreeString() + "{0}", Environment.NewLine);
-                    stringBuilder.AppendFormat("Number of Possible Impedance States: " + transmissionLine.NumberOfPossibleSeriesImpedanceStates.ToString() + "{0}", Environment.NewLine);
-                    stringBuilder.AppendFormat("Possible Impedance States:{0}", Environment.NewLine);
-                    foreach (Impedance impedance in transmissionLine.PossibleImpedanceValues)
-                    {
-                        stringBuilder.AppendFormat(impedance.ToVerboseString() + "{0}", Environment.NewLine);
-                    }
-                    stringBuilder.AppendFormat("Inferred Total Impedance:{0}", Environment.NewLine);
-                    stringBuilder.AppendFormat(transmissionLine.InferredTotalImpedance.ToVerboseString());
-                    stringBuilder.AppendFormat("Single Flow Branch Resolution:{0}", Environment.NewLine);
-                    stringBuilder.AppendFormat(transmissionLine.Graph.ResolveToSingleSeriesBranch().RawImpedanceParameters.ToVerboseString() + "{0}", Environment.NewLine);
-                    stringBuilder.AppendFormat("Asserted Total Branch Impedance:{0}", Environment.NewLine);
-                    stringBuilder.AppendFormat(transmissionLine.FromSideImpedanceToDeepestObservability.ToVerboseString() + "{0}", Environment.NewLine);
-                }
-
-            }
-            File.WriteAllText(Directory.GetCurrentDirectory() + "/SeriesCompensatorStatusInferencingData.txt", stringBuilder.ToString());
-            ActionStatus = "Wrote to " + Directory.GetCurrentDirectory() + "/SeriesCompensatorStatusInferencingData.txt";
-            Process.Start(Directory.GetCurrentDirectory() + "/SeriesCompensatorStatusInferencingData.txt");
-        }
-        
-        private void ViewSeriesCompensators()
-        {
-            StringBuilder stringBuilder = new StringBuilder();
-            foreach (TransmissionLine transmissionLine in m_network.Model.TransmissionLines)
-            {
-                if (transmissionLine.WillPerformSeriesCompensatorStatusInference)
-                {
-                    foreach (SeriesCompensator seriesCompensator in transmissionLine.SeriesCompensators)
-                    {
-                        stringBuilder.AppendFormat(seriesCompensator.ToVerboseString() + "{0}", Environment.NewLine);
-                    }
-                }
-            }
-            File.WriteAllText(Directory.GetCurrentDirectory() + "/SeriesCompensators.txt", stringBuilder.ToString());
-            ActionStatus = "Wrote to " + Directory.GetCurrentDirectory() + "/SeriesCompensators.txt";
-            Process.Start(Directory.GetCurrentDirectory() + "/SeriesCompensators.txt");
-        }
-        
-        private void ViewTransformers()
-        {
-            StringBuilder stringBuilder = new StringBuilder();
-            foreach (Transformer transformer in m_network.Model.Transformers)
-            {
-                stringBuilder.AppendFormat(transformer.ToVerboseString() + "{0}", Environment.NewLine);
-            }
-            File.WriteAllText(Directory.GetCurrentDirectory() + "/Transformers.txt", stringBuilder.ToString());
-            ActionStatus = "Wrote to " + Directory.GetCurrentDirectory() + "/Transformers.txt";
-            Process.Start(Directory.GetCurrentDirectory() + "/Transformers.txt");
-        }
-
         #region [ View Voltage Phasors ]
+
+        #region [ Modeled ]
+
+        private string CreateModeledVoltagesReport()
+        {
+            StringBuilder report = new StringBuilder();
+            report.AppendFormat(VoltagePhasorGroup.CSV_HEADER);
+            foreach (VoltagePhasorGroup voltagePhasorGroup in m_network.Model.Voltages)
+            {
+                report.AppendFormat(voltagePhasorGroup.ToCsvLineString());
+            }
+            return report.ToString();
+        }
+
+        private void SaveModeledVoltagesReport(string absolutePath)
+        {
+            SaveTextReport(absolutePath, CreateModeledVoltagesReport());
+        }
 
         private void ViewModeledVoltages()
         {
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.AppendFormat(m_network.Model.Voltages.Count.ToString() + " Modeled Voltage Phasors");
-            foreach (VoltagePhasorGroup voltagePhasorGroup in m_network.Model.Voltages)
-            {
-                stringBuilder.AppendFormat(voltagePhasorGroup.ToVerboseString() + "{0}", Environment.NewLine);
-            }
+            ShowTextReport("ModeledVoltages.csv", CreateModeledVoltagesReport());
+        }
 
-            File.WriteAllText(Directory.GetCurrentDirectory() + "/ModeledVoltages.txt", stringBuilder.ToString());
-            ActionStatus = "Wrote to " + Directory.GetCurrentDirectory() + "/ModeledVoltages.txt";
-            Process.Start(Directory.GetCurrentDirectory() + "/ModeledVoltages.txt");
+        #endregion
+
+        #region [ Expected ]
+
+        private string CreateExpectedVoltagesReport()
+        {
+            StringBuilder report = new StringBuilder();
+            report.AppendFormat(VoltagePhasorGroup.CSV_HEADER);
+            foreach (VoltagePhasorGroup voltagePhasorGroup in m_network.Model.ExpectedVoltages)
+            {
+                report.AppendFormat(voltagePhasorGroup.ToCsvLineString());
+            }
+            return report.ToString();
+        }
+
+        private void SaveExpectedVoltagesReport(string absolutePath)
+        {
+            SaveTextReport(absolutePath, CreateExpectedVoltagesReport());
         }
 
         private void ViewExpectedVoltages()
         {
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.AppendFormat(m_network.Model.ExpectedVoltages.Count.ToString() + " Expected Voltage Phasors");
-            foreach (VoltagePhasorGroup voltagePhasorGroup in m_network.Model.ExpectedVoltages)
-            {
-                stringBuilder.AppendFormat(voltagePhasorGroup.ToVerboseString() + "{0}", Environment.NewLine);
-            }
+            ShowTextReport("ExpectedVoltages.csv", CreateExpectedVoltagesReport());
+        }
 
-            File.WriteAllText(Directory.GetCurrentDirectory() + "/ExpectedVoltages.txt", stringBuilder.ToString());
-            ActionStatus = "Wrote to " + Directory.GetCurrentDirectory() + "/ExpectedVoltages.txt";
-            Process.Start(Directory.GetCurrentDirectory() + "/ExpectedVoltages.txt");
+        #endregion
+
+        #region [ Active ]
+
+        private string CreateActiveVoltagesReport()
+        {
+            StringBuilder report = new StringBuilder();
+            report.AppendFormat(VoltagePhasorGroup.CSV_HEADER);
+            foreach (VoltagePhasorGroup voltagePhasorGroup in m_network.Model.ActiveVoltages)
+            {
+                report.AppendFormat(voltagePhasorGroup.ToCsvLineString());
+            }
+            return report.ToString();
+        }
+
+        private void SaveActiveVoltagesReport(string absolutePath)
+        {
+            SaveTextReport(absolutePath, CreateActiveVoltagesReport());
         }
 
         private void ViewActiveVoltages()
         {
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.AppendFormat(m_network.Model.ActiveVoltages.Count.ToString() + " Active Voltage Phasors");
-            foreach (VoltagePhasorGroup voltagePhasorGroup in m_network.Model.ActiveVoltages)
-            {
-                stringBuilder.AppendFormat(voltagePhasorGroup.ToVerboseString() + "{0}", Environment.NewLine);
-            }
-
-            File.WriteAllText(Directory.GetCurrentDirectory() + "/ActiveVoltages.txt", stringBuilder.ToString());
-            ActionStatus = "Wrote to " + Directory.GetCurrentDirectory() + "/ActiveVoltages.txt";
-            Process.Start(Directory.GetCurrentDirectory() + "/ActiveVoltages.txt");
+            ShowTextReport("ActiveVoltages.csv", CreateActiveVoltagesReport());
         }
 
-        private void ViewInactiveVoltages()
+        #endregion
+
+        #region [ Inactive ]
+
+        private string CreateInactiveVoltagesReport()
         {
-            StringBuilder stringBuilder = new StringBuilder();
+            StringBuilder report = new StringBuilder();
             List<VoltagePhasorGroup> inactiveVoltages = new List<VoltagePhasorGroup>();
 
             foreach (VoltagePhasorGroup voltage in m_network.Model.ExpectedVoltages)
@@ -5197,19 +5851,31 @@ namespace NetworkModelEditor.ViewModels
                     inactiveVoltages.Add(voltage);
                 }
             }
-            stringBuilder.AppendFormat(inactiveVoltages.Count.ToString() + " Inactive Voltage Phasors");
+            report.AppendFormat(VoltagePhasorGroup.CSV_HEADER);
             foreach (VoltagePhasorGroup voltage in inactiveVoltages)
             {
-                stringBuilder.AppendFormat(voltage.ToVerboseString() + "{0}", Environment.NewLine);
+                report.AppendFormat(voltage.ToCsvLineString());
             }
-            File.WriteAllText(Directory.GetCurrentDirectory() + "/InactiveVoltages.txt", stringBuilder.ToString());
-            ActionStatus = "Wrote to " + Directory.GetCurrentDirectory() + "/InactiveVoltages.txt";
-            Process.Start(Directory.GetCurrentDirectory() + "/InactiveVoltages.txt");
+            return report.ToString();
         }
 
-        private void ViewReportedVoltages()
+        private void SaveInactiveVoltagesReport(string absolutePath)
         {
-            StringBuilder stringBuilder = new StringBuilder();
+            SaveTextReport(absolutePath, CreateInactiveVoltagesReport());
+        }
+
+        private void ViewInactiveVoltages()
+        {
+            ShowTextReport("InactiveVoltages.csv", CreateInactiveVoltagesReport());
+        }
+
+        #endregion
+
+        #region [ Reported ]
+
+        private string CreateReportedVoltagesReport()
+        {
+            StringBuilder report = new StringBuilder();
             List<VoltagePhasorGroup> reportedVoltages = new List<VoltagePhasorGroup>();
             foreach (VoltagePhasorGroup voltage in m_network.Model.ExpectedVoltages)
             {
@@ -5218,17 +5884,31 @@ namespace NetworkModelEditor.ViewModels
                     reportedVoltages.Add(voltage);
                 }
             }
-            stringBuilder.AppendFormat(reportedVoltages.Count.ToString() + " Reported Voltage Phasors");
+            report.AppendFormat(VoltagePhasorGroup.CSV_HEADER);
             foreach (VoltagePhasorGroup voltage in reportedVoltages)
             {
-                stringBuilder.AppendFormat(voltage.ToVerboseString() + "{0}", Environment.NewLine);
+                report.AppendFormat(voltage.ToCsvLineString());
             }
-            ShowTextReport("ReportedVoltages.txt", stringBuilder.ToString());
+            return report.ToString();
         }
 
-        private void ViewUnreportedVoltages()
+        private void SaveReportedVoltagesReport(string absolutePath)
         {
-            StringBuilder stringBuilder = new StringBuilder();
+            ShowTextReport(absolutePath, CreateReportedVoltagesReport());
+        }
+
+        private void ViewReportedVoltages()
+        {
+            ShowTextReport("ReportedVoltages.csv", CreateReportedVoltagesReport());
+        }
+
+        #endregion
+
+        #region [ Unreported ]
+
+        private string CreateUnreportedVoltagesReport()
+        {
+            StringBuilder report = new StringBuilder();
             List<VoltagePhasorGroup> unreportedVoltages = new List<VoltagePhasorGroup>();
             foreach (VoltagePhasorGroup voltage in m_network.Model.ExpectedVoltages)
             {
@@ -5237,17 +5917,31 @@ namespace NetworkModelEditor.ViewModels
                     unreportedVoltages.Add(voltage);
                 }
             }
-            stringBuilder.AppendFormat(unreportedVoltages.Count.ToString() + " Unreported Voltage Phasors");
+            report.AppendFormat(VoltagePhasorGroup.CSV_HEADER);
             foreach (VoltagePhasorGroup voltage in unreportedVoltages)
             {
-                stringBuilder.AppendFormat(voltage.ToVerboseString() + "{0}", Environment.NewLine);
+                report.AppendFormat(voltage.ToCsvLineString());
             }
-            ShowTextReport("UnreportedVoltages.txt", stringBuilder.ToString());
+            return report.ToString();
         }
 
-        private void ViewActiveVoltagesByStatusWord()
+        private void SaveUnreportedVoltagesReport(string absolutePath)
         {
-            StringBuilder stringBuilder = new StringBuilder();
+            SaveTextReport(absolutePath, CreateUnreportedVoltagesReport());
+        }
+
+        private void ViewUnreportedVoltages()
+        {
+            ShowTextReport("UnreportedVoltages.csv", CreateUnreportedVoltagesReport());
+        }
+
+        #endregion
+
+        #region [ Active By Status Word ]
+
+        private string CreateActiveVoltagesByStatusWordReport()
+        {
+            StringBuilder report = new StringBuilder();
             List<VoltagePhasorGroup> activeVoltages = new List<VoltagePhasorGroup>();
             foreach (VoltagePhasorGroup voltage in m_network.Model.ExpectedVoltages)
             {
@@ -5260,17 +5954,31 @@ namespace NetworkModelEditor.ViewModels
                     }
                 }
             }
-            stringBuilder.AppendFormat(activeVoltages.Count.ToString() + " Active Voltage Phasors by Status Word");
+            report.AppendFormat(VoltagePhasorGroup.CSV_HEADER);
             foreach (VoltagePhasorGroup voltage in activeVoltages)
             {
-                stringBuilder.AppendFormat(voltage.ToVerboseString() + "{0}", Environment.NewLine);
+                report.AppendFormat(voltage.ToCsvLineString());
             }
-            ShowTextReport("ActiveVoltagesByStatusWord.txt", stringBuilder.ToString());
+            return report.ToString();
         }
 
-        private void ViewInactiveVoltagesByStatusWord()
+        private void SaveActiveVoltagesByStatusWordReport(string absolutePath)
         {
-            StringBuilder stringBuilder = new StringBuilder();
+            SaveTextReport(absolutePath, CreateActiveVoltagesByStatusWordReport());
+        }
+
+        private void ViewActiveVoltagesByStatusWord()
+        {
+            ShowTextReport("ActiveVoltagesByStatusWord.csv", CreateActiveVoltagesByStatusWordReport());
+        }
+
+        #endregion
+
+        #region [ Inactive By Status Word ]
+
+        private string CreateInactiveVoltagesByStatusWordReport()
+        {
+            StringBuilder report = new StringBuilder();
             List<VoltagePhasorGroup> inactiveVoltages = new List<VoltagePhasorGroup>();
             foreach (VoltagePhasorGroup voltage in m_network.Model.ExpectedVoltages)
             {
@@ -5283,17 +5991,31 @@ namespace NetworkModelEditor.ViewModels
                     }
                 }
             }
-            stringBuilder.AppendFormat(inactiveVoltages.Count.ToString() + " Inactive Voltage Phasors by Status Word");
+            report.AppendFormat(VoltagePhasorGroup.CSV_HEADER);
             foreach (VoltagePhasorGroup voltage in inactiveVoltages)
             {
-                stringBuilder.AppendFormat(voltage.ToVerboseString() + "{0}", Environment.NewLine);
+                report.AppendFormat(voltage.ToCsvLineString());
             }
-            ShowTextReport("InactiveVoltagesByStatusWord.txt", stringBuilder.ToString());
+            return report.ToString();
         }
 
-        private void ViewInactiveVoltagesByMeasurement()
+        private void SaveInactiveVoltagesByStatusWordReport(string absolutePath)
         {
-            StringBuilder stringBuilder = new StringBuilder();
+            SaveTextReport(absolutePath, CreateInactiveVoltagesByStatusWordReport());
+        }
+
+        private void ViewInactiveVoltagesByStatusWord()
+        {
+            ShowTextReport("InactiveVoltagesByStatusWord.csv", CreateInactiveVoltagesByStatusWordReport());
+        }
+
+        #endregion
+
+        #region [ Inactive By Measurement ]
+
+        private string CreateInactiveVoltagesByMeasurementReport()
+        {
+            StringBuilder report = new StringBuilder();
             List<VoltagePhasorGroup> inactiveVoltages = new List<VoltagePhasorGroup>();
             foreach (VoltagePhasorGroup voltage in m_network.Model.ExpectedVoltages)
             {
@@ -5310,107 +6032,193 @@ namespace NetworkModelEditor.ViewModels
                 }
             }
 
-            stringBuilder.AppendFormat(inactiveVoltages.Count.ToString() + " Inactive Voltage Phasors by Measurement");
+            report.AppendFormat(VoltagePhasorGroup.CSV_HEADER);
             foreach (VoltagePhasorGroup voltage in inactiveVoltages)
             {
-                stringBuilder.AppendFormat(voltage.ToVerboseString() + "{0}", Environment.NewLine);
+                report.AppendFormat(voltage.ToCsvLineString());
             }
-            ShowTextReport("InactiveVoltagesByMeasurement.txt", stringBuilder.ToString());
+            return report.ToString();
         }
+
+        private void SaveInactiveVoltagesByMeasurementReport(string absolutePath)
+        {
+            SaveTextReport(absolutePath, CreateInactiveVoltagesByMeasurementReport());
+        }
+
+        private void ViewInactiveVoltagesByMeasurement()
+        {
+            ShowTextReport("InactiveVoltagesByMeasurement.csv", CreateInactiveVoltagesByMeasurementReport());
+        }
+
+        #endregion
 
         #endregion
 
         #region [ View Current Flow Phasors ]
 
-        private void ViewModeledCurrentFlows()
+        #region [ Modeled ]
+
+        private string CreateModeledCurrentFlowsReport()
         {
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.AppendFormat(m_network.Model.CurrentFlows.Count.ToString() + " Modeled Current Flow Phasors");
+            StringBuilder report = new StringBuilder();
+            report.AppendFormat(CurrentFlowPhasorGroup.CSV_HEADER);
             foreach (CurrentFlowPhasorGroup currentFlowPhasorGroup in m_network.Model.CurrentFlows)
             {
-                stringBuilder.AppendFormat(currentFlowPhasorGroup.ToVerboseString() + "{0}", Environment.NewLine);
+                report.AppendFormat(currentFlowPhasorGroup.ToCsvLineString());
             }
-            File.WriteAllText(Directory.GetCurrentDirectory() + "/ModeledCurrentFlows.txt", stringBuilder.ToString());
-            ActionStatus = "Wrote to " + Directory.GetCurrentDirectory() + "/ModeledCurrentFlows.txt";
-            Process.Start(Directory.GetCurrentDirectory() + "/ModeledCurrentFlows.txt");
+            return report.ToString();
+        }
+
+        private void SaveModeledCurrentFlowsReport(string absolutePath)
+        {
+            SaveTextReport(absolutePath, CreateModeledCurrentFlowsReport());
+        }
+
+        private void ViewModeledCurrentFlows()
+        {
+            ShowTextReport("ModeledCurrentFlows.csv", CreateModeledCurrentFlowsReport());
+        }
+
+        #endregion
+
+        #region [ Expected ]
+
+        private string CreateExpectedCurrentFlowsReport()
+        {
+            StringBuilder report = new StringBuilder();
+            report.AppendFormat(CurrentFlowPhasorGroup.CSV_HEADER);
+            foreach (CurrentFlowPhasorGroup currentFlowPhasorGroup in m_network.Model.ExpectedCurrentFlows)
+            {
+                report.AppendFormat(currentFlowPhasorGroup.ToCsvLineString());
+            }
+            return report.ToString();
+        }
+
+        private void SaveExpectedCurrentFlowsReport(string absolutePath)
+        {
+            SaveTextReport(absolutePath, CreateExpectedCurrentFlowsReport());
         }
 
         private void ViewExpectedCurrentFlows()
         {
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.AppendFormat(m_network.Model.ExpectedCurrentFlows.Count.ToString() + " Expected Current Flow Phasors");
+            ShowTextReport("ExpectedCurrentFlows.csv", CreateExpectedCurrentFlowsReport());
+        }
+
+        #endregion
+
+        #region [ Inactive ]
+
+        private string CreatInactiveCurrentFlowsReport()
+        {
+            StringBuilder report = new StringBuilder();
+            report.AppendFormat(CurrentFlowPhasorGroup.CSV_HEADER);
             foreach (CurrentFlowPhasorGroup currentFlowPhasorGroup in m_network.Model.ExpectedCurrentFlows)
             {
-                stringBuilder.AppendFormat(currentFlowPhasorGroup.ToVerboseString() + "{0}", Environment.NewLine);
+                if (!m_network.Model.ActiveCurrentFlows.Contains(currentFlowPhasorGroup))
+                {
+                    report.AppendFormat(currentFlowPhasorGroup.ToCsvLineString());
+                }
             }
-            File.WriteAllText(Directory.GetCurrentDirectory() + "/ExpectedCurrentFlows.txt", stringBuilder.ToString());
-            ActionStatus = "Wrote to " + Directory.GetCurrentDirectory() + "/ExpectedCurrentFlows.txt";
-            Process.Start(Directory.GetCurrentDirectory() + "/ExpectedCurrentFlows.txt");
+            return report.ToString();
+        }
+
+        private void SaveInactiveCurrentFlowsReport(string absolutePath)
+        {
+            SaveTextReport(absolutePath, CreatInactiveCurrentFlowsReport());
         }
 
         private void ViewInactiveCurrentFlows()
         {
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.AppendFormat("Inactive Current Flow Phasors");
-            foreach (CurrentFlowPhasorGroup currentFlowPhasorGroup in m_network.Model.ExpectedCurrentFlows)
+            ShowTextReport("InactiveCurrentFlows.csv", CreatInactiveCurrentFlowsReport());
+        }
+
+        #endregion
+
+        #region [ Included ]
+
+        private string CreateIncludedCurrentFlowsReport()
+        {
+            StringBuilder report = new StringBuilder();
+            report.AppendFormat(CurrentFlowPhasorGroup.CSV_HEADER);
+            foreach (CurrentFlowPhasorGroup currentPhasorGroup in m_network.Model.IncludedCurrentFlows)
             {
-                if (!m_network.Model.ActiveCurrentFlows.Contains(currentFlowPhasorGroup))
-                {
-                    stringBuilder.AppendFormat(currentFlowPhasorGroup.ToVerboseString() + "{0}", Environment.NewLine);
-                }
+                report.AppendFormat(currentPhasorGroup.ToCsvLineString());
             }
-            File.WriteAllText(Directory.GetCurrentDirectory() + "/InactiveCurrentFlows.txt", stringBuilder.ToString());
-            ActionStatus = "Wrote to " + Directory.GetCurrentDirectory() + "/InactiveCurrentFlows.txt";
-            Process.Start(Directory.GetCurrentDirectory() + "/InactiveCurrentFlows.txt");
+            return report.ToString();
+        }
+
+        private void SaveIncludedCurrentFlowsReport(string absolutePath)
+        {
+            SaveTextReport(absolutePath, CreateIncludedCurrentFlowsReport());
         }
 
         private void ViewIncludedCurrentFlows()
         {
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.AppendFormat(m_network.Model.IncludedCurrentFlows.Count.ToString() + " Included Current Flow Phasors");
-            foreach (CurrentFlowPhasorGroup currentPhasorGroup in m_network.Model.IncludedCurrentFlows)
-            {
-                stringBuilder.AppendFormat(currentPhasorGroup.ToVerboseString() + "{0}", Environment.NewLine);
-            }
 
-            File.WriteAllText(Directory.GetCurrentDirectory() + "/IncludedCurrentFlows.txt", stringBuilder.ToString());
-            ActionStatus = "Wrote to " + Directory.GetCurrentDirectory() + "/IncludedCurrentFlows.txt";
-            Process.Start(Directory.GetCurrentDirectory() + "/IncludedCurrentFlows.txt");
+            ShowTextReport("IncludedCurrentFlows.csv", CreateIncludedCurrentFlowsReport());
         }
 
-        private void ViewExcludedCurrentFlows()
+        #endregion
+
+        #region [ Excluded ]
+
+        private string CreateExcludeddCurrentFlowsReport()
         {
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.AppendFormat("Excluded Current Flow Phasors");
+            StringBuilder report = new StringBuilder();
+            report.AppendFormat(CurrentFlowPhasorGroup.CSV_HEADER);
             foreach (CurrentFlowPhasorGroup currentFlowPhasorGroup in m_network.Model.IncludedCurrentFlows)
             {
                 if (!m_network.Model.ActiveCurrentFlows.Contains(currentFlowPhasorGroup))
                 {
-                    stringBuilder.AppendFormat(currentFlowPhasorGroup.ToVerboseString() + "{0}", Environment.NewLine);
+                    report.AppendFormat(currentFlowPhasorGroup.ToCsvLineString());
                 }
             }
-            File.WriteAllText(Directory.GetCurrentDirectory() + "/ExcludedCurrentFlows.txt", stringBuilder.ToString());
-            ActionStatus = "Wrote to " + Directory.GetCurrentDirectory() + "/ExcludedCurrentFlows.txt";
-            Process.Start(Directory.GetCurrentDirectory() + "/ExcludedCurrentFlows.txt");
+            return report.ToString();
         }
-        
-        private void ViewActiveCurrentFlows()
+
+        private void SaveExcludedCurrentFlowsReport(string absolutePath)
         {
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.AppendFormat(m_network.Model.ActiveCurrentFlows.Count.ToString() + " Active Current Flow Phasors");
+            SaveTextReport(absolutePath, CreateExcludeddCurrentFlowsReport());
+        }
+
+        private void ViewExcludedCurrentFlows()
+        {
+            ShowTextReport("ExcludedCurrentFlows.csv", CreateExcludeddCurrentFlowsReport());
+        }
+
+        #endregion
+
+        #region [ Active ]
+
+        private string CreateActiveCurrentFlowsReport()
+        {
+            StringBuilder report = new StringBuilder();
+            report.AppendFormat(CurrentFlowPhasorGroup.CSV_HEADER);
             foreach (CurrentFlowPhasorGroup currentPhasorGroup in m_network.Model.ActiveCurrentFlows)
             {
-                stringBuilder.AppendFormat(currentPhasorGroup.ToVerboseString() + "{0}", Environment.NewLine);
+                report.AppendFormat(currentPhasorGroup.ToCsvLineString());
             }
-
-            File.WriteAllText(Directory.GetCurrentDirectory() + "/ActiveCurrentFlows.txt", stringBuilder.ToString());
-            ActionStatus = "Wrote to " + Directory.GetCurrentDirectory() + "/ActiveCurrentFlows.txt";
-            Process.Start(Directory.GetCurrentDirectory() + "/ActiveCurrentFlows.txt");
+            return report.ToString();
         }
 
-        private void ViewReportedCurrentFlows()
+        private void SaveActiveCurrentFlowsReport(string absolutePath)
         {
-            StringBuilder stringBuilder = new StringBuilder();
+            SaveTextReport(absolutePath, CreateActiveCurrentFlowsReport());
+        }
+
+        private void ViewActiveCurrentFlows()
+        {
+
+            ShowTextReport("ActiveCurrentFlows.csv", CreateActiveCurrentFlowsReport());
+        }
+
+        #endregion
+
+        #region [ Reported ]
+
+        private string CreateReportedCurrentFlowsReport()
+        {
+            StringBuilder report = new StringBuilder();
             List<CurrentFlowPhasorGroup> reportedCurrents = new List<CurrentFlowPhasorGroup>();
             foreach (CurrentFlowPhasorGroup current in m_network.Model.ExpectedCurrentFlows)
             {
@@ -5419,17 +6227,31 @@ namespace NetworkModelEditor.ViewModels
                     reportedCurrents.Add(current);
                 }
             }
-            stringBuilder.AppendFormat(reportedCurrents.Count.ToString() + " Reported Current Flow Phasors");
+            report.AppendFormat(CurrentFlowPhasorGroup.CSV_HEADER);
             foreach (CurrentFlowPhasorGroup current in reportedCurrents)
             {
-                stringBuilder.AppendFormat(current.ToVerboseString() + "{0}", Environment.NewLine);
+                report.AppendFormat(current.ToCsvLineString());
             }
-            ShowTextReport("ReportedCurrentFlows.txt", stringBuilder.ToString());
+            return report.ToString();
         }
 
-        private void ViewUnreportedCurrentFlows()
+        private void SaveReportedCurrentFlowsReport(string absolutePath)
         {
-            StringBuilder stringBuilder = new StringBuilder();
+            SaveTextReport(absolutePath, CreateReportedCurrentFlowsReport());
+        }
+
+        private void ViewReportedCurrentFlows()
+        {
+            ShowTextReport("ReportedCurrentFlows.csv", CreateReportedCurrentFlowsReport());
+        }
+
+        #endregion
+
+        #region [ Unreported ]
+
+        private string CreateUnreportedCurrentFlowsReport()
+        {
+            StringBuilder report = new StringBuilder();
             List<CurrentFlowPhasorGroup> unreportedCurrents = new List<CurrentFlowPhasorGroup>();
             foreach (CurrentFlowPhasorGroup current in m_network.Model.ExpectedCurrentFlows)
             {
@@ -5438,17 +6260,31 @@ namespace NetworkModelEditor.ViewModels
                     unreportedCurrents.Add(current);
                 }
             }
-            stringBuilder.AppendFormat(unreportedCurrents.Count.ToString() + " Unreported Current Flow Phasors");
+            report.AppendFormat(CurrentFlowPhasorGroup.CSV_HEADER);
             foreach (CurrentFlowPhasorGroup current in unreportedCurrents)
             {
-                stringBuilder.AppendFormat(current.ToVerboseString() + "{0}", Environment.NewLine);
+                report.AppendFormat(current.ToCsvLineString());
             }
-            ShowTextReport("UnreportedCurrentFlows.txt", stringBuilder.ToString());
+            return report.ToString();
         }
 
-        private void ViewActiveCurrentFlowsByStatusWord()
+        private void SaveUnreportedCurrentFlowsReport(string absolutePath)
         {
-            StringBuilder stringBuilder = new StringBuilder();
+            SaveTextReport(absolutePath, CreateUnreportedCurrentFlowsReport());
+        }
+
+        private void ViewUnreportedCurrentFlows()
+        {
+            ShowTextReport("UnreportedCurrentFlows.csv", CreateUnreportedCurrentFlowsReport());
+        }
+
+        #endregion
+
+        #region [ Active By Status Word ]
+
+        private string CreateActivedCurrentFlowsByStatusWordReport()
+        {
+            StringBuilder report = new StringBuilder();
             List<CurrentFlowPhasorGroup> activeCurrents = new List<CurrentFlowPhasorGroup>();
             foreach (CurrentFlowPhasorGroup current in m_network.Model.ExpectedCurrentFlows)
             {
@@ -5461,17 +6297,31 @@ namespace NetworkModelEditor.ViewModels
                     }
                 }
             }
-            stringBuilder.AppendFormat(activeCurrents.Count.ToString() + " Active Current Flow Phasors by Status Word");
+            report.AppendFormat(CurrentFlowPhasorGroup.CSV_HEADER);
             foreach (CurrentFlowPhasorGroup current in activeCurrents)
             {
-                stringBuilder.AppendFormat(current.ToVerboseString() + "{0}", Environment.NewLine);
+                report.AppendFormat(current.ToCsvLineString());
             }
-            ShowTextReport("ActiveCurrentFlowsByStatusWord.txt", stringBuilder.ToString());
+            return report.ToString();
         }
 
-        private void ViewInactiveCurrentFlowsByStatusWord()
+        private void SaveActiveCurrentFlowsByStatusWordReport(string absolutePath)
         {
-            StringBuilder stringBuilder = new StringBuilder();
+            SaveTextReport(absolutePath, CreateActivedCurrentFlowsByStatusWordReport());
+        }
+
+        private void ViewActiveCurrentFlowsByStatusWord()
+        {
+            ShowTextReport("ActiveCurrentFlowsByStatusWord.csv", CreateActivedCurrentFlowsByStatusWordReport());
+        }
+
+        #endregion
+
+        #region [ Inactive By Status Word ] 
+
+        private string CreateInactiveCurrentFlowsByStatusWordReport()
+        {
+            StringBuilder report = new StringBuilder();
             List<CurrentFlowPhasorGroup> inactiveCurrents = new List<CurrentFlowPhasorGroup>();
             foreach (CurrentFlowPhasorGroup current in m_network.Model.ExpectedCurrentFlows)
             {
@@ -5484,17 +6334,31 @@ namespace NetworkModelEditor.ViewModels
                     }
                 }
             }
-            stringBuilder.AppendFormat(inactiveCurrents.Count.ToString() + " Inactive Current Flow Phasors by Status Word");
+            report.AppendFormat(CurrentFlowPhasorGroup.CSV_HEADER);
             foreach (CurrentFlowPhasorGroup current in inactiveCurrents)
             {
-                stringBuilder.AppendFormat(current.ToVerboseString() + "{0}", Environment.NewLine);
+                report.AppendFormat(current.ToCsvLineString());
             }
-            ShowTextReport("InactiveCurrentFlowsByStatusWord.txt", stringBuilder.ToString());
+            return report.ToString();
         }
 
-        private void ViewInactiveCurrentFlowsByMeasurement()
+        private void SaveInactiveCurrentFlowsByStatusWordReport(string absolutePath)
         {
-            StringBuilder stringBuilder = new StringBuilder();
+            SaveTextReport(absolutePath, CreateInactiveCurrentFlowsByStatusWordReport());
+        }
+
+        private void ViewInactiveCurrentFlowsByStatusWord()
+        {
+            ShowTextReport("InactiveCurrentFlowsByStatusWord.csv", CreateInactiveCurrentFlowsByStatusWordReport());
+        }
+
+        #endregion
+
+        #region [ Inactive By Measurement ]
+
+        private string CreateInactiveCurrentFlowsByMeasurementReport()
+        {
+            StringBuilder report = new StringBuilder();
             List<CurrentFlowPhasorGroup> inactiveCurrents = new List<CurrentFlowPhasorGroup>();
             foreach (CurrentFlowPhasorGroup current in m_network.Model.ExpectedCurrentFlows)
             {
@@ -5511,75 +6375,138 @@ namespace NetworkModelEditor.ViewModels
                 }
             }
 
-            stringBuilder.AppendFormat(inactiveCurrents.Count.ToString() + " Inactive Current Flow Phasors by Measurement");
+            report.AppendFormat(CurrentFlowPhasorGroup.CSV_HEADER);
             foreach (CurrentFlowPhasorGroup current in inactiveCurrents)
             {
-                stringBuilder.AppendFormat(current.ToVerboseString() + "{0}", Environment.NewLine);
+                report.AppendFormat(current.ToCsvLineString());
             }
-            ShowTextReport("InactiveCurrentFlowsByMeasurement.txt", stringBuilder.ToString());
+            return report.ToString();
         }
+
+        private void SaveInactiveCurrentFlowsByMeasurementReport(string absolutePath)
+        {
+            SaveTextReport(absolutePath, CreateInactiveCurrentFlowsByMeasurementReport());
+        }
+
+        private void ViewInactiveCurrentFlowsByMeasurement()
+        {
+            ShowTextReport("InactiveCurrentFlowsByMeasurement.csv", CreateInactiveCurrentFlowsByMeasurementReport());
+        }
+
+        #endregion
+
         #endregion
 
         #region [ View Current Injection Phasors ]
 
-        private void ViewModeledCurrentInjections()
+        #region [ Modeled ]
+
+        private string CreateModeledCurrentInjectionsReport()
         {
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.AppendFormat(m_network.Model.CurrentInjections.Count.ToString() + " Modeled Current Injections Phasors");
+            StringBuilder report = new StringBuilder();
+            report.AppendFormat(CurrentInjectionPhasorGroup.CSV_HEADER);
             foreach (CurrentInjectionPhasorGroup currentInjectionPhasorGroup in m_network.Model.CurrentInjections)
             {
-                stringBuilder.AppendFormat(currentInjectionPhasorGroup.ToVerboseString() + "{0}", Environment.NewLine);
+                report.AppendFormat(currentInjectionPhasorGroup.ToCsvLineString());
             }
-            File.WriteAllText(Directory.GetCurrentDirectory() + "/ModeledCurrentInjections.txt", stringBuilder.ToString());
-            ActionStatus = "Wrote to " + Directory.GetCurrentDirectory() + "/ModeledCurrentInjections.txt";
-            Process.Start(Directory.GetCurrentDirectory() + "/ModeledCurrentInjections.txt");
+            return report.ToString();
+        }
+
+        private void SaveModeledCurrentInjectionsReport(string absolutePath)
+        {
+            SaveTextReport(absolutePath, CreateModeledCurrentInjectionsReport());
+        }
+
+        private void ViewModeledCurrentInjections()
+        {
+            ShowTextReport("ModeledCurrentInjections.csv", CreateModeledCurrentInjectionsReport());
+        }
+
+        #endregion
+
+        #region [ Expected ]
+
+        private string CreateExpectedCurrentInjectionsReport()
+        {
+            StringBuilder report = new StringBuilder();
+            report.AppendFormat(CurrentInjectionPhasorGroup.CSV_HEADER);
+            foreach (CurrentInjectionPhasorGroup currentInjectionPhasorGroup in m_network.Model.ExpectedCurrentInjections)
+            {
+                report.AppendFormat(currentInjectionPhasorGroup.ToCsvLineString());
+            }
+            return report.ToString();
+        }
+
+        private void SaveExpectedCurrentInjectionsReport(string absolutePath)
+        {
+            SaveTextReport(absolutePath, CreateExpectedCurrentInjectionsReport());
         }
 
         private void ViewExpectedCurrentInjections()
         {
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.AppendFormat(m_network.Model.ExpectedCurrentInjections.Count.ToString() + " Expected Current Injection Phasors");
-            foreach (CurrentInjectionPhasorGroup currentInjectionPhasorGroup in m_network.Model.ExpectedCurrentInjections)
+            ShowTextReport("ExpectedCurrentInjections.csv", CreateExpectedCurrentInjectionsReport());
+        }
+
+        #endregion
+
+        #region [ Active ]
+
+        private string CreateActiveCurrentInjectionsReport()
+        {
+            StringBuilder report = new StringBuilder();
+            report.AppendFormat(CurrentInjectionPhasorGroup.CSV_HEADER);
+            foreach (CurrentInjectionPhasorGroup currentInjectionPhasorGroup in m_network.Model.ActiveCurrentInjections)
             {
-                stringBuilder.AppendFormat(currentInjectionPhasorGroup.ToVerboseString() + "{0}", Environment.NewLine);
+                report.AppendFormat(currentInjectionPhasorGroup.ToCsvLineString());
             }
-            File.WriteAllText(Directory.GetCurrentDirectory() + "/ExpectedCurrentInjections.txt", stringBuilder.ToString());
-            ActionStatus = "Wrote to " + Directory.GetCurrentDirectory() + "/ExpectedCurrentInjections.txt";
-            Process.Start(Directory.GetCurrentDirectory() + "/ExpectedCurrentInjections.txt");
+            return report.ToString();
+        }
+
+        private void SaveActiveCurrentInjectionsReport(string absolutePath)
+        {
+            SaveTextReport(absolutePath, CreateActiveCurrentInjectionsReport());
         }
 
         private void ViewActiveCurrentInjections()
         {
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.AppendFormat(m_network.Model.ActiveCurrentInjections.Count.ToString() + " Active Current Injection Phasors");
-            foreach (CurrentInjectionPhasorGroup currentInjectionPhasorGroup in m_network.Model.ActiveCurrentInjections)
-            {
-                stringBuilder.AppendFormat(currentInjectionPhasorGroup.ToVerboseString() + "{0}", Environment.NewLine);
-            }
-            File.WriteAllText(Directory.GetCurrentDirectory() + "/ActiveCurrentInjections.txt", stringBuilder.ToString());
-            ActionStatus = "Wrote to " + Directory.GetCurrentDirectory() + "/ActiveCurrentInjections.txt";
-            Process.Start(Directory.GetCurrentDirectory() + "/ActiveCurrentInjections.txt");
+            ShowTextReport("ActiveCurrentInjections.csv", CreateActiveCurrentInjectionsReport());
         }
 
-        private void ViewInactiveCurrentInjections()
+        #endregion
+
+        #region [ Inactive ]
+
+        private string CreateInactiveCurrentInjectionsReport()
         {
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.AppendFormat("Inactive Current Injection Phasors");
+            StringBuilder report = new StringBuilder();
+            report.AppendFormat(CurrentInjectionPhasorGroup.CSV_HEADER);
             foreach (CurrentInjectionPhasorGroup currentInjectionPhasorGroup in m_network.Model.ExpectedCurrentInjections)
             {
                 if (!m_network.Model.ActiveCurrentInjections.Contains(currentInjectionPhasorGroup))
                 {
-                    stringBuilder.AppendFormat(currentInjectionPhasorGroup.ToVerboseString() + "{0}", Environment.NewLine);
+                    report.AppendFormat(currentInjectionPhasorGroup.ToCsvLineString());
                 }
             }
-            File.WriteAllText(Directory.GetCurrentDirectory() + "/InactiveCurrentInjections.txt", stringBuilder.ToString());
-            ActionStatus = "Wrote to " + Directory.GetCurrentDirectory() + "/InactiveCurrentInjections.txt";
-            Process.Start(Directory.GetCurrentDirectory() + "/InactiveCurrentInjections.txt");
+            return report.ToString();
         }
 
-        private void ViewReportedCurrentInjections()
+        private void SaveInactiveCurrentInjectionsReport(string absolutePath)
         {
-            StringBuilder stringBuilder = new StringBuilder();
+            SaveTextReport(absolutePath, CreateInactiveCurrentInjectionsReport());
+        }
+
+        private void ViewInactiveCurrentInjections()
+        {
+            ShowTextReport("InactiveCurrentInjections.csv", CreateInactiveCurrentInjectionsReport());
+        }
+
+        #endregion
+
+        #region [ Reported ]
+
+        private string CreateReportedCurrentInjectionsReport()
+        {
+            StringBuilder report = new StringBuilder();
             List<CurrentInjectionPhasorGroup> reportedCurrents = new List<CurrentInjectionPhasorGroup>();
             foreach (CurrentInjectionPhasorGroup current in m_network.Model.ExpectedCurrentInjections)
             {
@@ -5588,17 +6515,31 @@ namespace NetworkModelEditor.ViewModels
                     reportedCurrents.Add(current);
                 }
             }
-            stringBuilder.AppendFormat(reportedCurrents.Count.ToString() + " Reported Current Injection Phasors");
+            report.AppendFormat(CurrentInjectionPhasorGroup.CSV_HEADER);
             foreach (CurrentInjectionPhasorGroup current in reportedCurrents)
             {
-                stringBuilder.AppendFormat(current.ToVerboseString() + "{0}", Environment.NewLine);
+                report.AppendFormat(current.ToCsvLineString());
             }
-            ShowTextReport("ReportedCurrentInjections.txt", stringBuilder.ToString());
+            return report.ToString();
         }
 
-        private void ViewUnreportedCurrentInjections()
+        private void SaveReportedCurrentInjectionsReport(string absolutePath)
         {
-            StringBuilder stringBuilder = new StringBuilder();
+            SaveTextReport(absolutePath, CreateReportedCurrentInjectionsReport());
+        }
+
+        private void ViewReportedCurrentInjections()
+        {
+            ShowTextReport("ReportedCurrentInjections.csv", CreateReportedCurrentInjectionsReport());
+        }
+
+        #endregion
+
+        #region [ Unreported ]
+
+        private string CreateUnreportedCurrentInjectionsReport()
+        {
+            StringBuilder report = new StringBuilder();
             List<CurrentInjectionPhasorGroup> unreportedCurrents = new List<CurrentInjectionPhasorGroup>();
             foreach (CurrentInjectionPhasorGroup current in m_network.Model.ExpectedCurrentInjections)
             {
@@ -5607,17 +6548,31 @@ namespace NetworkModelEditor.ViewModels
                     unreportedCurrents.Add(current);
                 }
             }
-            stringBuilder.AppendFormat(unreportedCurrents.Count.ToString() + " Unreported Current Injection Phasors");
+            report.AppendFormat(CurrentInjectionPhasorGroup.CSV_HEADER);
             foreach (CurrentInjectionPhasorGroup current in unreportedCurrents)
             {
-                stringBuilder.AppendFormat(current.ToVerboseString() + "{0}", Environment.NewLine);
+                report.AppendFormat(current.ToCsvLineString());
             }
-            ShowTextReport("UnreportedCurrentInjections.txt", stringBuilder.ToString());
+            return report.ToString();
         }
 
-        private void ViewActiveCurrentInjectionsByStatusWord()
+        private void SaveUnreportedCurrentInjectionsReport(string absolutePath)
         {
-            StringBuilder stringBuilder = new StringBuilder();
+            SaveTextReport(absolutePath, CreateUnreportedCurrentInjectionsReport());
+        }
+
+        private void ViewUnreportedCurrentInjections()
+        {
+            ShowTextReport("UnreportedCurrentInjections.csv", CreateUnreportedCurrentInjectionsReport());
+        }
+
+        #endregion
+
+        #region [ Active By Status Word ]
+
+        private string CreateActiveCurrentInjectionsByStatusWordReport()
+        {
+            StringBuilder report = new StringBuilder();
             List<CurrentInjectionPhasorGroup> activeCurrents = new List<CurrentInjectionPhasorGroup>();
             foreach (CurrentInjectionPhasorGroup current in m_network.Model.ExpectedCurrentInjections)
             {
@@ -5630,17 +6585,31 @@ namespace NetworkModelEditor.ViewModels
                     }
                 }
             }
-            stringBuilder.AppendFormat(activeCurrents.Count.ToString() + " Active Current Injection Phasors by Status Word");
+            report.AppendFormat(CurrentInjectionPhasorGroup.CSV_HEADER);
             foreach (CurrentInjectionPhasorGroup current in activeCurrents)
             {
-                stringBuilder.AppendFormat(current.ToVerboseString() + "{0}", Environment.NewLine);
+                report.AppendFormat(current.ToCsvLineString());
             }
-            ShowTextReport("ActiveCurrentInjectionsByStatusWord.txt", stringBuilder.ToString());
+            return report.ToString();
         }
 
-        private void ViewInactiveCurrentInjectionsByStatusWord()
+        private void SaveActiveCurrentInjectionsByStatusWordReport(string absolutePath)
         {
-            StringBuilder stringBuilder = new StringBuilder();
+            SaveTextReport(absolutePath, CreateActiveCurrentInjectionsByStatusWordReport());
+        }
+
+        private void ViewActiveCurrentInjectionsByStatusWord()
+        {
+            ShowTextReport("ActiveCurrentInjectionsByStatusWord.csv", CreateActiveCurrentInjectionsByStatusWordReport());
+        }
+
+        #endregion
+
+        #region [ Inactive By Status Word ]
+
+        private string CreateInactiveCurrentInjectionsByStatusWordReport()
+        {
+            StringBuilder report = new StringBuilder();
             List<CurrentInjectionPhasorGroup> inactiveCurrents = new List<CurrentInjectionPhasorGroup>();
             foreach (CurrentInjectionPhasorGroup current in m_network.Model.ExpectedCurrentInjections)
             {
@@ -5653,17 +6622,31 @@ namespace NetworkModelEditor.ViewModels
                     }
                 }
             }
-            stringBuilder.AppendFormat(inactiveCurrents.Count.ToString() + " Inactive Current Injection Phasors by Status Word");
+            report.AppendFormat(CurrentInjectionPhasorGroup.CSV_HEADER);
             foreach (CurrentInjectionPhasorGroup current in inactiveCurrents)
             {
-                stringBuilder.AppendFormat(current.ToVerboseString() + "{0}", Environment.NewLine);
+                report.AppendFormat(current.ToCsvLineString());
             }
-            ShowTextReport("InactiveCurrentInjectionsByStatusWord.txt", stringBuilder.ToString());
+            return report.ToString();
         }
 
-        private void ViewInactiveCurrentInjectionsByMeasurement()
+        private void SaveInactiveCurrentInjectionsByStatusWordReport(string absolutePath)
         {
-            StringBuilder stringBuilder = new StringBuilder();
+            SaveTextReport(absolutePath, CreateInactiveCurrentInjectionsByStatusWordReport());
+        }
+
+        private void ViewInactiveCurrentInjectionsByStatusWord()
+        {
+            ShowTextReport("InactiveCurrentInjectionsByStatusWord.csv", CreateInactiveCurrentInjectionsByStatusWordReport());
+        }
+
+        #endregion
+
+        #region [ Inactive By Measurement ]
+
+        private string CreateInactiveCurrentInjectionsByMeasurementReport()
+        {
+            StringBuilder report = new StringBuilder();
             List<CurrentInjectionPhasorGroup> inactiveCurrents = new List<CurrentInjectionPhasorGroup>();
             foreach (CurrentInjectionPhasorGroup current in m_network.Model.ExpectedCurrentInjections)
             {
@@ -5680,114 +6663,129 @@ namespace NetworkModelEditor.ViewModels
                 }
             }
 
-            stringBuilder.AppendFormat(inactiveCurrents.Count.ToString() + " Inactive Current Injection Phasors by Measurement");
+            report.AppendFormat(CurrentInjectionPhasorGroup.CSV_HEADER);
             foreach (CurrentInjectionPhasorGroup current in inactiveCurrents)
             {
-                stringBuilder.AppendFormat(current.ToVerboseString() + "{0}", Environment.NewLine);
+                report.AppendFormat(current.ToCsvLineString());
             }
-            ShowTextReport("InactiveCurrentInjectionsByMeasurement.txt", stringBuilder.ToString());
+            return report.ToString();
         }
+
+        private void SaveInactiveCurrentInjectionsByMeasurementReport(string absolutePath)
+        {
+            SaveTextReport(absolutePath, CreateInactiveCurrentInjectionsByMeasurementReport());
+        }
+
+        private void ViewInactiveCurrentInjectionsByMeasurement()
+        {
+            ShowTextReport("InactiveCurrentInjectionsByMeasurement.csv", CreateInactiveCurrentInjectionsByMeasurementReport());
+        }
+
+        #endregion
+
         #endregion
 
         #region [ View Switching Device Statuses ]
 
+        #region [ Modeled ]
+
+        private string CreateModeledBreakerStatusesReport()
+        {
+            StringBuilder report = new StringBuilder();
+            report.AppendFormat(BreakerStatus.CSV_HEADER);
+            foreach (BreakerStatus breakerStatus in m_network.Model.BreakerStatuses)
+            {
+                report.AppendFormat(breakerStatus.ToCsvLineString());
+            }
+            return report.ToString();
+        }
+
+        private void SaveModeledBreakerStatusesReport(string absolutePath)
+        {
+            SaveTextReport(absolutePath, CreateModeledBreakerStatusesReport());
+        }
+
         public void ViewModeledBreakerStatuses()
         {
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.AppendFormat(m_network.Model.BreakerStatuses.Count.ToString() + " Modeled Breaker Statuses");
-
-            foreach (BreakerStatus breakerStatus in m_network.Model.BreakerStatuses)
-            {
-                stringBuilder.AppendFormat(breakerStatus.ToVerboseString() + "{0}", Environment.NewLine);
-            }
-
-            ShowTextReport("ModeledBreakerStatuses.txt", stringBuilder.ToString());
-        }
-
-        public void ViewExpectedBreakerStatuses()
-        {
-            StringBuilder stringBuilder = new StringBuilder();
-
-            foreach (BreakerStatus breakerStatus in m_network.Model.BreakerStatuses)
-            {
-                if (breakerStatus.IsEnabled && breakerStatus.Key != "Undefined")
-                {
-                    stringBuilder.AppendFormat(breakerStatus.ToVerboseString() + "{0}", Environment.NewLine);
-                }
-            }
-
-            ShowTextReport("ExpectedBreakerStatuses.txt", stringBuilder.ToString());
-        }
-
-        public void ViewReportedBreakerStatuses()
-        {
-            StringBuilder stringBuilder = new StringBuilder();
-
-            foreach (BreakerStatus breakerStatus in m_network.Model.BreakerStatuses)
-            {
-                if (breakerStatus.WasReported)
-                {
-                    stringBuilder.AppendFormat(breakerStatus.ToVerboseString() + "{0}", Environment.NewLine);
-                }
-            }
-
-            ShowTextReport("ReportedBreakerStatuses.txt", stringBuilder.ToString());
-        }
-
-        public void ViewCircuitBreakers()
-        {
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.AppendFormat(m_network.Model.CircuitBreakers.Count.ToString() + " Circuit Breakers");
-
-            foreach (CircuitBreaker breaker in m_network.Model.CircuitBreakers)
-            {
-                stringBuilder.AppendFormat(breaker.ToVerboseString() + "{0}", Environment.NewLine);
-            }
-
-            ShowTextReport("CircuitBreakers.txt", stringBuilder.ToString());
-        }
-
-        public void ViewSwitches()
-        {
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.AppendFormat(m_network.Model.Switches.Count.ToString() + " Switches");
-
-            foreach (SynchrophasorAnalytics.Modeling.Switch circuitSwitch in m_network.Model.Switches)
-            {
-                stringBuilder.AppendFormat(circuitSwitch.ToVerboseString() + "{0}", Environment.NewLine);
-            }
-
-            ShowTextReport("Switches.txt", stringBuilder.ToString());
-        }
-
-        public void ViewAllSwitchingDevices()
-        {
-            StringBuilder stringBuilder = new StringBuilder();
-            int count = m_network.Model.CircuitBreakers.Count + m_network.Model.Switches.Count;
-            stringBuilder.AppendFormat(count.ToString() + " Switching Devices");
-
-            foreach (CircuitBreaker breaker in m_network.Model.CircuitBreakers)
-            {
-                stringBuilder.AppendFormat(breaker.ToVerboseString() + "{0}", Environment.NewLine);
-            }
-
-            foreach (SynchrophasorAnalytics.Modeling.Switch circuitSwitch in m_network.Model.Switches)
-            {
-                stringBuilder.AppendFormat(circuitSwitch.ToVerboseString() + "{0}", Environment.NewLine);
-            }
-
-            ShowTextReport("SwitchingDevices.txt", stringBuilder.ToString());
+            ShowTextReport("ModeledBreakerStatuses.csv", CreateModeledBreakerStatusesReport());
         }
 
         #endregion
 
+        #region [ Expected ]
+
+        private string CreateExpectedBreakerStatusesReport()
+        {
+            StringBuilder report = new StringBuilder();
+            report.Append(BreakerStatus.CSV_HEADER);
+            foreach (BreakerStatus breakerStatus in m_network.Model.BreakerStatuses)
+            {
+                if (breakerStatus.IsEnabled && breakerStatus.Key != "Undefined")
+                {
+                    report.AppendFormat(breakerStatus.ToCsvLineString());
+                }
+            }
+            return report.ToString();
+        }
+
+        private void SaveExpectedBreakerStatusesReport(string absolutePath)
+        {
+            SaveTextReport(absolutePath, CreateExpectedBreakerStatusesReport());
+        }
+
+        public void ViewExpectedBreakerStatuses()
+        {
+            ShowTextReport("ExpectedBreakerStatuses.csv", CreateExpectedBreakerStatusesReport());
+        }
+
+        #endregion
+
+        #region [ Reported ]
+
+        private string CreateReportedBreakerStatusesReport()
+        {
+            StringBuilder report = new StringBuilder();
+            report.Append(BreakerStatus.CSV_HEADER);
+            foreach (BreakerStatus breakerStatus in m_network.Model.BreakerStatuses)
+            {
+                if (breakerStatus.WasReported)
+                {
+                    report.AppendFormat(breakerStatus.ToCsvLineString());
+                }
+            }
+            return report.ToString();
+        }
+
+        private void SaveReportedBreakerStatusesReport(string absolutePath)
+        {
+            SaveTextReport(absolutePath, CreateReportedBreakerStatusesReport());
+        }
+
+        public void ViewReportedBreakerStatuses()
+        {
+            ShowTextReport("ReportedBreakerStatuses.csv", CreateReportedBreakerStatusesReport());
+        }
+
+        #endregion
+
+        #endregion
+
+        #region [ File Output ]
+
         private void ShowTextReport(string fileName, string content)
         {
             string absolutePath = Directory.GetCurrentDirectory() + $"/{fileName}";
-            File.WriteAllText(absolutePath, content);
-            ActionStatus = $"Wrote to {absolutePath}";
+            SaveTextReport(absolutePath, content);
             Process.Start(absolutePath);
         }
+
+        private void SaveTextReport(string absolutePath, string content)
+        {
+            File.WriteAllText(absolutePath, content);
+            ActionStatus = $"Wrote to {absolutePath}";
+        }
+
+        #endregion
 
         #endregion
 

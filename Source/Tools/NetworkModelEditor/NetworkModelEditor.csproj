@@ -90,6 +90,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="AnalysisReport.cs" />
+    <Compile Include="AnalysisReportType.cs" />
+    <Compile Include="AnalysisRun.cs" />
+    <Compile Include="BatchAnalysisFile.cs" />
     <Compile Include="Behaviors\MouseDoubleClickBehavior.cs" />
     <Compile Include="Commands\RelayCommand.cs" />
     <Compile Include="DetailViewTemplateSelector.cs" />

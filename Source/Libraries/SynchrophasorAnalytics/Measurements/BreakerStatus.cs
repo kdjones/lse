@@ -71,6 +71,8 @@ namespace SynchrophasorAnalytics.Measurements
 
         #endregion
 
+        public static string CSV_HEADER = $"InternalID,Number,Name,Description,Status,Binary Value,Bit,Key,Parent CB{Environment.NewLine}";
+
         #region [ Properties ]
 
         /// <summary>
@@ -476,12 +478,12 @@ namespace SynchrophasorAnalytics.Measurements
         }
 
         /// <summary>
-        /// A descriptive string representation of the <see cref="LinearStateEstimator.Measurements.BreakerStatus"/> class instance. The format is <i>BreakerStatus,internalId,number,name,description,bitPosition,enabledFlag,measurementKey,parentCircuitBreakerInternalID</i> and can be used for a rudimentary momento design pattern.
+        /// No description
         /// </summary>
         /// <returns>A string representation of the instance of the class.</returns>
         public override string ToString()
         {
-            return "BreakerStatus," + m_internalID.ToString() + "," + m_number.ToString() + "," + m_name + "," + m_name + "," + m_description + "," + m_bitPosition.ToString() + "," + m_enabled.ToString() + "," + m_inputMeasurementKey + "," + m_parentCircuitBreakerID.ToString();
+            return $"{Name}_{BitPosition}(Enabled: {IsEnabled})";
         }
 
         /// <summary>
@@ -511,6 +513,30 @@ namespace SynchrophasorAnalytics.Measurements
                 stringBuilder.AppendFormat("       Parent CB: Unclaimed {0}", Environment.NewLine);
             }
             stringBuilder.AppendLine();
+            return stringBuilder.ToString();
+        }
+
+        public string ToCsvLineString()
+        {
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.AppendFormat(InternalID.ToString() + ",");
+            stringBuilder.AppendFormat(Number.ToString() + ",");
+            stringBuilder.AppendFormat(Name + ",");
+            stringBuilder.AppendFormat(Description + ",");
+            stringBuilder.AppendFormat(this.Value.ToString() + ",");
+            stringBuilder.AppendFormat(AddPrefixOfZerosIfNeeded(Convert.ToString(m_binaryValue, 2)) + ",");
+            stringBuilder.AppendFormat(BitPosition.ToString() + ",");
+            stringBuilder.AppendFormat(Key + ",");
+            if (ParentCircuitBreaker != null)
+            {
+                string substation = ParentCircuitBreaker.ParentSubstation.Name;
+                string device = ParentCircuitBreaker.Name;
+                stringBuilder.AppendFormat($"{substation}_{device}{Environment.NewLine}");
+            }
+            else
+            {
+                stringBuilder.AppendFormat($"Unclaimed{Environment.NewLine}");
+            }
             return stringBuilder.ToString();
         }
 

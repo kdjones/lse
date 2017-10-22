@@ -88,6 +88,8 @@ namespace SynchrophasorAnalytics.Measurements
         private double m_previousBinaryValue;
 
         #endregion
+        
+        public static string CSV_HEADER = $"InternalID,Number,Description,Key,Enabled,Reported,Binary Value,{Environment.NewLine}";
 
         #region [ Properties ]
 
@@ -775,7 +777,7 @@ namespace SynchrophasorAnalytics.Measurements
         /// <returns>A descriptive string representation of the <see cref="LinearStateEstimator.Measurements.StatusWord"/>.</returns>
         public override string ToString()
         {
-            return "StatusWord," + m_internalID.ToString() + "," + m_number.ToString() + "," + m_description + "," + m_enabled.ToString() + "," + m_inputMeasurementKey.ToString();
+            return $"{Description}(Enabled: {IsEnabled})";
         }
 
         /// <summary>
@@ -848,6 +850,19 @@ namespace SynchrophasorAnalytics.Measurements
             stringBuilder.AppendFormat($"     DataIsValid: {DataIsValid}{Environment.NewLine}");
             stringBuilder.AppendFormat($"   DataDiscarded: {DataDiscarded}{Environment.NewLine}");
             stringBuilder.AppendLine();
+            return stringBuilder.ToString();
+        }
+
+        public string ToCsvLineString()
+        {
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.AppendFormat($"{InternalID},");
+            stringBuilder.AppendFormat($"{Number},");
+            stringBuilder.AppendFormat($"{Description},");
+            stringBuilder.AppendFormat($"{Key},");
+            stringBuilder.AppendFormat($"{IsEnabled},");
+            stringBuilder.AppendFormat($"{StatusWordWasReported},");
+            stringBuilder.AppendFormat($"{BinaryValue}{Environment.NewLine}");
             return stringBuilder.ToString();
         }
 

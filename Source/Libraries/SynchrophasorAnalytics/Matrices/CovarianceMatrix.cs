@@ -131,10 +131,10 @@ namespace SynchrophasorAnalytics.Matrices
             List<CurrentFlowPhasorGroup> measuredCurrents = network.Model.IncludedCurrentFlows;
             List<CurrentInjectionPhasorGroup> measuredShuntCurrents = network.Model.ActiveCurrentInjections;
 
-            // Resolve the Network into a list of ObservedBusses
-            List<ObservedBus> observedBusses = network.Model.ObservedBusses;
+            // Resolve the Network into a list of ObservedBuses
+            List<ObservedBus> observedBusses = network.Model.ObservedBuses;
 
-            // Create a list of directly measured nodes from the set of ObservedBusses
+            // Create a list of directly measured nodes from the set of ObservedBuses
             List<Node> measuredNodes = new List<Node>();
             foreach (ObservedBus observedBus in observedBusses)
             {
@@ -185,10 +185,10 @@ namespace SynchrophasorAnalytics.Matrices
 
             List<CurrentInjectionPhasorGroup> measuredShuntCurrents = network.Model.ActiveCurrentInjections;
 
-            // Resolve the Network into a list of ObservedBusses
-            List<ObservedBus> observedBusses = network.Model.ObservedBusses;
+            // Resolve the Network into a list of ObservedBuses
+            List<ObservedBus> observedBusses = network.Model.ObservedBuses;
 
-            // Create a list of directly measured nodes from the set of ObservedBusses
+            // Create a list of directly measured nodes from the set of ObservedBuses
             List<Node> measuredNodes = new List<Node>();
             foreach (ObservedBus observedBus in observedBusses)
             {

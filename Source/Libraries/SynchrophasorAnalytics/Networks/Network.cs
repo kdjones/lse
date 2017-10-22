@@ -147,7 +147,7 @@ namespace SynchrophasorAnalytics.Networks
         {
             get
             {
-                foreach (ObservedBus observedBus in m_networkModel.ObservedBusses)
+                foreach (ObservedBus observedBus in m_networkModel.ObservedBuses)
                 {
                     foreach (Node node in observedBus.Nodes)
                     {
@@ -485,7 +485,7 @@ namespace SynchrophasorAnalytics.Networks
             {
                 List<VoltagePhasorGroup> voltagePhasorForPrimaryPhasorCalibration = new List<VoltagePhasorGroup>();
 
-                foreach (ObservedBus observedBus in m_networkModel.ObservedBusses)
+                foreach (ObservedBus observedBus in m_networkModel.ObservedBuses)
                 {
                     foreach (Node node in observedBus.Nodes)
                     {
@@ -622,10 +622,10 @@ namespace SynchrophasorAnalytics.Networks
 
         private DenseMatrix GetPositiveSequenceVoltageMeasurementVectorFromModel(bool usePerUnit)
         {
-            // Resolve the Network into a list of ObservedBusses
-            List<ObservedBus> observedBusses = m_networkModel.ObservedBusses;
+            // Resolve the Network into a list of ObservedBuses
+            List<ObservedBus> observedBusses = m_networkModel.ObservedBuses;
 
-            // Create a list of directly measured nodes from the set of ObservedBusses
+            // Create a list of directly measured nodes from the set of ObservedBuses
             List<Node> measuredNodes = new List<Node>();
 
             foreach (ObservedBus observedBus in observedBusses)
@@ -758,10 +758,10 @@ namespace SynchrophasorAnalytics.Networks
 
         private DenseMatrix GetThreePhaseVoltageMeasurementVectorFromModel(bool usePerUnit)
         {
-            // Resolve the Network into a list of ObservedBusses
-            List<ObservedBus> observedBusses = m_networkModel.ObservedBusses;
+            // Resolve the Network into a list of ObservedBuses
+            List<ObservedBus> observedBusses = m_networkModel.ObservedBuses;
 
-            // Create a list of directly measured nodes from the set of ObservedBusses
+            // Create a list of directly measured nodes from the set of ObservedBuses
             List<Node> measuredNodes = new List<Node>();
             foreach (ObservedBus observedBus in observedBusses)
             {
@@ -880,7 +880,7 @@ namespace SynchrophasorAnalytics.Networks
 
         private void SendPositiveSequenceStateVectorToModel(DenseMatrix stateVector, bool isPerUnit)
         {
-            List<ObservedBus> observedBusses = m_networkModel.ObservedBusses;
+            List<ObservedBus> observedBusses = m_networkModel.ObservedBuses;
 
             for (int i = 0; i < observedBusses.Count; i++)
             {
@@ -893,7 +893,7 @@ namespace SynchrophasorAnalytics.Networks
 
         private void SendThreePhaseStateVectorToModel(DenseMatrix stateVector, bool isPerUnit)
         {
-            List<ObservedBus> observedBusses = m_networkModel.ObservedBusses;
+            List<ObservedBus> observedBusses = m_networkModel.ObservedBuses;
 
             for (int i = 0; i < observedBusses.Count; i++)
             {

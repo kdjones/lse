@@ -70,6 +70,8 @@ namespace SynchrophasorAnalytics.Measurements
 
         #endregion
 
+        public static string CSV_HEADER = $"InternalID,Number,Acronym,Name,Description,Enabled,Use Status,Status,PosSeq Magnitude Measurement Key,PosSeq Angle Measurement Key,PosSeq Magnitude Estimate Key,PosSeq Angle Estimate Key,PosSeq Magnitude Measurement,PosSeq Angle Measurement,PosSeq Magnitude Estimate,PosSeq Angle Estimate,From Node,To Node,Reported,Include In Estimator{Environment.NewLine}";
+
         #region [ Properties ]
 
         /// <summary>
@@ -389,6 +391,32 @@ namespace SynchrophasorAnalytics.Measurements
             stringBuilder.AppendFormat($"UseInEstimator +: {IncludeInPositiveSequenceEstimator}{Environment.NewLine}");
             stringBuilder.AppendFormat($"UseInEstimator 3: {IncludeInEstimator.ToString()}{Environment.NewLine}");
             stringBuilder.AppendLine();
+            return stringBuilder.ToString();
+        }
+
+        public new string ToCsvLineString()
+        {
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.AppendFormat($"{InternalID},");
+            stringBuilder.AppendFormat($"{Number},");
+            stringBuilder.AppendFormat($"{Acronym},");
+            stringBuilder.AppendFormat($"{Name},");
+            stringBuilder.AppendFormat($"{Description},");
+            stringBuilder.AppendFormat($"{IsEnabled},");
+            stringBuilder.AppendFormat($"{UseStatusFlagForRemovingMeasurements},");
+            stringBuilder.AppendFormat($"{Status},");
+            stringBuilder.AppendFormat($"{PositiveSequence.Measurement.MagnitudeKey},");
+            stringBuilder.AppendFormat($"{PositiveSequence.Measurement.AngleKey},");
+            stringBuilder.AppendFormat($"{PositiveSequence.Estimate.MagnitudeKey},");
+            stringBuilder.AppendFormat($"{PositiveSequence.Estimate.AngleKey},");
+            stringBuilder.AppendFormat($"{PositiveSequence.Measurement.Magnitude},");
+            stringBuilder.AppendFormat($"{PositiveSequence.Measurement.AngleInDegrees},");
+            stringBuilder.AppendFormat($"{PositiveSequence.Estimate.Magnitude},");
+            stringBuilder.AppendFormat($"{PositiveSequence.Estimate.AngleInDegrees},");
+            stringBuilder.AppendFormat($"{MeasuredFromNode.ParentSubstation.Name}_{MeasuredFromNode.Name},");
+            stringBuilder.AppendFormat($"{MeasuredToNode.ParentSubstation.Name}_{MeasuredToNode.Name},");
+            stringBuilder.AppendFormat($"{PositiveSequence.Measurement.MeasurementWasReported},");
+            stringBuilder.AppendFormat($"{IncludeInPositiveSequenceEstimator}{Environment.NewLine}");
             return stringBuilder.ToString();
         }
 

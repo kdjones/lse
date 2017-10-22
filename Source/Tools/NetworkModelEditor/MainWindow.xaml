@@ -46,8 +46,33 @@
         </Style>
         
         <HierarchicalDataTemplate DataType="{x:Type viewModels:MenuItemViewModel}" ItemsSource="{Binding Path=Children}"/>
-        
+
     </Window.Resources>
+
+    <Window.InputBindings>
+        <KeyBinding Key="O" Modifiers="Ctrl" Command="{Binding OpenFileCommand}"/>
+        <KeyBinding Key="O" Modifiers="Ctrl+Shift" Command="{Binding OpenMeasurementSampleFileCommand}"/>
+        <KeyBinding Key="S" Modifiers="Ctrl" Command="{Binding SaveFileCommand}"/>
+        <KeyBinding Key="S" Modifiers="Ctrl+Shift" Command="{Binding SaveMeasurementSampleFilesCommand}"/>
+        <KeyBinding Key="C" Modifiers="Ctrl+Shift" Command="{Binding ConnectToOpenEcaCommand}"/>
+        <KeyBinding Key="R" Modifiers="Ctrl+Shift" Command="{Binding RefreshMetaDataCommand}"/>
+        <KeyBinding Key="M" Modifiers="Ctrl+Shift" Command="{Binding StartMeasurementSamplerCommand}"/>
+        <KeyBinding Key="T" Modifiers="Ctrl+Shift" Command="{Binding TakeMeasurementSampleCommand}"/>
+        <KeyBinding Key="M" Modifiers="Ctrl+Alt" Command="{Binding StopMeasurementSamplerCommand}"/>
+        <KeyBinding Key="R" Modifiers="Ctrl" Command="{Binding UpdateTreeViewCommand}"/>
+        <KeyBinding Key="Q" Modifiers="Ctrl+Alt" Command="{Binding ClearMeasurementsFromModelCommand}"/>
+        <KeyBinding Key="W" Modifiers="Ctrl+Alt" Command="{Binding InitializeModelCommand}"/>
+        <KeyBinding Key="E" Modifiers="Ctrl+Alt" Command="{Binding MapMeasurementsToModelCommand}"/>
+        <KeyBinding Key="R" Modifiers="Ctrl+Alt" Command="{Binding DetermineActiveCurrentFlowsCommand}"/>
+        <KeyBinding Key="T" Modifiers="Ctrl+Alt" Command="{Binding DetermineActiveCurrentInjectionsCommand}"/>
+        <KeyBinding Key="Y" Modifiers="Ctrl+Alt" Command="{Binding ResolvetoObservedBusesCommand}"/>
+        <KeyBinding Key="U" Modifiers="Ctrl+Alt" Command="{Binding ResolveToSingleFlowBranchesCommand}"/>
+        <KeyBinding Key="I" Modifiers="Ctrl+Alt" Command="{Binding ComputeSystemStateCommand}"/>
+        <KeyBinding Key="O" Modifiers="Ctrl+Alt" Command="{Binding ComputeLineFlowsCommand}"/>
+        <KeyBinding Key="P" Modifiers="Ctrl+Alt" Command="{Binding ViewObservableNodesCommand}"/>
+        <KeyBinding Key="G" Modifiers="Ctrl" Command="{Binding RunCompleteAnalysisCommand}"/>
+        <KeyBinding Key="G" Modifiers="Ctrl+Shift" Command="{Binding OpenBatchAnalysisFileCommand}"/>
+    </Window.InputBindings>
     <DockPanel>
         <Menu DockPanel.Dock="Top" ItemsSource="{Binding Path=MenuBarItems}"/>
 

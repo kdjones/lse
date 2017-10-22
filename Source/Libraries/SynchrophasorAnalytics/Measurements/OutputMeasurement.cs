@@ -9,6 +9,8 @@ namespace SynchrophasorAnalytics.Measurements
 
     public class OutputMeasurement
     {
+        public static string CSV_HEADER = $"PointTag,Value,Description,Device,Signal Type,Key{Environment.NewLine}";
+
         private const string LINEAR_STATE_ESTIMATOR = "LSE";
         private const string VOLTAGE_PHASOR_MAGNITUDE = "VPHM";
         private const string VOLTAGE_PHASOR_ANGLE = "VPHA";
@@ -354,6 +356,11 @@ namespace SynchrophasorAnalytics.Measurements
         public string ToVerboseString()
         {
             return $"{PointTag} | {Value} | {Description}  | {DevicePrefix}!{DeviceSuffix} | {SignalType} | {Key}";
+        }
+
+        public string ToCsvLineString()
+        {
+            return $"{PointTag},{Value},{Description},{DevicePrefix}!{DeviceSuffix},{SignalType},{Key}{Environment.NewLine}";
         }
     }
 }
