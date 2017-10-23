@@ -83,6 +83,10 @@ namespace SynchrophasorAnalytics.Modeling
         private List<Transformer> m_childrenTransformers;
         private List<CircuitBreaker> m_childrenCircuitBreakers;
         private List<Switch> m_childrenSwitches;
+        private List<VoltagePhasorGroup> m_expectedVoltages;
+        private List<VoltagePhasorGroup> m_reportedVoltages;
+        private double[] m_reportedVoltageAngles;
+        private double[] m_previousReportedVoltageAngles;
 
         private SubstationGraph m_graph;
         private List<VoltageLevelGroup> m_voltageLevelGroups;
@@ -503,7 +507,46 @@ namespace SynchrophasorAnalytics.Modeling
             }
         }
 
+        [XmlIgnore()]
+        public List<VoltagePhasorGroup> ExpectedVoltages
+        {
+            get
+            {
+                if (m_expectedVoltages == null)
+                {
+                    ListExpectedVoltages();
+                }
+                return m_expectedVoltages;
+            }
+        }
 
+        [XmlIgnore()]
+        public List<VoltagePhasorGroup> ReportedVoltages
+        {
+            get
+            {
+                ListReportedVoltages();
+                return m_reportedVoltages;
+            }
+        }
+
+        [XmlIgnore()]
+        public double[] ReportedVoltageAngles
+        {
+            get
+            {
+                return m_reportedVoltageAngles;
+            }
+        }
+
+        [XmlIgnore()]
+        public double[] PreviousReportedVoltageAngles
+        {
+            get
+            {
+                return m_previousReportedVoltageAngles;
+            }
+        }
 
         #endregion
 
@@ -769,7 +812,65 @@ namespace SynchrophasorAnalytics.Modeling
         {
             m_observedBusCountKey = "Undefined";
         }
-        
+
+        public void UpdateReportedVoltageAngles()
+        {
+            m_previousReportedVoltageAngles = m_reportedVoltageAngles;
+            m_reportedVoltageAngles = new double[ReportedVoltages.Count];
+            for (int i = 0; i < ReportedVoltages.Count; i++)
+            {
+                m_reportedVoltageAngles[i] = m_reportedVoltages[i].PositiveSequence.Measurement.AngleInDegrees;
+            }
+        }
+
+        //public bool CheckReportedVoltageAnglesForChange()
+        //{
+        //    if(PreviousReportedVoltageAngles.Length != ReportedVoltageAngles.Length)
+        //    {
+        //        return true;
+        //    }
+
+        //}
+
+        //private double[] CalculateReferencedVoltageAngles(double[] unreferencedAngles)
+        //{
+        //    double[] referencedAngles = new double[unreferencedAngles.Length];
+        //    double reference = unreferencedAngles[0];
+        //    for (int i = 0; i < unreferencedAngles.Length; i++)
+        //    {
+        //        referencedAngles[i] = unreferencedAngles
+        //    }
+        //}
+
+
+        #endregion
+
+        #region [ Private Methods ]
+
+        private void ListExpectedVoltages()
+        {
+            m_expectedVoltages = new List<VoltagePhasorGroup>();
+            foreach (Node node in Nodes)
+            {
+                if (node.Voltage.ExpectsMeasurements)
+                {
+                    m_expectedVoltages.Add(node.Voltage);
+                }
+            }
+        }
+
+        private void ListReportedVoltages()
+        {
+            m_reportedVoltages = new List<VoltagePhasorGroup>();
+            foreach (VoltagePhasorGroup voltage in ExpectedVoltages)
+            {
+                if (voltage.PositiveSequence.Measurement.MeasurementWasReported)
+                {
+                    m_reportedVoltages.Add(voltage);
+                }
+            }
+        }
+
         #endregion
     }
 }

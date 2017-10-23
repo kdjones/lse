@@ -2256,6 +2256,7 @@ namespace NetworkModelEditor.ViewModels
             m_singleFlowBranchesHaveBeenResolved = false;
             m_stateWasComputed = false;
 
+            DisableControls();
         }
 
         #endregion
@@ -6812,13 +6813,28 @@ namespace NetworkModelEditor.ViewModels
         {
             string absolutePath = Directory.GetCurrentDirectory() + $"/{fileName}";
             SaveTextReport(absolutePath, content);
-            Process.Start(absolutePath);
+            try
+            {
+                Process.Start(absolutePath);
+            }
+            catch (Exception e)
+            {
+                System.Windows.MessageBox.Show($"{e.Message}\n{e.InnerException.Message}");
+            }
         }
 
         private void SaveTextReport(string absolutePath, string content)
         {
-            File.WriteAllText(absolutePath, content);
-            ActionStatus = $"Wrote to {absolutePath}";
+            try
+            {
+                File.WriteAllText(absolutePath, content);
+                ActionStatus = $"Wrote to {absolutePath}";
+            }
+            catch(Exception e)
+            {
+                System.Windows.MessageBox.Show($"{e.Message}\n{e.InnerException.Message}");
+            }
+
         }
 
         #endregion

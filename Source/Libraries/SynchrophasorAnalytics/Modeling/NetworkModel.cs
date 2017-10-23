@@ -3813,6 +3813,42 @@ namespace SynchrophasorAnalytics.Modeling
                 }
             }
 
+
+            foreach (ShuntCompensator shunt in m_shuntCompensators)
+            {
+                if (!reportableNodes.Contains(shunt.ConnectedNode))
+                {
+                    reportableNodes.Add(shunt.ConnectedNode);
+                }
+            }
+
+            foreach (Node node in m_nodes)
+            {
+                if (!reportableNodes.Contains(node))
+                {
+                    int connectedDeviceCount = 0;
+                    foreach (CircuitBreaker circuitBreaker in m_circuitBreakers)
+                    {
+                        if (circuitBreaker.FromNode == node || circuitBreaker.ToNode == node)
+                        {
+                            connectedDeviceCount++;
+                        }
+                    }
+                    foreach (Switch circuitSwitch in m_switches)
+                    {
+                        if (circuitSwitch.FromNode == node || circuitSwitch.ToNode == node)
+                        {
+                            connectedDeviceCount++;
+                        }
+                    }
+                    if (connectedDeviceCount >= 3)
+                    {
+                        // its a bus or a line or a tx or a shunt
+                        reportableNodes.Add(node);
+                    }
+                }
+            }
+            
             foreach (Node node in reportableNodes)
             {
                 output.Add(new OutputMeasurement()
@@ -4650,7 +4686,7 @@ namespace SynchrophasorAnalytics.Modeling
         {
             List<OutputMeasurement> output = new List<OutputMeasurement>();
 
-            foreach (VoltagePhasorGroup voltage in m_voltages)
+            foreach (VoltagePhasorGroup voltage in m_expectedVoltages)
             {
                 output.Add(new OutputMeasurement()
                 {
@@ -4665,7 +4701,7 @@ namespace SynchrophasorAnalytics.Modeling
                     Description = $"{voltage.Description} Measurement Validation Flag"
                 });
             }
-            foreach (CurrentFlowPhasorGroup current in m_currentFlows)
+            foreach (CurrentFlowPhasorGroup current in m_expectedCurrentFlows)
             {
                 output.Add(new OutputMeasurement()
                 {
@@ -4680,7 +4716,7 @@ namespace SynchrophasorAnalytics.Modeling
                     Description = $"{current.Description} Measurement Validation Flag"
                 });
             }
-            foreach (CurrentInjectionPhasorGroup current in m_currentInjections)
+            foreach (CurrentInjectionPhasorGroup current in m_expectedCurrentInjections)
             {
                 output.Add(new OutputMeasurement()
                 {

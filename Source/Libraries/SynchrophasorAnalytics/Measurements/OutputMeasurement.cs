@@ -240,7 +240,7 @@ namespace SynchrophasorAnalytics.Measurements
                 case OutputType.CurrentInjectionMeasurementValidationFlag:
                     return DIGITAL;
                 case OutputType.PerformanceMetric:
-                    return STATISTIC;
+                    return CALCULATED_VALUE;
                 case OutputType.SeriesCompensatorStatus:
                     return DIGITAL;
                 case OutputType.SwitchStatus:
@@ -248,7 +248,7 @@ namespace SynchrophasorAnalytics.Measurements
                 case OutputType.TapPosition:
                     return CALCULATED_VALUE;
                 case OutputType.TopologyProfiling:
-                    return STATISTIC;
+                    return CALCULATED_VALUE;
                 case OutputType.VoltageAngleEstimate:
                     return VOLTAGE_PHASOR_ANGLE;
                 case OutputType.VoltageAngleResidual:
