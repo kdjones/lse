@@ -2256,23 +2256,6 @@ namespace NetworkModelEditor.ViewModels
             m_singleFlowBranchesHaveBeenResolved = false;
             m_stateWasComputed = false;
 
-            DisableControls();
-            AnalysisReport report = new AnalysisReport()
-            {
-                Path = "\\report"
-            };
-
-            AnalysisRun analysis = new AnalysisRun()
-            {
-                ModelFile = "\\model-file",
-                SampleFile = "\\sample-file",
-            };
-            analysis.Reports.Add(report);
-
-            BatchAnalysisFile batchFile = new BatchAnalysisFile();
-            batchFile.Analyses.Add(analysis);
-
-            batchFile.SerializeToXml(@"C:\Users\kevin\Desktop\LseBatchRun.xml");
         }
 
         #endregion
@@ -3173,10 +3156,19 @@ namespace NetworkModelEditor.ViewModels
                 {
                     node.Voltage.PositiveSequence.Measurement.MagnitudeKey = nodeExtension.MagnitudeHistorianId;
                     node.Voltage.PositiveSequence.Measurement.AngleKey = nodeExtension.AngleHistorianId;
-                    DataRow row = m_openEcaConnection.Metadata.Tables["MeasurementDetail"].Select($"SignalAcronym = 'FLAG' AND DeviceAcronym LIKE '{nodeExtension.DeviceName}'").Single();
-                    string guid = row["SignalID"].ToString();
-                    StatusWord statusWord = m_network.Model.StatusWords.Find(x => x.Key == guid);
-                    node.Voltage.Status = statusWord;
+                    DataRow[] results = m_openEcaConnection.Metadata.Tables["MeasurementDetail"].Select($"SignalAcronym = 'FLAG' AND DeviceAcronym LIKE '{nodeExtension.DeviceName}'");
+                    if (results.Length > 0)
+                    {
+                        DataRow row = results.Single();
+                        string guid = row["SignalID"].ToString();
+                        StatusWord statusWord = m_network.Model.StatusWords.Find(x => x.Key == guid);
+                        node.Voltage.Status = statusWord;
+                    }
+                    else
+                    {
+                        unmappedExtensionCount++;
+                        unmappedExtensionList.AppendLine($"{nodeExtension.StationName}.{nodeExtension.Id}");
+                    }
                 }
                 else
                 {
@@ -3187,7 +3179,7 @@ namespace NetworkModelEditor.ViewModels
             SpecialStatus = $"Failed to map {unmappedExtensionCount} extension(s).";
             if (unmappedExtensionCount > 0)
             {
-                System.Windows.Forms.MessageBox.Show(unmappedExtensionList.ToString());
+                ShowTextReport("UnmappedNodeExtensions.txt", unmappedExtensionList.ToString());
             }
         }
 
@@ -3242,19 +3234,41 @@ namespace NetworkModelEditor.ViewModels
                     CurrentFlowPhasorGroup toSubstationCurrent = lineSegment.ParentTransmissionLine.ToSubstationCurrent;
                     toSubstationCurrent.PositiveSequence.Measurement.MagnitudeKey = lineSegmentExtension.ToNodeMagnitudeHistorianId;
                     toSubstationCurrent.PositiveSequence.Measurement.AngleKey = lineSegmentExtension.ToNodeAngleHistorianId;
+                    bool isUnmappable = false;
                     if (lineSegmentExtension.FromNodeDeviceName != "Undefined")
                     {
-                        DataRow row = m_openEcaConnection.Metadata.Tables["MeasurementDetail"].Select($"SignalAcronym = 'FLAG' AND DeviceAcronym LIKE '{lineSegmentExtension.FromNodeDeviceName}'").Single();
-                        string guid = row["SignalID"].ToString();
-                        StatusWord statusWord = m_network.Model.StatusWords.Find(x => x.Key == guid);
-                        fromSubstationCurrent.Status = statusWord;
+                        DataRow[] results = m_openEcaConnection.Metadata.Tables["MeasurementDetail"].Select($"SignalAcronym = 'FLAG' AND DeviceAcronym LIKE '{lineSegmentExtension.FromNodeDeviceName}'");
+                        if (results.Length > 0)
+                        {
+                            DataRow row = results.Single();
+                            string guid = row["SignalID"].ToString();
+                            StatusWord statusWord = m_network.Model.StatusWords.Find(x => x.Key == guid);
+                            fromSubstationCurrent.Status = statusWord;
+                        }
+                        else
+                        {
+                            isUnmappable = true;
+                        }
                     }
                     if (lineSegmentExtension.ToNodeDeviceName != "Undefined")
                     {
-                        DataRow row = m_openEcaConnection.Metadata.Tables["MeasurementDetail"].Select($"SignalAcronym = 'FLAG' AND DeviceAcronym LIKE '{lineSegmentExtension.ToNodeDeviceName}'").Single();
-                        string guid = row["SignalID"].ToString();
-                        StatusWord statusWord = m_network.Model.StatusWords.Find(x => x.Key == guid);
-                        toSubstationCurrent.Status = statusWord;
+                        DataRow[] results = m_openEcaConnection.Metadata.Tables["MeasurementDetail"].Select($"SignalAcronym = 'FLAG' AND DeviceAcronym LIKE '{lineSegmentExtension.ToNodeDeviceName}'");
+                        if (results.Length > 0)
+                        {
+                            DataRow row = results.Single();
+                            string guid = row["SignalID"].ToString();
+                            StatusWord statusWord = m_network.Model.StatusWords.Find(x => x.Key == guid);
+                            toSubstationCurrent.Status = statusWord;
+                        }
+                        else
+                        {
+                            isUnmappable = true;
+                        }
+                    }
+                    if (isUnmappable)
+                    {
+                        unmappedExtensionCount++;
+                        unmappedExtensions.AppendLine($"{lineSegmentExtension.DivisionName}.{lineSegmentExtension.TransmissionLineId}.{lineSegmentExtension.Id}");
                     }
                 }
                 else
@@ -3267,7 +3281,7 @@ namespace NetworkModelEditor.ViewModels
 
             if (unmappedExtensionCount > 0)
             {
-                System.Windows.Forms.MessageBox.Show(unmappedExtensions.ToString());
+                ShowTextReport("UnmappedLineSegmentExtensions.txt", unmappedExtensions.ToString());
             }
         }
 
@@ -3404,19 +3418,41 @@ namespace NetworkModelEditor.ViewModels
                     CurrentFlowPhasorGroup toSubstationCurrent = transformer.ToNodeCurrent;
                     toSubstationCurrent.PositiveSequence.Measurement.MagnitudeKey = transformerExtension.ToNodeMagnitudeHistorianId;
                     toSubstationCurrent.PositiveSequence.Measurement.AngleKey = transformerExtension.ToNodeAngleHistorianId;
+                    bool isUnmappable = false;
                     if (transformerExtension.FromNodeDeviceName != "Undefined")
                     {
-                        DataRow row = m_openEcaConnection.Metadata.Tables["MeasurementDetail"].Select($"SignalAcronym = 'FLAG' AND DeviceAcronym LIKE '{transformerExtension.FromNodeDeviceName}'").Single();
-                        string guid = row["SignalID"].ToString();
-                        StatusWord statusWord = m_network.Model.StatusWords.Find(x => x.Key == guid);
-                        fromSubstationCurrent.Status = statusWord;
+                        DataRow[] results = m_openEcaConnection.Metadata.Tables["MeasurementDetail"].Select($"SignalAcronym = 'FLAG' AND DeviceAcronym LIKE '{transformerExtension.FromNodeDeviceName}'");
+                        if (results.Length > 0)
+                        {
+                            DataRow row = results.Single();
+                            string guid = row["SignalID"].ToString();
+                            StatusWord statusWord = m_network.Model.StatusWords.Find(x => x.Key == guid);
+                            fromSubstationCurrent.Status = statusWord;
+                        }
+                        else
+                        {
+                            isUnmappable = true;
+                        }
                     }
                     if (transformerExtension.ToNodeDeviceName != "Undefined")
                     {
-                        DataRow row = m_openEcaConnection.Metadata.Tables["MeasurementDetail"].Select($"SignalAcronym = 'FLAG' AND DeviceAcronym LIKE '{transformerExtension.ToNodeDeviceName}'").Single();
-                        string guid = row["SignalID"].ToString();
-                        StatusWord statusWord = m_network.Model.StatusWords.Find(x => x.Key == guid);
-                        toSubstationCurrent.Status = statusWord;
+                        DataRow[] results = m_openEcaConnection.Metadata.Tables["MeasurementDetail"].Select($"SignalAcronym = 'FLAG' AND DeviceAcronym LIKE '{transformerExtension.ToNodeDeviceName}'");
+                        if (results.Length > 0)
+                        {
+                            DataRow row = results.Single();
+                            string guid = row["SignalID"].ToString();
+                            StatusWord statusWord = m_network.Model.StatusWords.Find(x => x.Key == guid);
+                            toSubstationCurrent.Status = statusWord;
+                        }
+                        else
+                        {
+                            isUnmappable = true;
+                        }
+                    }
+                    if (isUnmappable)
+                    {
+                        unmappedExtensionCount++;
+                        unmappedExtensionList.AppendLine($"{transformerExtension.StationName}.{transformerExtension.Parent}.{transformerExtension.Id}");
                     }
                 }
                 else
@@ -3428,7 +3464,7 @@ namespace NetworkModelEditor.ViewModels
             SpecialStatus = $"Failed to map {unmappedExtensionCount} extension(s).";
             if (unmappedExtensionCount > 0)
             {
-                System.Windows.Forms.MessageBox.Show(unmappedExtensionList.ToString());
+                ShowTextReport("UnmappedTransformerExtensions.txt", unmappedExtensionList.ToString());
             }
         }
 
