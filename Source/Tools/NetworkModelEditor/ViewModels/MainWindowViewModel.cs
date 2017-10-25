@@ -265,6 +265,7 @@ namespace NetworkModelEditor.ViewModels
         private RelayCommand m_createPerformanceMetricMeasurementsCommand;
         private RelayCommand m_createTopologyProfilingMeasurementsCommand;
         private RelayCommand m_createMeasurementValidationFlagMeasurementsCommand;
+        private RelayCommand m_createCustomEcaMappingCommand;
 
         #endregion
 
@@ -312,6 +313,7 @@ namespace NetworkModelEditor.ViewModels
         private MenuItemViewModel m_createPerformanceMetricsMeasurementsMenuItem;
         private MenuItemViewModel m_createTopologyProfilingMeasurementsMenuItem;
         private MenuItemViewModel m_createMeasurementValidationFlagMeasurementsMenuItem;
+        private MenuItemViewModel m_createCustomEcaMappingMenuItem;
 
         private MenuItemViewModel m_mapCreatedMeasurementsMenuItem;
         private MenuItemViewModel m_mapVoltageEstimateMeasurementsMenuItem;
@@ -1337,7 +1339,15 @@ namespace NetworkModelEditor.ViewModels
                 return new RelayCommand(param => this.MapMeasurementValidationFlags(), param => true);
             }
         }
-        
+
+        public ICommand CreateCustomEcaMappingCommand
+        {
+            get
+            {
+                return new RelayCommand(param => this.SaveCustomEcaMapping(), param => true);
+            }
+        }
+
         #region [ Setup Commands ] 
 
         public ICommand InitializeModelCommand
@@ -2778,7 +2788,7 @@ namespace NetworkModelEditor.ViewModels
             m_pruneModelByVoltageLevelMenuItem = new MenuItemViewModel("Prune Model by Voltage Level", PruneModelByVoltageLevelCommand);
             m_pruneModelBySubstationMenuItem = new MenuItemViewModel("Prune Model by Substation", PruneModelBySubstationCommand);
             m_pruneModelByCompanyMenuItem = new MenuItemViewModel("Prune Model by Company", PruneModelByCompanyCommand);
-
+            m_createCustomEcaMappingMenuItem = new MenuItemViewModel("Create Custom *.ecamap File", CreateCustomEcaMappingCommand);
 
             m_createVoltageEstimateMeasurementsMenuItem = new MenuItemViewModel("Voltage Estimates", CreateVoltageEstimateMeasurementsCommand);
             m_createCurrentFlowEstimateMeasurementsMenuItem = new MenuItemViewModel("Current Flow Estimates", CreateCurrentFlowEstimateMeasurementsCommand);
@@ -2835,6 +2845,7 @@ namespace NetworkModelEditor.ViewModels
             m_modelActionsMenuItem.AddMenuItem(m_keyifyTopologyMetricsMenuItem);
             m_modelActionsMenuItem.AddMenuItem(m_unkeyifyModelMenuItem);
             m_modelActionsMenuItem.AddMenuItem(m_createMeasurementsMenuItem);
+            m_modelActionsMenuItem.AddMenuItem(m_createCustomEcaMappingMenuItem);
             m_modelActionsMenuItem.AddMenuItem(m_mapCreatedMeasurementsMenuItem);
             m_modelActionsMenuItem.AddMenuItem(m_pruneModelMenuItem);
             m_modelActionsMenuItem.AddMenuItem(m_pruneModelByVoltageLevelMenuItem);
@@ -3602,6 +3613,169 @@ namespace NetworkModelEditor.ViewModels
                     if (exception != null)
                     {
                         System.Windows.MessageBox.Show(exception.ToString(), "Failed to save xml file.");
+                    }
+                }
+            }
+        }
+
+        private string CreateEcaPhasorMappings()
+        {
+            StringBuilder mappings = new StringBuilder();
+
+            foreach (VoltagePhasorGroup voltage in m_network.Model.ExpectedVoltages)
+            {
+                string mappingIdentifier = $"{voltage.MeasuredNode.Name}_POS_V";
+                string magnitude = $"Magnitude: {voltage.PositiveSequence.Measurement.MagnitudeKey}";
+                string angle = $"Angle: {voltage.PositiveSequence.Measurement.AngleKey}";
+                mappings.AppendLine("ECA Phasor " + mappingIdentifier + " {");
+                mappings.AppendLine("    " + magnitude);
+                mappings.AppendLine("    " + angle);
+                mappings.AppendLine("}" + Environment.NewLine);
+
+            }
+
+            foreach (CurrentFlowPhasorGroup flow in m_network.Model.ExpectedCurrentFlows)
+            {
+                string fromNode = flow.MeasuredFromNode.Name;
+                string toNode = flow.MeasuredToNode.Name;
+                string mappingIdentifier = $"{fromNode}_to_{toNode}_POS_I_FLOW";
+                string magnitude = $"Magnitude: {flow.PositiveSequence.Measurement.MagnitudeKey}";
+                string angle = $"Angle: {flow.PositiveSequence.Measurement.AngleKey}";
+                mappings.AppendLine("ECA Phasor " + mappingIdentifier + " {");
+                mappings.AppendLine("    " + magnitude);
+                mappings.AppendLine("    " + angle);
+                mappings.AppendLine("}" + Environment.NewLine);
+            }
+
+            foreach (CurrentInjectionPhasorGroup injection in m_network.Model.ExpectedCurrentInjections)
+            {
+                string node = injection.MeasuredConnectedNode.Name;
+                string mappingIdentifier = $"{node}_POS_I_INJ";
+                string magnitude = $"Magnitude: {injection.PositiveSequence.Measurement.MagnitudeKey}";
+                string angle = $"Angle: {injection.PositiveSequence.Measurement.AngleKey}";
+                mappings.AppendLine("ECA Phasor " + mappingIdentifier + " {");
+                mappings.AppendLine("    " + magnitude);
+                mappings.AppendLine("    " + angle);
+                mappings.AppendLine("}" + Environment.NewLine);
+            }
+
+            return mappings.ToString();
+
+        }
+
+        private string CreateStatusWordFilterStatement()
+        {
+            StringBuilder clause = new StringBuilder();
+
+            foreach (StatusWord statusWord in m_network.Model.ExpectedStatusWords)
+            {
+                clause.Append($"SignalID='{statusWord.Key}'");
+                if (statusWord != m_network.Model.ExpectedStatusWords.Last())
+                {
+                    clause.Append($" OR ");
+                }
+            }
+
+            return $"FILTER ActiveMeasurements WHERE ({clause})";
+        }
+
+        private string CreateEcaStatusWordMapping()
+        {
+            string filterStatement = CreateStatusWordFilterStatement();
+
+            StringBuilder mapping = new StringBuilder();
+            mapping.AppendLine("ECA StatusWords AllStatusWords {");
+            mapping.AppendLine("    Values: { " + filterStatement + " }");
+            mapping.AppendLine("}" + Environment.NewLine);
+
+            return mapping.ToString();
+        }
+
+
+
+        private string CreateDigitalsFilterStatement()
+        {
+            StringBuilder clause = new StringBuilder();
+
+            foreach (BreakerStatus breakerStatus in m_network.Model.ExpectedBreakerStatuses)
+            {
+                clause.Append($"SignalID='{breakerStatus.Key}'");
+                if (breakerStatus != m_network.Model.ExpectedBreakerStatuses.Last())
+                {
+                    clause.Append($" OR ");
+                }
+            }
+
+            return $"FILTER ActiveMeasurements WHERE ({clause})";
+        }
+
+        private string CreateEcaDigitalsMapping()
+        {
+            string filterStatement = CreateDigitalsFilterStatement();
+
+            StringBuilder mapping = new StringBuilder();
+            mapping.AppendLine("ECA Digitals AllDigitals {");
+            mapping.AppendLine("    Values: { " + filterStatement + " }");
+            mapping.AppendLine("}" + Environment.NewLine);
+
+            return mapping.ToString();
+        }
+
+        private string CreateEcaCurrentPhasorCollectionMapping()
+        {
+            string currentFilterStatement = $"FILTER Mappings WHERE TypeCategory='ECA' AND TypeIdentifier='Phasor' AND (MappingIdentifier LIKE '%POS_I_FLOW' OR MappingIdentifier LIKE '%POS_I_INJ')";
+
+            StringBuilder currentMapping = new StringBuilder();
+            currentMapping.AppendLine("ECA PhasorCollection AllCurrentPhasors {");
+            currentMapping.AppendLine("    Phasors: { " + currentFilterStatement + " }");
+            currentMapping.AppendLine("}" + Environment.NewLine);
+
+            return currentMapping.ToString();
+
+        }
+
+        private string CreateEcaVoltagePhasorCollectionMapping()
+        {
+            string voltageFilterStatement = $"FILTER Mappings WHERE TypeCategory='ECA' AND TypeIdentifier='Phasor' AND MappingIdentifier LIKE '%POS_V'";
+
+            StringBuilder voltageMapping = new StringBuilder();
+            voltageMapping.AppendLine("ECA PhasorCollection AllVoltagePhasors {");
+            voltageMapping.AppendLine("    Phasors: { " + voltageFilterStatement + " }");
+            voltageMapping.AppendLine("}" + Environment.NewLine);
+
+            return voltageMapping.ToString();
+        }
+
+        private string CreateEcaMapping()
+        {
+            StringBuilder mapping = new StringBuilder();
+            mapping.Append(CreateEcaStatusWordMapping());
+            mapping.Append(CreateEcaDigitalsMapping());
+            mapping.Append(CreateEcaVoltagePhasorCollectionMapping());
+            mapping.Append(CreateEcaCurrentPhasorCollectionMapping());
+            mapping.Append(CreateEcaPhasorMappings());
+            return mapping.ToString();
+        }
+
+        private void SaveCustomEcaMapping()
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+
+            saveFileDialog.DefaultExt = ".ecamap";
+            saveFileDialog.Filter = "ECAMAP (.ecamap)|*.ecamap";
+
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    SaveTextReport(saveFileDialog.FileName, CreateEcaMapping());
+                    ActionStatus = $"Saved *.ecamap to {saveFileDialog.FileName}";
+                }
+                catch (Exception exception)
+                {
+                    if (exception != null)
+                    {
+                        System.Windows.MessageBox.Show(exception.ToString(), "Failed to save *.ecamap file.");
                     }
                 }
             }

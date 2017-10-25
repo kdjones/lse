@@ -75,10 +75,10 @@ namespace SynchrophasorAnalytics.Measurements
             {
                 if (MeasurementWasReported == false)
                 {
-                    return false;
+                    return false; 
                 }
                 else if (Type == PhasorType.VoltagePhasor && Magnitude < (0.2 * (BaseKV.Value * 1000)))
-                {
+                {   
                     return false;
                 }
                 else if (Type == PhasorType.CurrentPhasor && Magnitude < 10)

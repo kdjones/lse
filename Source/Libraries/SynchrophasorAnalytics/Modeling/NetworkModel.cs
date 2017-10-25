@@ -1153,7 +1153,7 @@ namespace SynchrophasorAnalytics.Modeling
             {
                 return m_expectedCurrentInjections;
             }
-            set
+            set 
             {
                 m_expectedCurrentInjections = value;
             }
@@ -1169,11 +1169,11 @@ namespace SynchrophasorAnalytics.Modeling
             {
                 if (m_phaseSelection == PhaseSelection.PositiveSequence)
                 {
-                    return m_voltages.FindAll(voltage => voltage.IncludeInPositiveSequenceEstimator);
+                    return m_expectedVoltages.FindAll(voltage => voltage.IncludeInPositiveSequenceEstimator);
                 }
                 else if (m_phaseSelection == PhaseSelection.ThreePhase)
                 {
-                    return m_voltages.FindAll(voltage => voltage.IncludeInEstimator);
+                    return m_expectedVoltages.FindAll(voltage => voltage.IncludeInEstimator);
                 }
                 else
                 {
@@ -1317,7 +1317,7 @@ namespace SynchrophasorAnalytics.Modeling
 
             foreach (CircuitBreaker breaker in CircuitBreakers)
             {
-                if (breaker.Status != null && BreakerStatuses.Contains(breaker.Status))
+                if (breaker.Status != null && BreakerStatuses.Contains(breaker.Status) && breaker.Status.Key != UNDEFINED_KEY)
                 {
                     m_expectedBreakerStatuses.Add(breaker.Status);
                 }
@@ -3812,8 +3812,7 @@ namespace SynchrophasorAnalytics.Modeling
                     reportableNodes.Add(transformer.ToNode);
                 }
             }
-
-
+            
             foreach (ShuntCompensator shunt in m_shuntCompensators)
             {
                 if (!reportableNodes.Contains(shunt.ConnectedNode))
