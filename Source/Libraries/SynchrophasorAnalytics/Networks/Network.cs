@@ -58,12 +58,26 @@ namespace SynchrophasorAnalytics.Networks
         private bool[] m_pastDiscreteVoltagePhasorState;
         private bool[] m_pastDiscreteCurrentPhasorState;
         private bool[] m_pastDiscreteShuntCurrentPhasorState;
+        private SwitchingDeviceInferredState[] m_pastLevelTwoCircuitBreakerState;
         private int[] m_pastBreakerStatusState;
         private double[] m_pastStatusWordState;
 
         #endregion
 
         #region [ Properties ]
+
+        [XmlIgnore()]
+        public string LinearAlgebraProvider
+        {
+            get
+            {
+                if (m_systemMatrix != null)
+                {
+                    return m_systemMatrix.LinearAlgebraProvider;
+                }
+                return "Matrix is null";
+            }
+        }
 
         [XmlElement("PerformanceMetrics")]
         public PerformanceMetrics PerformanceMetrics
@@ -929,12 +943,16 @@ namespace SynchrophasorAnalytics.Networks
         /// </summary>
         public void ComputeSystemState()
         {
+            m_networkModel.PerformanceTimer.Reset();
+            m_networkModel.PerformanceTimer.Start();
             if (m_systemMatrix == null || m_hasChangedSincePreviousFrame)
             {
                 m_systemMatrix = new SystemMatrix(this);
             }
             
             PerUnitStateVector = m_systemMatrix.PsuedoInverseOfMatrix * PerUnitMeasurementVector;
+            m_networkModel.PerformanceTimer.Stop();
+            PerformanceMetrics.StateComputationExecutionTime = m_networkModel.PerformanceTimer.ElapsedTicks;
         }
 
         /// <summary>
@@ -942,6 +960,8 @@ namespace SynchrophasorAnalytics.Networks
         /// </summary>
         public void RunNetworkReconstructionCheck()
         {
+            m_networkModel.PerformanceTimer.Reset();
+            m_networkModel.PerformanceTimer.Start();
             if (ComparePresentAndPastDiscreteStates())
             {
                 m_hasChangedSincePreviousFrame = true;
@@ -951,6 +971,8 @@ namespace SynchrophasorAnalytics.Networks
             {
                 m_hasChangedSincePreviousFrame = false;
             }
+            m_networkModel.PerformanceTimer.Stop();
+            PerformanceMetrics.ObservabilityAnalysisExecutionTime += m_networkModel.PerformanceTimer.ElapsedTicks;
         }
 
         #endregion
@@ -960,7 +982,7 @@ namespace SynchrophasorAnalytics.Networks
         private void UpdatePastDiscreteStates()
         {
 
-            for (int i = 0; i < m_networkModel.ExpectedVoltages.Count(); i++)
+            for (int i = 0; i < m_networkModel.ExpectedVoltages.Count; i++)
             {
                 if (m_networkModel.PhaseConfiguration == PhaseSelection.ThreePhase)
                 {
@@ -972,7 +994,7 @@ namespace SynchrophasorAnalytics.Networks
                 }
             }
 
-            for (int i = 0; i < m_networkModel.ExpectedCurrentFlows.Count(); i++)
+            for (int i = 0; i < m_networkModel.ExpectedCurrentFlows.Count; i++)
             {
                 if (m_networkModel.PhaseConfiguration == PhaseSelection.ThreePhase)
                 {
@@ -984,7 +1006,7 @@ namespace SynchrophasorAnalytics.Networks
                 }
             }
 
-            for (int i = 0; i < m_networkModel.ExpectedCurrentInjections.Count(); i++)
+            for (int i = 0; i < m_networkModel.ExpectedCurrentInjections.Count; i++)
             {
                 if (m_networkModel.PhaseConfiguration == PhaseSelection.ThreePhase)
                 {
@@ -996,14 +1018,27 @@ namespace SynchrophasorAnalytics.Networks
                 }
             }
 
-            for (int i = 0; i < m_networkModel.ExpectedBreakerStatuses.Count(); i++)
+            for (int i = 0; i < m_networkModel.ExpectedBreakerStatuses.Count; i++)
             {
                 m_pastBreakerStatusState[i] = m_networkModel.ExpectedBreakerStatuses[i].BinaryValue;
             }
 
-            for (int i = 0; i < m_networkModel.ExpectedStatusWords.Count(); i++)
+            for (int i = 0; i < m_networkModel.ExpectedStatusWords.Count; i++)
             {
                 m_pastStatusWordState[i] = m_networkModel.ExpectedStatusWords[i].BinaryValue;
+            }
+
+            for (int i = 0; i < m_networkModel.ExpectedLevelTwoCircuitBreakers.Count; i++)
+            {
+                m_pastLevelTwoCircuitBreakerState[i] = m_networkModel.ExpectedLevelTwoCircuitBreakers[i].InferredState;
+            }
+
+            foreach (Substation substation in m_networkModel.LevelThreeAndAboveSubstations)
+            {
+                if (substation.Graph != null)
+                {
+                    substation.Graph.UpdateConnectivityMatrix();
+                }
             }
 
         }
@@ -1016,6 +1051,7 @@ namespace SynchrophasorAnalytics.Networks
             m_pastDiscreteShuntCurrentPhasorState = new bool[m_networkModel.ExpectedCurrentInjections.Count()];
             m_pastBreakerStatusState = new int[m_networkModel.ExpectedBreakerStatuses.Count()];
             m_pastStatusWordState = new double[m_networkModel.ExpectedStatusWords.Count()];
+            m_pastLevelTwoCircuitBreakerState = new SwitchingDeviceInferredState[m_networkModel.ExpectedLevelTwoCircuitBreakers.Count()];
 
             for (int i = 0; i < m_pastDiscreteVoltagePhasorState.Length; i++)
             {
@@ -1053,11 +1089,28 @@ namespace SynchrophasorAnalytics.Networks
                     m_pastStatusWordState[i] = 0;
                 }
             }
+
+            if (m_pastLevelTwoCircuitBreakerState.Length > 0)
+            {
+                for (int i = 0; i < m_pastLevelTwoCircuitBreakerState.Length; i++)
+
+                {
+                    m_pastLevelTwoCircuitBreakerState[i] = SwitchingDeviceInferredState.Closed;
+                }
+            }
+
+            foreach (Substation substation in m_networkModel.LevelThreeAndAboveSubstations)
+            {
+                if (substation.Graph != null)
+                {
+                    substation.Graph.InitializeConnectivityMatrix();
+                }
+            }
         }
 
         private bool ComparePresentAndPastDiscreteStates()
         {
-            for (int i = 0; i < m_networkModel.ExpectedVoltages.Count(); i++)
+            for (int i = 0; i < m_networkModel.ExpectedVoltages.Count; i++)
             {
                 if (m_networkModel.PhaseConfiguration == PhaseSelection.ThreePhase)
                 {
@@ -1075,7 +1128,7 @@ namespace SynchrophasorAnalytics.Networks
                 }
             }
 
-            for (int i = 0; i < m_networkModel.ExpectedCurrentFlows.Count(); i++)
+            for (int i = 0; i < m_networkModel.ExpectedCurrentFlows.Count; i++)
             {
                 if (m_networkModel.PhaseConfiguration == PhaseSelection.ThreePhase)
                 {
@@ -1093,7 +1146,7 @@ namespace SynchrophasorAnalytics.Networks
                 }
             }
 
-            for (int i = 0; i < m_networkModel.ExpectedCurrentInjections.Count(); i++)
+            for (int i = 0; i < m_networkModel.ExpectedCurrentInjections.Count; i++)
             {
                 if (m_networkModel.PhaseConfiguration == PhaseSelection.ThreePhase)
                 {
@@ -1111,7 +1164,7 @@ namespace SynchrophasorAnalytics.Networks
                 }
             }
 
-            for (int i = 0; i < m_networkModel.ExpectedBreakerStatuses.Count(); i++)
+            for (int i = 0; i < m_networkModel.ExpectedBreakerStatuses.Count; i++)
             {
                 if (m_pastBreakerStatusState[i] != m_networkModel.ExpectedBreakerStatuses[i].BinaryValue)
                 {
@@ -1119,9 +1172,25 @@ namespace SynchrophasorAnalytics.Networks
                 }
             }
 
-            for (int i = 0; i < m_networkModel.ExpectedStatusWords.Count(); i++)
+            for (int i = 0; i < m_networkModel.ExpectedStatusWords.Count; i++)
             {
                 if (m_pastStatusWordState[i] != m_networkModel.ExpectedStatusWords[i].BinaryValue)
+                {
+                    return true;
+                }
+            }
+
+            for (int i = 0; i < m_networkModel.ExpectedLevelTwoCircuitBreakers.Count; i++)
+            {
+                if (m_pastLevelTwoCircuitBreakerState[i] != m_networkModel.ExpectedLevelTwoCircuitBreakers[i].InferredState)
+                {
+                    return true;
+                }
+            }
+
+            foreach (Substation substation in m_networkModel.LevelThreeAndAboveSubstations)
+            {
+                if (substation.Graph.ComparePastAndPresentConnectivityMatrices())
                 {
                     return true;
                 }

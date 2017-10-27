@@ -25,11 +25,10 @@
 //
 //******************************************************************************************************
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Xml.Serialization;
 using SynchrophasorAnalytics.Modeling;
+using SynchrophasorAnalytics.Reporting;
 
 namespace SynchrophasorAnalytics.Measurements
 {
@@ -38,7 +37,7 @@ namespace SynchrophasorAnalytics.Measurements
     /// </summary>
     /// <remarks>This class contains a property for each flag inside of the C37.118 status word.</remarks>
     /// <seealso cref="StatusWordBit"/>
-    public partial class StatusWord : INetworkDescribable, IClearable
+    public partial class StatusWord : INetworkDescribable, IClearable, ICsvReportable
     {
         #region [ Constants ]
 
@@ -92,6 +91,15 @@ namespace SynchrophasorAnalytics.Measurements
         public static string CSV_HEADER = $"InternalID,Number,Description,Key,Enabled,Reported,Binary Value,{Environment.NewLine}";
 
         #region [ Properties ]
+
+        [XmlIgnore()]
+        public string CsvHeader
+        {
+            get
+            {
+                return CSV_HEADER;
+            }
+        }
 
         /// <summary>
         /// A statistically unique identifier for the instance of the class.

@@ -20,17 +20,17 @@
 //******************************************************************************************************
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
 using System.Text;
 using SynchrophasorAnalytics.Measurements;
+using SynchrophasorAnalytics.Reporting;
 
 namespace SynchrophasorAnalytics.Modeling
 {
     /// <summary>
     /// Represents a collection of <see cref="LinearStateEstimator.Modeling.Node"/> objects which topology processing has determined are directly electrically connected together.
     /// </summary>
-    public class ObservedBus : INetworkDescribable
+    public class ObservedBus : INetworkDescribable, ICsvReportable
     {
         #region [ Private Constants ]
 
@@ -52,8 +52,16 @@ namespace SynchrophasorAnalytics.Modeling
         public static string CSV_HEADER = $"Observed Bus Unique ID,";
 
         #region [ Properties ]
-
         
+        public string CsvHeader
+        {
+            get
+            {
+                return CSV_HEADER + Node.CSV_HEADER;
+            }
+        }
+
+
         public Guid UniqueId
         {
             get

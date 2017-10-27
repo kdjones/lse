@@ -1,15 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Serialization;
+using SynchrophasorAnalytics.Measurements;
 
 
 namespace SynchrophasorAnalytics.Networks
 {
     [Serializable()]
-    public class PerformanceMetrics
+    public class PerformanceMetrics : IClearable
     {
         #region [ Private Members ]
 
@@ -502,6 +500,20 @@ namespace SynchrophasorAnalytics.Networks
             stringBuilder.AppendFormat($"                 Total Milliseconds: {TotalExecutionTimeInMilliseconds} ms{Environment.NewLine}");
             stringBuilder.AppendLine();
             return stringBuilder.ToString();
+        }
+
+        public void ClearValues()
+        {
+            RefreshExecutionTime = 0;
+            ParsingExecutionTime = 0;
+            MeasurementMappingExecutionTime = 0;
+            ObservabilityAnalysisExecutionTime = 0;
+            ActiveCurrentPhasorDeterminationExecutionTime = 0;
+            StateComputationExecutionTime = 0;
+            SolutionRetrievalExecutionTime = 0;
+            OutputPreparationExecutionTime = 0;
+            TotalExecutionTimeInMilliseconds = 0;
+            m_totalExecutionTimeInTicks = 0;
         }
 
         #endregion

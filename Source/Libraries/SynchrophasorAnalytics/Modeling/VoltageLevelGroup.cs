@@ -24,6 +24,7 @@ namespace SynchrophasorAnalytics.Modeling
         private int m_internalID;
         private List<Node> m_nodes;
         private List<Node> m_directlyObservedNodes;
+        private List<Node> m_expectedNodes;
         private VoltageLevel m_baseKv;
         private List<ObservedBus> m_observedBuses;
 

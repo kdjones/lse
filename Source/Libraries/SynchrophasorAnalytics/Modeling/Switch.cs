@@ -25,6 +25,7 @@ using System.Text;
 using System.Xml.Serialization;
 using SynchrophasorAnalytics.Measurements;
 using SynchrophasorAnalytics.Networks;
+using SynchrophasorAnalytics.Reporting;
 
 
 namespace SynchrophasorAnalytics.Modeling
@@ -32,7 +33,7 @@ namespace SynchrophasorAnalytics.Modeling
     /// <summary>
     /// Represents a switching device which does accept telemetry from its analagous field device.
     /// </summary>
-    public class Switch : SwitchingDeviceBase
+    public class Switch : SwitchingDeviceBase, ICsvReportable
     {
         #region [ Private Members ]
 
@@ -195,6 +196,15 @@ namespace SynchrophasorAnalytics.Modeling
             get
             {
                 return m_parentSubstation.ParentDivision.ParentCompany.ParentModel.InPruningMode;
+            }
+        }
+
+        [XmlIgnore()]
+        public string CsvHeader
+        {
+            get
+            {
+                return CSV_HEADER;
             }
         }
 

@@ -34,14 +34,15 @@
 //******************************************************************************************************
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.IO;
-using SynchrophasorAnalytics.Measurements;
 using System.Xml.Serialization;
+using SynchrophasorAnalytics.Graphs;
+using SynchrophasorAnalytics.Measurements;
 using SynchrophasorAnalytics.Networks;
-using SynchrophasorAnalytics.Matrices;
-using SynchrophasorAnalytics.Calibration;
+
 
 namespace SynchrophasorAnalytics.Modeling
 {
@@ -51,11 +52,15 @@ namespace SynchrophasorAnalytics.Modeling
     [Serializable()]
     public class NetworkModel : INetworkDescribable
     {
+        #region [ Private Constants ]
+
         private const string UNDEFINED_KEY = "Undefined";
+
+        #endregion
 
         #region [ Private Members ]
 
-        #region [ INetworkDescribable fields ]
+        #region [ INetworkDescribable Fields ]
 
         private Guid m_uniqueId;
         private int m_internalId;
@@ -71,17 +76,19 @@ namespace SynchrophasorAnalytics.Modeling
         private InputOutputSettings m_inputOutputSettings;
         private CurrentFlowPostProcessingSetting m_currentFlowPostProcessingSetting;
         private CurrentInjectionPostProcessingSetting m_currentInjectionPostProcessingSetting;
+        private Stopwatch m_stopWatch;
 
-        /// <summary>
-        /// Network Components
-        /// </summary>
+        #region [ Components ]
+
         private List<Company> m_companies;
         private List<Division> m_divisions;
         private List<Substation> m_substations;
+        private List<Substation> m_levelThreeAndAboveSubstations;
         private List<TransmissionLine> m_transmissionLines;
         private List<Node> m_nodes;
         private List<Switch> m_switches;
         private List<CircuitBreaker> m_circuitBreakers;
+        private List<CircuitBreaker> m_expectedLevelTwoCircuitBreakers;
         private List<ShuntCompensator> m_shuntCompensators;
         private List<SeriesCompensator> m_seriesCompensators;
         private List<LineSegment> m_lineSegments;
@@ -92,28 +99,33 @@ namespace SynchrophasorAnalytics.Modeling
         private List<SwitchingDeviceBase> m_switchingDevices;
         private List<TapConfiguration> m_tapConfigurations;
 
-        /// <summary>
-        /// Network Measurements
-        /// </summary>
+        #endregion
+
+        #region [ Measurements ]
+
         private List<VoltagePhasorGroup> m_voltages;
         private List<VoltagePhasorGroup> m_expectedVoltages;
         private List<CurrentFlowPhasorGroup> m_currentFlows;
         private List<CurrentFlowPhasorGroup> m_expectedCurrentFlows;
-        private List<CurrentInjectionPhasorGroup> m_currentInjections;
-        private List<CurrentInjectionPhasorGroup> m_expectedCurrentInjections;
-        private List<BreakerStatus> m_breakerStatuses;
-        private List<BreakerStatus> m_expectedBreakerStatuses;
-        private List<StatusWord> m_statusWords;
-        private List<StatusWord> m_expectedStatusWords;
         private List<CurrentFlowPhasorGroup> m_activeCurrentFlows;
         private List<CurrentFlowPhasorGroup> m_potentiallyActiveCurrentFlows;
+        private List<CurrentInjectionPhasorGroup> m_currentInjections;
+        private List<CurrentInjectionPhasorGroup> m_expectedCurrentInjections;
         private List<CurrentInjectionPhasorGroup> m_activeCurrentInjections;
         private List<CurrentInjectionPhasorGroup> m_potentiallyActiveCurrentInjections;
+        private List<BreakerStatus> m_breakerStatuses;
+        private List<BreakerStatus> m_expectedBreakerStatuses;
+        private List<BreakerStatus> m_assignedBreakerStatuses;
+        private List<StatusWord> m_statusWords;
+        private List<StatusWord> m_expectedStatusWords;
 
-        /// <summary>
-        /// Parent
-        /// </summary>
+        #endregion
+
+        #region [ Parent ]
+
         private Network m_parentNetwork;
+
+        #endregion
 
         private bool m_inPruningMode;
 
@@ -130,6 +142,18 @@ namespace SynchrophasorAnalytics.Modeling
             set
             {
                 m_inPruningMode = value;
+            }
+        }
+
+        public Stopwatch PerformanceTimer
+        {
+            get
+            {
+                if (m_stopWatch == null)
+                {
+                    m_stopWatch = new Stopwatch();
+                }
+                return m_stopWatch;
             }
         }
 
@@ -250,6 +274,8 @@ namespace SynchrophasorAnalytics.Modeling
         #endregion
 
         #region [ I/O ]
+
+        #region [ Key Value Pairs ]
 
         /// <summary>
         /// A Dictionary with the raw measurements and other inputs paired with their respective measurement keys.
@@ -416,6 +442,10 @@ namespace SynchrophasorAnalytics.Modeling
             }
         }
 
+        #endregion
+
+        #region [ Output Measurements ]
+
         [XmlIgnore()]
         public List<OutputMeasurement> StateEstimateOutput
         {
@@ -505,6 +535,8 @@ namespace SynchrophasorAnalytics.Modeling
                 return GetMeasurementValidationFlagsOutput();
             }
         }
+
+        #endregion
 
         #endregion
 
@@ -825,6 +857,30 @@ namespace SynchrophasorAnalytics.Modeling
             }
         }
 
+        [XmlIgnore()]
+        public List<Substation> LevelThreeAndAboveSubstations
+        {
+            get
+            {
+                if (m_levelThreeAndAboveSubstations == null)
+                {
+                    m_levelThreeAndAboveSubstations = Substations.FindAll(x => x.TopologyLevel == TopologyEstimationLevel.Three ||
+                                                                               x.TopologyLevel == TopologyEstimationLevel.Four ||
+                                                                               x.TopologyLevel == TopologyEstimationLevel.Five);
+                }
+                return m_levelThreeAndAboveSubstations;
+            }
+        }
+
+        [XmlIgnore()]
+        public List<Substation> ObservedSubstations
+        {
+            get
+            {
+                return ListObservedSubstations();
+            }
+        }
+
         /// <summary>
         /// A list of <see cref="LinearStateEstimator.Modeling.TransmissionLine"/> objects in the <see cref="LinearStateEstimator.Modeling.NetworkModel"/>.
         /// </summary>
@@ -854,6 +910,15 @@ namespace SynchrophasorAnalytics.Modeling
             set
             {
                 m_nodes = value;
+            }
+        }
+
+        [XmlIgnore()]
+        public List<Node> ObservedNodes
+        {
+            get
+            {
+                return ListObservedNodes();
             }
         }
 
@@ -888,6 +953,20 @@ namespace SynchrophasorAnalytics.Modeling
                 m_circuitBreakers = value;
             }
         }
+
+        [XmlIgnore()]
+        public List<CircuitBreaker> ExpectedLevelTwoCircuitBreakers
+        {
+            get
+            {
+                if (m_expectedLevelTwoCircuitBreakers == null)
+                {
+                    m_expectedLevelTwoCircuitBreakers = CircuitBreakers.FindAll(x => x.FromNode.Voltage.ExpectsMeasurements && x.ToNode.Voltage.ExpectsMeasurements);
+                }
+                return m_expectedLevelTwoCircuitBreakers;
+            }
+        }
+
 
         /// <summary>
         /// A list of <see cref="LinearStateEstimator.Modeling.Transformer"/> objects in the <see cref="LinearStateEstimator.Modeling.NetworkModel"/>.
@@ -1005,6 +1084,8 @@ namespace SynchrophasorAnalytics.Modeling
 
         #region [ Network Measurements ]
 
+        #region [ Voltages ]
+
         /// <summary>
         /// A list of all of the collections of voltage phasors modeled in the network.
         /// </summary>
@@ -1018,96 +1099,6 @@ namespace SynchrophasorAnalytics.Modeling
             set
             {
                 m_voltages = value;
-            }
-        }
-
-        /// <summary>
-        /// A list of all of the current flow measurements modeled in the network.
-        /// </summary>
-        [XmlIgnore()]
-        public List<CurrentFlowPhasorGroup> CurrentFlows
-        {
-            get
-            {
-                return m_currentFlows;
-            }
-            set
-            {
-                m_currentFlows = value;
-            }
-        }
-
-        /// <summary>
-        /// A list of all of the shunt current injections modeled in the network.
-        /// </summary>
-        [XmlIgnore()]
-        public List<CurrentInjectionPhasorGroup> CurrentInjections
-        {
-            get
-            {
-                return m_currentInjections;
-            }
-            set
-            {
-                m_currentInjections = value;
-            }
-        }
-
-        /// <summary>
-        /// A list of all of the breaker statuses modeled in the network.
-        /// </summary>
-        [XmlArray("BreakerStatuses")]
-        public List<BreakerStatus> BreakerStatuses
-        {
-            get
-            {
-                return m_breakerStatuses;
-            }
-            set
-            {
-                m_breakerStatuses = value;
-            }
-        }
-
-        [XmlIgnore()]
-        public List<BreakerStatus> ExpectedBreakerStatuses
-        {
-            get
-            {
-                return m_expectedBreakerStatuses;
-            }
-            set
-            {
-                m_expectedBreakerStatuses = value;
-            }
-        }
-
-        /// <summary>
-        /// A list of all of the status words from all of the devices streaming phasor measurements in the network.
-        /// </summary>
-        [XmlArray("StatusWords")]
-        public List<StatusWord> StatusWords
-        {
-            get
-            {
-                return m_statusWords;
-            }
-            set
-            {
-                m_statusWords = value;
-            }
-        }
-
-        [XmlIgnore()]
-        public List<StatusWord> ExpectedStatusWords
-        {
-            get
-            {
-                return m_expectedStatusWords;
-            }
-            set
-            {
-                m_expectedStatusWords = value;
             }
         }
 
@@ -1126,39 +1117,7 @@ namespace SynchrophasorAnalytics.Modeling
                 m_expectedVoltages = value;
             }
         }
-
-        /// <summary>
-        /// A list of all of the current flow phasor measurements which have been modeled to accept measurements. (measurement keys not equal to the 'Undefined' keyword)
-        /// </summary>
-        [XmlIgnore()]
-        public List<CurrentFlowPhasorGroup> ExpectedCurrentFlows
-        {
-            get
-            {
-                return m_expectedCurrentFlows;
-            }
-            set
-            {
-                m_expectedCurrentFlows = value;
-            }
-        }
-
-        /// <summary>
-        /// A list of all of the current injection phasor measurements which have been modeled to accept measurements. (measurement keys not equal to the 'Undefined' keyword)
-        /// </summary>
-        [XmlIgnore()]
-        public List<CurrentInjectionPhasorGroup> ExpectedCurrentInjections
-        {
-            get
-            {
-                return m_expectedCurrentInjections;
-            }
-            set 
-            {
-                m_expectedCurrentInjections = value;
-            }
-        }
-
+        
         /// <summary>
         /// A list of all of the voltage phasor measurements which are of sufficient quality to be considered for inclusion in the state estimation problem. A subset of the total list of voltage phasor measurements.
         /// </summary>
@@ -1179,6 +1138,96 @@ namespace SynchrophasorAnalytics.Modeling
                 {
                     return new List<VoltagePhasorGroup>();
                 }
+            }
+        }
+        
+        [XmlIgnore()]
+        public List<VoltagePhasorGroup> InactiveVoltages
+        {
+            get
+            {
+                return ExpectedVoltages.FindAll(x => !ActiveVoltages.Contains(x));
+            }
+        }
+
+        [XmlIgnore()]
+        public List<VoltagePhasorGroup> ReportedVoltages
+        {
+            get
+            {
+                return ExpectedVoltages.FindAll(x => x.PositiveSequence.Measurement.MeasurementWasReported);
+            }
+        }
+
+        [XmlIgnore()]
+        public List<VoltagePhasorGroup> UnreportedVoltages
+        {
+            get
+            {
+                return ExpectedVoltages.FindAll(x => !x.PositiveSequence.Measurement.MeasurementWasReported);
+            }
+        }
+
+        [XmlIgnore()]
+        public List<VoltagePhasorGroup> ActiveByStatusWordVoltages
+        {
+            get
+            {
+                return ExpectedVoltages.FindAll(x => x.Status != null && StatusWords.Contains(x.Status) && !(x.Status.DataIsValid || x.Status.SynchronizationIsValid));
+            }
+        }
+
+        [XmlIgnore()]
+        public List<VoltagePhasorGroup> InactiveByStatusWordVoltages
+        {
+            get
+            {
+                return ExpectedVoltages.FindAll(x => !ActiveByStatusWordVoltages.Contains(x));
+            }
+        }
+
+        [XmlIgnore()]
+        public List<VoltagePhasorGroup> InactiveByMeasurementVoltages
+        {
+            get
+            {
+                return InactiveVoltages.FindAll(x => !InactiveByStatusWordVoltages.Contains(x));
+            }
+        }
+        
+        #endregion
+
+        #region [ Current Flows ]
+
+        /// <summary>
+        /// A list of all of the current flow measurements modeled in the network.
+        /// </summary>
+        [XmlIgnore()]
+        public List<CurrentFlowPhasorGroup> CurrentFlows
+        {
+            get
+            {
+                return m_currentFlows;
+            }
+            set
+            {
+                m_currentFlows = value;
+            }
+        }
+
+        /// <summary>
+        /// A list of all of the current flow phasor measurements which have been modeled to accept measurements. (measurement keys not equal to the 'Undefined' keyword)
+        /// </summary>
+        [XmlIgnore()]
+        public List<CurrentFlowPhasorGroup> ExpectedCurrentFlows
+        {
+            get
+            {
+                return m_expectedCurrentFlows;
+            }
+            set
+            {
+                m_expectedCurrentFlows = value;
             }
         }
 
@@ -1210,6 +1259,105 @@ namespace SynchrophasorAnalytics.Modeling
             }
         }
 
+        [XmlIgnore()]
+        public List<CurrentFlowPhasorGroup> InactiveCurrentFlows
+        {
+            get
+            {
+                return CurrentFlows.FindAll(x => !ActiveCurrentFlows.Contains(x));
+            }
+        }
+
+        [XmlIgnore()]
+        public List<CurrentFlowPhasorGroup> ExcludedCurrentFlows
+        {
+            get
+            {
+                return ActiveCurrentFlows.FindAll(x => !x.MeasuredFromNode.IsObserved);
+            }
+        }
+
+        [XmlIgnore()]
+        public List<CurrentFlowPhasorGroup> ReportedCurrentFlows
+        {
+            get
+            {
+                return ExpectedCurrentFlows.FindAll(x => x.PositiveSequence.Measurement.MeasurementWasReported);
+            }
+        }
+
+        [XmlIgnore()]
+        public List<CurrentFlowPhasorGroup> UnreportedCurrentFlows
+        {
+            get
+            {
+                return ExpectedCurrentFlows.FindAll(x => !x.PositiveSequence.Measurement.MeasurementWasReported);
+            }
+        }
+
+        [XmlIgnore()]
+        public List<CurrentFlowPhasorGroup> ActiveByStatusWordCurrentFlows
+        {
+            get
+            {
+                return ExpectedCurrentFlows.FindAll(x => x.Status != null && StatusWords.Contains(x.Status) && !(x.Status.DataIsValid || x.Status.SynchronizationIsValid));
+            }
+        }
+
+        [XmlIgnore()]
+        public List<CurrentFlowPhasorGroup> InactiveByStatusWordCurrentFlows
+        {
+            get
+            {
+                return ExpectedCurrentFlows.FindAll(x => !ActiveByStatusWordCurrentFlows.Contains(x));
+            }
+        }
+
+        [XmlIgnore()]
+        public List<CurrentFlowPhasorGroup> InactiveByMeasurementCurrentFlows
+        {
+            get
+            {
+                return InactiveCurrentFlows.FindAll(x => !InactiveByStatusWordCurrentFlows.Contains(x));
+            }
+        }
+        
+        #endregion
+
+        #region [ Current Injections ]
+
+        /// <summary>
+        /// A list of all of the shunt current injections modeled in the network.
+        /// </summary>
+        [XmlIgnore()]
+        public List<CurrentInjectionPhasorGroup> CurrentInjections
+        {
+            get
+            {
+                return m_currentInjections;
+            }
+            set
+            {
+                m_currentInjections = value;
+            }
+        }
+
+        /// <summary>
+        /// A list of all of the current injection phasor measurements which have been modeled to accept measurements. (measurement keys not equal to the 'Undefined' keyword)
+        /// </summary>
+        [XmlIgnore()]
+        public List<CurrentInjectionPhasorGroup> ExpectedCurrentInjections
+        {
+            get
+            {
+                return m_expectedCurrentInjections;
+            }
+            set
+            {
+                m_expectedCurrentInjections = value;
+            }
+        }
+
         /// <summary>
         /// A list of all of the current injection phasor measurements which satisfy necessary crieteria to be included in the state estimation problem. A subst of the tital list of current injection phasor measurements.
         /// </summary>
@@ -1230,13 +1378,188 @@ namespace SynchrophasorAnalytics.Modeling
                 {
                     return new List<CurrentInjectionPhasorGroup>();
                 }
-                //return m_activeCurrentInjections;
             }
             set
             {
                 m_activeCurrentInjections = value;
             }
         }
+        
+        [XmlIgnore()]
+        public List<CurrentInjectionPhasorGroup> InactiveCurrentInjections
+        {
+            get
+            {
+                return ExpectedCurrentInjections.FindAll(x => !ActiveCurrentInjections.Contains(x));
+            }
+        }
+
+        [XmlIgnore()]
+        public List<CurrentInjectionPhasorGroup> ReportedCurrentInjections
+        {
+            get
+            {
+                return ExpectedCurrentInjections.FindAll(x => x.PositiveSequence.Measurement.MeasurementWasReported);
+            }
+        }
+
+        [XmlIgnore()]
+        public List<CurrentInjectionPhasorGroup> UnreportedCurrentInjections
+        {
+            get
+            {
+                return ExpectedCurrentInjections.FindAll(x => !x.PositiveSequence.Measurement.MeasurementWasReported);
+            }
+        }
+
+        [XmlIgnore()]
+        public List<CurrentInjectionPhasorGroup> ActiveByStatusWordCurrentInjections
+        {
+            get
+            {
+                return ExpectedCurrentInjections.FindAll(x => x.Status != null && StatusWords.Contains(x.Status) && !(x.Status.DataIsValid || x.Status.SynchronizationIsValid));
+            }
+        }
+
+        [XmlIgnore()]
+        public List<CurrentInjectionPhasorGroup> InactiveByStatusWordCurrentInjections
+        {
+            get
+            {
+                return ExpectedCurrentInjections.FindAll(x => !ActiveByStatusWordCurrentInjections.Contains(x));
+            }
+        }
+
+        [XmlIgnore()]
+        public List<CurrentInjectionPhasorGroup> InactiveByMeasurementCurrentInjections
+        {
+            get
+            {
+                return InactiveCurrentInjections.FindAll(x => !InactiveByStatusWordCurrentInjections.Contains(x));
+            }
+        }
+
+        #endregion
+
+        #region [ Digitals - Breaker Statuses ]
+
+        /// <summary>
+        /// A list of all of the breaker statuses modeled in the network.
+        /// </summary>
+        [XmlArray("BreakerStatuses")]
+        public List<BreakerStatus> BreakerStatuses
+        {
+            get
+            {
+                return m_breakerStatuses;
+            }
+            set
+            {
+                m_breakerStatuses = value;
+            }
+        }
+
+        [XmlIgnore()]
+        public List<BreakerStatus> ExpectedBreakerStatuses
+        {
+            get
+            {
+                return m_expectedBreakerStatuses;
+            }
+            set
+            {
+                m_expectedBreakerStatuses = value;
+            }
+        }
+
+        [XmlIgnore()]
+        public List<BreakerStatus> ReportedBreakerStatuses
+        {
+            get
+            {
+                return ExpectedBreakerStatuses.FindAll(x => x.WasReported);
+            }
+        }
+
+        [XmlIgnore()]
+        public List<BreakerStatus> UnreportedBreakerStatuses
+        {
+            get
+            {
+                return ExpectedBreakerStatuses.FindAll(x => !x.WasReported);
+            }
+        }
+        
+        #endregion
+
+        #region [ Status Words ]
+
+        /// <summary>
+        /// A list of all of the status words from all of the devices streaming phasor measurements in the network.
+        /// </summary>
+        [XmlArray("StatusWords")]
+        public List<StatusWord> StatusWords
+        {
+            get
+            {
+                return m_statusWords;
+            }
+            set
+            {
+                m_statusWords = value;
+            }
+        }
+
+        [XmlIgnore()]
+        public List<StatusWord> ExpectedStatusWords
+        {
+            get
+            {
+                return m_expectedStatusWords;
+            }
+            set
+            {
+                m_expectedStatusWords = value;
+            }
+        }
+
+        [XmlIgnore()]
+        public List<StatusWord> LseInvalidStatusWords
+        {
+            get
+            {
+                return ReportedStatusWords.FindAll(x => x.DataIsValid || x.SynchronizationIsValid);
+            }
+        }
+
+        [XmlIgnore()]
+        public List<StatusWord> LseValidStatusWords
+        {
+            get
+            {
+                return ReportedStatusWords.FindAll(x => !(x.DataIsValid || x.SynchronizationIsValid));
+            }
+        }
+
+        [XmlIgnore()]
+        public List<StatusWord> ReportedStatusWords
+        {
+            get
+            {
+                return ExpectedStatusWords.FindAll(x => x.StatusWordWasReported);
+            }
+        }
+
+        [XmlIgnore()]
+        public List<StatusWord> UnreportedStatusWords
+        {
+            get
+            {
+                return ExpectedStatusWords.FindAll(x => !x.StatusWordWasReported);
+            }
+        }
+        
+        #endregion
 
         #endregion
 
@@ -1281,7 +1604,7 @@ namespace SynchrophasorAnalytics.Modeling
         #endregion
 
         #region [ Public Methods ]
-
+        
         /// <summary>
         /// Reconstitues the references between parent, child, and sibling objects in 
         /// the <see cref="NetworkModel"/> as well as several other initialization functions.
@@ -1313,15 +1636,12 @@ namespace SynchrophasorAnalytics.Modeling
 
         public void ListExpectedBreakerStatuses()
         {
-            m_expectedBreakerStatuses = new List<BreakerStatus>();
+            m_expectedBreakerStatuses = BreakerStatuses.FindAll(x => x.IsEnabled && x.Key != UNDEFINED_KEY);
+        }
 
-            foreach (CircuitBreaker breaker in CircuitBreakers)
-            {
-                if (breaker.Status != null && BreakerStatuses.Contains(breaker.Status) && breaker.Status.Key != UNDEFINED_KEY)
-                {
-                    m_expectedBreakerStatuses.Add(breaker.Status);
-                }
-            }
+        public void ListAssignedBreakerStatuses()
+        {
+            m_assignedBreakerStatuses = ExpectedBreakerStatuses.FindAll(x => x.ParentCircuitBreaker != null);
         }
 
         public void ListExpectedStatusWords()
@@ -1418,11 +1738,48 @@ namespace SynchrophasorAnalytics.Modeling
             }
         }
 
+        public List<Node> ListObservedNodes()
+        {
+            List<Node> observedNodes = new List<Node>();
+
+            foreach (ObservedBus observedBus in ObservedBuses)
+            {
+                observedNodes.AddRange(observedBus.Nodes);
+            }
+
+            return observedNodes;
+        }
+
+        public List<Substation> ListObservedSubstations()
+        {
+            List<Substation> observedSubstations = new List<Substation>();
+
+            foreach (Node node in ObservedNodes)
+            {
+                if (!observedSubstations.Contains(node.ParentSubstation))
+                {
+                    observedSubstations.Add(node.ParentSubstation);
+                }
+            }
+
+            return observedSubstations;
+        }
+
         /// <summary>
         /// Clears the values before receiving a new set of measurements
         /// </summary>
         public void ClearValues()
         {
+            PerformanceTimer.Reset();
+            PerformanceTimer.Start();
+
+            if (ParentNetwork != null)
+            {
+                ParentNetwork.PerformanceMetrics.ClearValues();
+            }
+
+            InputKeyValuePairs.Clear();
+
             foreach (VoltagePhasorGroup voltagePhasorGroup in ExpectedVoltages)
             {
                 voltagePhasorGroup.ClearValues();
@@ -1447,6 +1804,13 @@ namespace SynchrophasorAnalytics.Modeling
             {
                 statusWord.ClearValues();
             }
+
+            PerformanceTimer.Stop();
+            if (ParentNetwork != null)
+            {
+                ParentNetwork.PerformanceMetrics.RefreshExecutionTime = PerformanceTimer.ElapsedTicks;
+            }
+            
         }
 
         /// <summary>
@@ -1454,12 +1818,19 @@ namespace SynchrophasorAnalytics.Modeling
         /// </summary>
         public void OnNewMeasurements()
         {
+            PerformanceTimer.Reset();
+            PerformanceTimer.Start();
             InsertVoltageMeasurements();
             InsertCurrentFlowMeasurements();
             InsertCurrentInjectionMeasurements();
             InsertBreakerStatuses();
             InsertStatusWords();
             InsertTransformerTapPositions();
+            PerformanceTimer.Stop();
+            if (ParentNetwork != null)
+            {
+                ParentNetwork.PerformanceMetrics.MeasurementMappingExecutionTime = PerformanceTimer.ElapsedTicks;
+            }
         }
 
         /// <summary>
@@ -1483,6 +1854,9 @@ namespace SynchrophasorAnalytics.Modeling
         /// <returns></returns>
         public void ResolveToObservedBuses()
         {
+            PerformanceTimer.Reset();
+            PerformanceTimer.Start();
+
             m_observedBuses.Clear();
 
             List<List<ObservedBus>> substationBuses = new List<List<ObservedBus>>();
@@ -1526,6 +1900,11 @@ namespace SynchrophasorAnalytics.Modeling
                 }
             }
 
+            PerformanceTimer.Stop();
+            if (ParentNetwork != null)
+            {
+                ParentNetwork.PerformanceMetrics.ObservabilityAnalysisExecutionTime += PerformanceTimer.ElapsedTicks;
+            }
         }
 
         /// <summary>
@@ -1533,12 +1912,21 @@ namespace SynchrophasorAnalytics.Modeling
         /// </summary>
         public void ResolveToSingleFlowBranches()
         {
+            PerformanceTimer.Reset();
+            PerformanceTimer.Start();
+
             foreach (TransmissionLine transmissionLine in m_transmissionLines)
             {
                 transmissionLine.RunTopologyProcessing();
                 transmissionLine.ComputeRealTimePositiveSequenceImpedance();
                 transmissionLine.RunSeriesCompensatorStatusInference();
                 transmissionLine.SetFinalImpedanceValues();
+            }
+
+            PerformanceTimer.Stop();
+            if (ParentNetwork != null)
+            {
+                ParentNetwork.PerformanceMetrics.ObservabilityAnalysisExecutionTime += PerformanceTimer.ElapsedTicks;
             }
         }
 
@@ -1548,6 +1936,9 @@ namespace SynchrophasorAnalytics.Modeling
         /// <returns></returns>
         public void DetermineActiveCurrentFlows()
         {
+            PerformanceTimer.Reset();
+            PerformanceTimer.Start();
+
             m_activeCurrentFlows.Clear();
 
             if (m_phaseSelection == PhaseSelection.PositiveSequence)
@@ -1570,6 +1961,12 @@ namespace SynchrophasorAnalytics.Modeling
                     }
                 }
             }
+
+            PerformanceTimer.Stop();
+            if (ParentNetwork != null)
+            {
+                ParentNetwork.PerformanceMetrics.ActiveCurrentPhasorDeterminationExecutionTime += PerformanceTimer.ElapsedTicks;
+            }
         }
 
         /// <summary>
@@ -1578,6 +1975,9 @@ namespace SynchrophasorAnalytics.Modeling
         /// <returns></returns>
         public void DetermineActiveCurrentInjections()
         {
+            PerformanceTimer.Reset();
+            PerformanceTimer.Start();
+
             m_activeCurrentInjections.Clear();
 
             if (m_phaseSelection == PhaseSelection.PositiveSequence)
@@ -1599,6 +1999,12 @@ namespace SynchrophasorAnalytics.Modeling
                         m_activeCurrentInjections.Add(currentPhasorGroup);
                     }
                 }
+            }
+
+            PerformanceTimer.Stop();
+            if (ParentNetwork != null)
+            {
+                ParentNetwork.PerformanceMetrics.ActiveCurrentPhasorDeterminationExecutionTime += PerformanceTimer.ElapsedTicks;
             }
         }
 
@@ -2477,98 +2883,6 @@ namespace SynchrophasorAnalytics.Modeling
             }
         }
 
-        private void ListNetworkMeasurements()
-        {
-            m_voltages = new List<VoltagePhasorGroup>();
-            m_expectedVoltages = new List<VoltagePhasorGroup>();
-            m_currentFlows = new List<CurrentFlowPhasorGroup>();
-            m_expectedCurrentFlows = new List<CurrentFlowPhasorGroup>();
-            m_currentInjections = new List<CurrentInjectionPhasorGroup>();
-            m_expectedCurrentInjections = new List<CurrentInjectionPhasorGroup>();
-
-            foreach (Company company in m_companies)
-            {
-                foreach (Division division in company.Divisions)
-                {
-                    foreach (Substation substation in division.Substations)
-                    {
-                        foreach (Node node in substation.Nodes)
-                        {
-                            m_voltages.Add(node.Voltage);
-                            if (node.Voltage.ExpectsMeasurements)
-                            {
-                                m_expectedVoltages.Add(node.Voltage);
-                            }
-                        }
-
-                        foreach (Transformer transformer in substation.Transformers)
-                        {
-                            // Add the current phasor groups to the list
-                            m_currentFlows.Add(transformer.FromNodeCurrent);
-                            m_currentFlows.Add(transformer.ToNodeCurrent);
-
-                            // Set the measured branch of each current phasor group
-                            transformer.FromNodeCurrent.MeasuredBranch = transformer;
-                            transformer.ToNodeCurrent.MeasuredBranch = transformer;
-
-                            if (transformer.FromNodeCurrent.ExpectsMeasurements)
-                            {
-                                m_expectedCurrentFlows.Add(transformer.FromNodeCurrent);
-                            }
-                            if (transformer.ToNodeCurrent.ExpectsMeasurements)
-                            {
-                                m_expectedCurrentFlows.Add(transformer.ToNodeCurrent);
-                            }
-                        }
-
-                        foreach (ShuntCompensator shunt in substation.Shunts)
-                        {
-                            m_currentInjections.Add(shunt.Current);
-
-                            shunt.Current.MeasuredBranch = shunt;
-
-                            if (shunt.Current.ExpectsMeasurements)
-                            {
-                                m_expectedCurrentInjections.Add(shunt.Current);
-                            }
-                        }
-                    }
-                    foreach (TransmissionLine transmissionLine in division.TransmissionLines)
-                    {
-                        // Add the current phasor groups to the list
-                        m_currentFlows.Add(transmissionLine.FromSubstationCurrent);
-                        m_currentFlows.Add(transmissionLine.ToSubstationCurrent);
-
-                        // Set the measured branch of each current phasor group
-                        transmissionLine.FromSubstationCurrent.MeasuredBranch = transmissionLine;
-                        transmissionLine.ToSubstationCurrent.MeasuredBranch = transmissionLine;
-
-                        if (transmissionLine.FromSubstationCurrent.ExpectsMeasurements)
-                        {
-                            m_expectedCurrentFlows.Add(transmissionLine.FromSubstationCurrent);
-                        }
-                        if (transmissionLine.ToSubstationCurrent.ExpectsMeasurements)
-                        {
-                            m_expectedCurrentFlows.Add(transmissionLine.ToSubstationCurrent);
-                        }
-
-                        foreach (Node node in transmissionLine.Nodes)
-                        {
-                            if (!m_voltages.Contains(node.Voltage))
-                            {
-                                m_voltages.Add(node.Voltage);
-                                if (node.Voltage.ExpectsMeasurements)
-                                {
-                                    m_expectedVoltages.Add(node.Voltage);
-                                }
-
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
         /// <summary>
         /// Links the <see cref="BreakerStatus"/> objects to their parent <see cref="CircuitBreaker"/>.
         /// </summary>
@@ -3241,83 +3555,7 @@ namespace SynchrophasorAnalytics.Modeling
                 substation.InitializeVoltageLevelGroups();
             }
         }
-
-        /// <summary>
-        /// Takes the <see cref="Node.Voltage"/> from all of the <see cref="Node"/> objects in the model
-        /// and collects them into one list to make updating values much easier.
-        /// </summary>
-        private void ListVoltagePhasors()
-        {
-            foreach (Company company in m_companies)
-            {
-                foreach (Division division in company.Divisions)
-                {
-                    foreach (Substation substation in division.Substations)
-                    {
-                        foreach (Node node in substation.Nodes)
-                        {
-                            m_voltages.Add(node.Voltage);
-                        }
-                    }
-                    foreach (TransmissionLine transmissionLine in division.TransmissionLines)
-                    {
-                        foreach (Node node in transmissionLine.Nodes)
-                        {
-                            if (!m_voltages.Contains(node.Voltage))
-                            {
-                                m_voltages.Add(node.Voltage);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// Takes the <see cref="Transformer.FromNodeCurrent"/>, <see cref="Transformer.ToNodeCurrent"/>,
-        /// <see cref="TransmissionLine.FromSubstationCurrent"/>, and <see cref="TransmissionLine.ToSubstationCurrent"/>
-        /// from all of the <see cref="Transformer"/> and <see cref="TransmissionLine"/> objects in the model
-        /// and collects them into one list to make updating values much easier.
-        /// </summary>
-        private void ListCurrentPhasors()
-        {
-            foreach (Company company in m_companies)
-            {
-                foreach (Division division in company.Divisions)
-                {
-                    foreach (Substation substation in division.Substations)
-                    {
-                        foreach (Transformer transformer in substation.Transformers)
-                        {
-                            // Add the current phasor groups to the list
-                            m_currentFlows.Add(transformer.FromNodeCurrent);
-                            m_currentFlows.Add(transformer.ToNodeCurrent);
-
-                            // Set the measured branch of each current phasor group
-                            transformer.FromNodeCurrent.MeasuredBranch = transformer;
-                            transformer.ToNodeCurrent.MeasuredBranch = transformer;
-                        }
-                        foreach (ShuntCompensator shunt in substation.Shunts)
-                        {
-                            m_currentInjections.Add(shunt.Current);
-
-                            shunt.Current.MeasuredBranch = shunt;
-                        }
-                    }
-                    foreach (TransmissionLine transmissionLine in division.TransmissionLines)
-                    {
-
-                        // Add the current phasor groups to the list
-                        m_currentFlows.Add(transmissionLine.FromSubstationCurrent);
-                        m_currentFlows.Add(transmissionLine.ToSubstationCurrent);
-
-                        // Set the measured branch of each current phasor group
-                        transmissionLine.FromSubstationCurrent.MeasuredBranch = transmissionLine;
-                        transmissionLine.ToSubstationCurrent.MeasuredBranch = transmissionLine;
-                    }
-                }
-            }
-        }
+        
 
         /// <summary>
         /// Maps the raw voltage measurement values to their virtual counterpart
@@ -3786,6 +4024,9 @@ namespace SynchrophasorAnalytics.Modeling
 
         private List<OutputMeasurement> GetVoltageEstimatesOutput()
         {
+            PerformanceTimer.Reset();
+            PerformanceTimer.Start();
+
             List<OutputMeasurement> output = new List<OutputMeasurement>();
             List<Node> reportableNodes = new List<Node>();
 
@@ -3876,6 +4117,12 @@ namespace SynchrophasorAnalytics.Modeling
                 });
             }
 
+            PerformanceTimer.Stop();
+            if (ParentNetwork != null)
+            {
+                ParentNetwork.PerformanceMetrics.SolutionRetrievalExecutionTime += PerformanceTimer.ElapsedTicks;
+            }
+
             return output;
         }
 
@@ -3935,6 +4182,9 @@ namespace SynchrophasorAnalytics.Modeling
 
         private List<OutputMeasurement> GetCurrentFlowEstimatesOutput()
         {
+            PerformanceTimer.Reset();
+            PerformanceTimer.Start();
+
             List<OutputMeasurement> output = new List<OutputMeasurement>();
 
             foreach (CurrentFlowPhasorGroup current in m_currentFlows)
@@ -3963,6 +4213,12 @@ namespace SynchrophasorAnalytics.Modeling
                     Value = current.PositiveSequence.Estimate.AngleInDegrees,
                     Description = $"{current.Description} Positive Sequence Angle In Degrees"
                 });
+            }
+
+            PerformanceTimer.Stop();
+            if (ParentNetwork != null)
+            {
+                ParentNetwork.PerformanceMetrics.SolutionRetrievalExecutionTime += PerformanceTimer.ElapsedTicks;
             }
 
             return output;
@@ -4024,6 +4280,9 @@ namespace SynchrophasorAnalytics.Modeling
 
         private List<OutputMeasurement> GetCurrentInjectionEstimatesOutput()
         {
+            PerformanceTimer.Reset();
+            PerformanceTimer.Start();
+
             List<OutputMeasurement> output = new List<OutputMeasurement>();
 
             foreach (CurrentInjectionPhasorGroup current in m_currentInjections)
@@ -4052,6 +4311,12 @@ namespace SynchrophasorAnalytics.Modeling
                     Value = current.PositiveSequence.Estimate.AngleInDegrees,
                     Description = $"{current.Description} Positive Sequence Angle In Degrees"
                 });
+            }
+
+            PerformanceTimer.Stop();
+            if (ParentNetwork != null)
+            {
+                ParentNetwork.PerformanceMetrics.SolutionRetrievalExecutionTime += PerformanceTimer.ElapsedTicks;
             }
 
             return output;
@@ -4113,6 +4378,9 @@ namespace SynchrophasorAnalytics.Modeling
 
         private List<OutputMeasurement> GetVoltageMeasurementResidualsOutput()
         {
+            PerformanceTimer.Reset();
+            PerformanceTimer.Start();
+
             List<OutputMeasurement> output = new List<OutputMeasurement>();
 
             List<string> keys = new List<string>();
@@ -4150,6 +4418,12 @@ namespace SynchrophasorAnalytics.Modeling
                         Description = $"{voltage.Description} Positive Sequence Angle Residual In Degrees"
                     });
                 }
+            }
+
+            PerformanceTimer.Stop();
+            if (ParentNetwork != null)
+            {
+                ParentNetwork.PerformanceMetrics.SolutionRetrievalExecutionTime += PerformanceTimer.ElapsedTicks;
             }
 
             return output;
@@ -4206,6 +4480,9 @@ namespace SynchrophasorAnalytics.Modeling
 
         private List<OutputMeasurement> GetCurrentMeasurementResidualsOutput()
         {
+            PerformanceTimer.Reset();
+            PerformanceTimer.Start();
+
             List<OutputMeasurement> output = new List<OutputMeasurement>();
 
             List<string> keys = new List<string>();
@@ -4272,6 +4549,13 @@ namespace SynchrophasorAnalytics.Modeling
                     Description = $"{current.Description} Positive Sequence Angle Residual In Degrees"
                 });
             }
+
+            PerformanceTimer.Stop();
+            if (ParentNetwork != null)
+            {
+                ParentNetwork.PerformanceMetrics.SolutionRetrievalExecutionTime += PerformanceTimer.ElapsedTicks;
+            }
+
             return output;
         }
 
@@ -4326,6 +4610,9 @@ namespace SynchrophasorAnalytics.Modeling
 
         private List<OutputMeasurement> GetCircuitBreakerStatusesOutput()
         {
+            PerformanceTimer.Reset();
+            PerformanceTimer.Start();
+
             List<OutputMeasurement> output = new List<OutputMeasurement>();
             List<string> keys = new List<string>();
 
@@ -4350,6 +4637,12 @@ namespace SynchrophasorAnalytics.Modeling
                 }
             }
 
+            PerformanceTimer.Stop();
+            if (ParentNetwork != null)
+            {
+                ParentNetwork.PerformanceMetrics.SolutionRetrievalExecutionTime += PerformanceTimer.ElapsedTicks;
+            }
+
             return output;
         }
 
@@ -4369,10 +4662,14 @@ namespace SynchrophasorAnalytics.Modeling
                     }
                 }
             }
+            
         }
 
         private List<OutputMeasurement> GetSwitchStatusesOutput()
         {
+            PerformanceTimer.Reset();
+            PerformanceTimer.Start();
+
             List<OutputMeasurement> output = new List<OutputMeasurement>();
             List<string> keys = new List<string>();
 
@@ -4397,6 +4694,12 @@ namespace SynchrophasorAnalytics.Modeling
                     });
                 }
 
+            }
+            
+            PerformanceTimer.Stop();
+            if (ParentNetwork != null)
+            {
+                ParentNetwork.PerformanceMetrics.SolutionRetrievalExecutionTime += PerformanceTimer.ElapsedTicks;
             }
 
             return output;
@@ -4595,6 +4898,9 @@ namespace SynchrophasorAnalytics.Modeling
 
         private List<OutputMeasurement> GetTopologyProfilingInformationOutput()
         {
+            PerformanceTimer.Reset();
+            PerformanceTimer.Start();
+
             List<OutputMeasurement> output = new List<OutputMeasurement>();
 
             List<string> keys = new List<string>();
@@ -4664,6 +4970,13 @@ namespace SynchrophasorAnalytics.Modeling
                     }
                 }
             }
+
+            PerformanceTimer.Stop();
+            if (ParentNetwork != null)
+            {
+                ParentNetwork.PerformanceMetrics.SolutionRetrievalExecutionTime += PerformanceTimer.ElapsedTicks;
+            }
+
             return output;
         }
 
@@ -4683,6 +4996,9 @@ namespace SynchrophasorAnalytics.Modeling
 
         private List<OutputMeasurement> GetMeasurementValidationFlagsOutput()
         {
+            PerformanceTimer.Reset();
+            PerformanceTimer.Start();
+
             List<OutputMeasurement> output = new List<OutputMeasurement>();
 
             foreach (VoltagePhasorGroup voltage in m_expectedVoltages)
@@ -4729,6 +5045,12 @@ namespace SynchrophasorAnalytics.Modeling
                     Value = Convert.ToDouble(current.IncludeInPositiveSequenceEstimator),
                     Description = $"{current.Description} Measurement Validation Flag"
                 });
+            }
+
+            PerformanceTimer.Stop();
+            if (ParentNetwork != null)
+            {
+                ParentNetwork.PerformanceMetrics.SolutionRetrievalExecutionTime += PerformanceTimer.ElapsedTicks;
             }
 
             return output;
@@ -4929,6 +5251,126 @@ namespace SynchrophasorAnalytics.Modeling
                 }
             }
         }
+
+        #region [ Modeled and Expected Measurements ]
+
+        private void ListNetworkMeasurements()
+        {
+            m_voltages = new List<VoltagePhasorGroup>();
+            m_expectedVoltages = new List<VoltagePhasorGroup>();
+            m_currentFlows = new List<CurrentFlowPhasorGroup>();
+            m_expectedCurrentFlows = new List<CurrentFlowPhasorGroup>();
+            m_currentInjections = new List<CurrentInjectionPhasorGroup>();
+            m_expectedCurrentInjections = new List<CurrentInjectionPhasorGroup>();
+
+            foreach (Company company in m_companies)
+            {
+                foreach (Division division in company.Divisions)
+                {
+                    foreach (Substation substation in division.Substations)
+                    {
+                        foreach (Node node in substation.Nodes)
+                        {
+                            m_voltages.Add(node.Voltage);
+                            if (node.Voltage.ExpectsMeasurements)
+                            {
+                                m_expectedVoltages.Add(node.Voltage);
+                            }
+                        }
+
+                        foreach (Transformer transformer in substation.Transformers)
+                        {
+                            // Add the current phasor groups to the list
+                            m_currentFlows.Add(transformer.FromNodeCurrent);
+                            m_currentFlows.Add(transformer.ToNodeCurrent);
+
+                            // Set the measured branch of each current phasor group
+                            transformer.FromNodeCurrent.MeasuredBranch = transformer;
+                            transformer.ToNodeCurrent.MeasuredBranch = transformer;
+
+                            if (transformer.FromNodeCurrent.ExpectsMeasurements)
+                            {
+                                m_expectedCurrentFlows.Add(transformer.FromNodeCurrent);
+                            }
+                            if (transformer.ToNodeCurrent.ExpectsMeasurements)
+                            {
+                                m_expectedCurrentFlows.Add(transformer.ToNodeCurrent);
+                            }
+                        }
+
+                        foreach (ShuntCompensator shunt in substation.Shunts)
+                        {
+                            m_currentInjections.Add(shunt.Current);
+
+                            shunt.Current.MeasuredBranch = shunt;
+
+                            if (shunt.Current.ExpectsMeasurements)
+                            {
+                                m_expectedCurrentInjections.Add(shunt.Current);
+                            }
+                        }
+                    }
+                    foreach (TransmissionLine transmissionLine in division.TransmissionLines)
+                    {
+                        // Add the current phasor groups to the list
+                        m_currentFlows.Add(transmissionLine.FromSubstationCurrent);
+                        m_currentFlows.Add(transmissionLine.ToSubstationCurrent);
+
+                        // Set the measured branch of each current phasor group
+                        transmissionLine.FromSubstationCurrent.MeasuredBranch = transmissionLine;
+                        transmissionLine.ToSubstationCurrent.MeasuredBranch = transmissionLine;
+
+                        if (transmissionLine.FromSubstationCurrent.ExpectsMeasurements)
+                        {
+                            m_expectedCurrentFlows.Add(transmissionLine.FromSubstationCurrent);
+                        }
+                        if (transmissionLine.ToSubstationCurrent.ExpectsMeasurements)
+                        {
+                            m_expectedCurrentFlows.Add(transmissionLine.ToSubstationCurrent);
+                        }
+
+                        foreach (Node node in transmissionLine.Nodes)
+                        {
+                            if (!m_voltages.Contains(node.Voltage))
+                            {
+                                m_voltages.Add(node.Voltage);
+                                if (node.Voltage.ExpectsMeasurements)
+                                {
+                                    m_expectedVoltages.Add(node.Voltage);
+                                }
+
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        #endregion
+
+        #region [ Conditionally Filtered Measurements ]
+
+
+
+        // Modeled Current Injections
+        // Expected Current Injections
+        // Active Current Injections
+        // Inactive Current Injections
+        // Reported Current Injections
+        // Unreported Current Injections
+        // Active by Status Words Injection
+        // Inactive By Status Words Injection
+        // Inactive by measurement injection
+
+        #endregion
+
+        #region [ Filtered Components ]
+
+        // Modeled Switching Device
+        // Expected Switching Deice
+        // Reported Switching Device
+
+        #endregion
 
         #endregion
 

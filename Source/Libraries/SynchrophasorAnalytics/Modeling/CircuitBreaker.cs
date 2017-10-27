@@ -26,6 +26,7 @@ using System.Linq;
 using System.Text;
 using System.Xml.Serialization;
 using SynchrophasorAnalytics.Measurements;
+using SynchrophasorAnalytics.Reporting;
 
 namespace SynchrophasorAnalytics.Modeling
 {
@@ -34,7 +35,7 @@ namespace SynchrophasorAnalytics.Modeling
     /// </summary>
     /// <seealso cref="LinearStateEstimator.Modeling.Switch"/>
     /// <seealso cref="LinearStateEstimator.Modeling.SwitchingDeviceBase"/>
-    public class CircuitBreaker : SwitchingDeviceBase
+    public class CircuitBreaker : SwitchingDeviceBase, ICsvReportable
     {
         #region [ Private Constants ]
 
@@ -258,6 +259,15 @@ namespace SynchrophasorAnalytics.Modeling
             }
         }
 
+        [XmlIgnore()]
+        public string CsvHeader
+        {
+            get
+            {
+                return CSV_HEADER;
+            }
+        }
+
         #endregion
 
         #region [ Constructors ]
@@ -332,9 +342,7 @@ namespace SynchrophasorAnalytics.Modeling
         #endregion
 
         #region [ Public Methods ]
-
-
-
+        
         /// <summary>
         /// A string representation of the <see cref="LinearStateEstimator.Modeling.CircuitBreaker"/>. The format is <i>CircuitBreaker,baseProperty1, baseProperty2, ... ,statusInternalId,parentSubstationInternalId</i> and can be used for a rudimentary momento design pattern.
         /// </summary>

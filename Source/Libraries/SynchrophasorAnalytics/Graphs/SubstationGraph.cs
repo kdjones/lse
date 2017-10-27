@@ -41,11 +41,14 @@ namespace SynchrophasorAnalytics.Graphs
         private int m_internalID;
         private double m_angleDeltaThresholdInDegrees;
         private List<Node> m_vertexSet;
+        private List<Node> m_expectedVertexSet;
         private List<SwitchingDeviceBase> m_edgeSet;
         private VertexAdjacencyList m_adjacencyList;
         private List<ObservedBus> m_observedBuses;
         private TopologyEstimationLevel m_topologyLevel;
         private bool m_topologyErrorDetected;
+        private PhasorPair[,] m_phasorPairMatrix;
+        private bool[,] m_pastConnectivityMatrix;
 
         #endregion 
 
@@ -140,6 +143,34 @@ namespace SynchrophasorAnalytics.Graphs
             }
         }
 
+        public List<Node> ExpectedVertexSet
+        {
+            get
+            {
+                if (m_expectedVertexSet == null)
+                {
+                    m_expectedVertexSet = VertexSet.FindAll(x => x.Voltage.ExpectsMeasurements);
+                }
+                return m_expectedVertexSet;
+            }
+        }
+
+        public PhasorPair[,] PhasorPairMatrix
+        {
+            get
+            {
+                return m_phasorPairMatrix;
+            }
+        }
+
+        public bool[,] PastConnectivityMatrix
+        {
+            get
+            {
+                return m_pastConnectivityMatrix;
+            }
+        }
+
         #endregion
 
         #region [ Constructors ]
@@ -157,6 +188,8 @@ namespace SynchrophasorAnalytics.Graphs
             BuildeEdgeSet(substation);
             InitializeAdjacencyList();
             m_observedBuses = new List<ObservedBus>();
+            CreatePhasorPairMatrix();
+            InitializeConnectivityMatrix();
         }
 
         #endregion
@@ -543,6 +576,59 @@ namespace SynchrophasorAnalytics.Graphs
         }
 
         #endregion
+
+        public void CreatePhasorPairMatrix()
+        {
+            m_phasorPairMatrix = new PhasorPair[ExpectedVertexSet.Count, ExpectedVertexSet.Count];
+
+            foreach (Node i in ExpectedVertexSet)
+            {
+                foreach (Node j in ExpectedVertexSet)
+                {
+                    PhasorPair pair = new PhasorPair(i.Voltage.PositiveSequence.Measurement, j.Voltage.PositiveSequence.Measurement);
+                    m_phasorPairMatrix[ExpectedVertexSet.IndexOf(i), ExpectedVertexSet.IndexOf(j)] = pair;
+                }
+            }
+        }
+
+        public void InitializeConnectivityMatrix()
+        {
+            m_pastConnectivityMatrix = new bool[ExpectedVertexSet.Count, ExpectedVertexSet.Count];
+
+            for (int i = 0; i < ExpectedVertexSet.Count; i++)
+            {
+                for (int j = 0; j < ExpectedVertexSet.Count; j++)
+                {
+                    m_pastConnectivityMatrix[i, j] = (m_phasorPairMatrix[i, j].AbsoluteAngleDeltaInDegrees < AngleDeltaThresholdInDegrees);
+                }
+            }
+        }
+
+        public void UpdateConnectivityMatrix()
+        {
+            for (int i = 0; i < ExpectedVertexSet.Count; i++)
+            {
+                for (int j = 0; j < ExpectedVertexSet.Count; j++)
+                {
+                    m_pastConnectivityMatrix[i, j] = (m_phasorPairMatrix[i, j].AbsoluteAngleDeltaInDegrees < AngleDeltaThresholdInDegrees);
+                }
+            }
+        }
+
+        public bool ComparePastAndPresentConnectivityMatrices()
+        {
+            for (int i = 0; i < ExpectedVertexSet.Count; i++)
+            {
+                for (int j = 0; j < ExpectedVertexSet.Count; j++)
+                {
+                    if (m_pastConnectivityMatrix[i, j] != (m_phasorPairMatrix[i, j].AbsoluteAngleDeltaInDegrees < AngleDeltaThresholdInDegrees))
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
 
         #region [ Private Methods ]
 

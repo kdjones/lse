@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SynchrophasorAnalytics.Reporting;
 
 namespace SynchrophasorAnalytics.Measurements
 {
 
-    public class OutputMeasurement
+    public class OutputMeasurement : ICsvReportable
     {
         public static string CSV_HEADER = $"PointTag,Value,Description,Device,Signal Type,Key{Environment.NewLine}";
 
@@ -49,6 +46,14 @@ namespace SynchrophasorAnalytics.Measurements
 
         private OutputType m_type;
         private MeasuredDeviceType m_measuredDeviceType;
+        
+        public string CsvHeader
+        {
+            get
+            {
+                return CSV_HEADER;
+            }
+        }
 
         public MeasuredDeviceType MeasuredDeviceType
         {

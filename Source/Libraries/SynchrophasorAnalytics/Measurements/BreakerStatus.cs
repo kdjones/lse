@@ -27,12 +27,10 @@
 //
 //******************************************************************************************************
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Xml.Serialization;
 using SynchrophasorAnalytics.Modeling;
-using SynchrophasorAnalytics.Measurements;
+using SynchrophasorAnalytics.Reporting;
 
 namespace SynchrophasorAnalytics.Measurements
 {
@@ -41,7 +39,7 @@ namespace SynchrophasorAnalytics.Measurements
     /// </summary>
     /// <seealso cref="LinearStateEstimator.Measurements.BreakerStatusBit"/>
     [Serializable()]
-    public class BreakerStatus : INetworkDescribable, IClearable
+    public class BreakerStatus : INetworkDescribable, IClearable, ICsvReportable
     {
         #region [ Private Members ]
 
@@ -363,6 +361,15 @@ namespace SynchrophasorAnalytics.Measurements
             set 
             {
                 m_parentCircuitBreakerID = value; 
+            }
+        }
+
+        [XmlIgnore()]
+        public string CsvHeader
+        {
+            get
+            {
+                return CSV_HEADER;
             }
         }
 

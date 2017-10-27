@@ -39,6 +39,7 @@ using System.IO;
 using MathNet.Numerics;
 
 using MathNet.Numerics.LinearAlgebra.Complex;
+//using MathNet.Numerics.Providers.LinearAlgebra.Mkl;
 using SynchrophasorAnalytics.Networks;
 using SynchrophasorAnalytics.Modeling;
 using SynchrophasorAnalytics.Measurements;
@@ -169,6 +170,14 @@ namespace SynchrophasorAnalytics.Matrices
             }
         }
 
+        public string LinearAlgebraProvider
+        {
+            get
+            {
+                return Control.LinearAlgebraProvider.ToString();
+            }
+        }
+
         #endregion
 
         #region [ Constructors ]
@@ -186,12 +195,25 @@ namespace SynchrophasorAnalytics.Matrices
         /// <param name="network">The virtualized <see cref="LinearStateEstimator.Networks.Network"/> model.</param>
         public SystemMatrix(Network network)
         {
+            UseNativeProviders();
+            //UseManagedProviders();
             BuildMatrices(network);
         }
 
         #endregion
 
         #region [ Private Methods ]
+
+        private void UseNativeProviders()
+        {
+            Control.UseNativeMKL();
+        }
+
+        private void UseManagedProviders()
+        {
+            Control.UseManaged();
+        }
+
 
         /// <summary>
         /// Builds the system matrix

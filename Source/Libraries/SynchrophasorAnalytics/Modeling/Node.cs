@@ -24,12 +24,11 @@
 //******************************************************************************************************
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Xml.Serialization;
-using SynchrophasorAnalytics.Modeling;
 using SynchrophasorAnalytics.Measurements;
+using SynchrophasorAnalytics.Reporting;
 
 namespace SynchrophasorAnalytics.Modeling
 {
@@ -37,7 +36,7 @@ namespace SynchrophasorAnalytics.Modeling
     /// Represents a single electrical node in a power system.
     /// </summary>
     [Serializable()]
-    public class Node : INetworkDescribable
+    public class Node : INetworkDescribable, ICsvReportable
     {
         #region [ Private Constants ]
 
@@ -427,6 +426,14 @@ namespace SynchrophasorAnalytics.Modeling
             }
         }
 
+        [XmlIgnore()]
+        public string CsvHeader
+        {
+            get
+            {
+                return CSV_HEADER;
+            }
+        }
 
         #endregion
 

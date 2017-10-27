@@ -19,11 +19,10 @@
 //
 //******************************************************************************************************
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Xml.Serialization;
 using SynchrophasorAnalytics.Modeling;
+using SynchrophasorAnalytics.Reporting;
 
 namespace SynchrophasorAnalytics.Measurements
 {
@@ -35,7 +34,7 @@ namespace SynchrophasorAnalytics.Measurements
     /// <seealso cref="LinearStateEstimator.Measurements.CurrentInjectionPhasorGroup"/>
     /// <seealso cref="LinearStateEstimator.Measurements.PhasorType"/>
     [Serializable()]
-    public class VoltagePhasorGroup : PhasorGroup
+    public class VoltagePhasorGroup : PhasorGroup, ICsvReportable
     {
         #region [ Private Members ]
 
@@ -120,6 +119,16 @@ namespace SynchrophasorAnalytics.Measurements
                 return base.IncludeInPositiveSequenceEstimator;
             }
         }
+        
+        [XmlIgnore()]
+        public string CsvHeader
+        {
+            get
+            {
+                return CSV_HEADER;
+            }
+        }
+
         #endregion
 
         #region [ Constructors ]
