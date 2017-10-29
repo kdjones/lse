@@ -517,7 +517,7 @@ namespace SynchrophasorAnalytics.Modeling
         {
             get
             {
-                double delta = CrossDevicePhasors.PositiveSequenceMeasurementPair.TotalVectorDelta;
+                double delta = CrossDevicePhasors.PositiveSequenceMeasurementPair.NormalizedTotalVectorDeltaMagnitude;
                 if (delta > m_crossDeviceTotalVectorDeltaThreshold)
                 {
                     return true;

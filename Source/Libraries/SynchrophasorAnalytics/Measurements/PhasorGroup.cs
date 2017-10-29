@@ -94,10 +94,61 @@ namespace SynchrophasorAnalytics.Measurements
 
         private string m_negativeSequenceToPositiveSequenceRatioKey;
         private bool m_shouldSerializeEstimatedNegativeSequenceToPositiveSequenceRatio;
+        private bool m_wasActive;
+        private int m_deactivationCount = 0;
+        private int m_activationCount = 0;
 
         #endregion
 
         #region [ Properties ]
+
+        [XmlIgnore()]
+        public bool WasActive
+        {
+            get
+            {
+                return m_wasActive;
+            }
+            set
+            {
+                m_wasActive = value;
+            }
+        }
+
+        [XmlIgnore()]
+        public int DeactivationCount
+        {
+            get
+            {
+                return m_deactivationCount;
+            }
+            set
+            {
+                m_deactivationCount = value;
+                if (m_deactivationCount > 100)
+                {
+                    IsEnabled = false;
+                }
+            }
+        }
+
+
+        [XmlIgnore()]
+        public int ActivationCount
+        {
+            get
+            {
+                return m_activationCount;
+            }
+            set
+            {
+                m_activationCount = value;
+                if (m_activationCount > 1000)
+                {
+                    IsEnabled = true;
+                }
+            }
+        }
 
         /// <summary>
         /// A statistically unique identifier for the instance of the class.
@@ -224,6 +275,11 @@ namespace SynchrophasorAnalytics.Measurements
             set
             {
                 m_enabled = value;
+                ActivationCount = 0;
+                if (m_enabled)
+                {
+                    DeactivationCount = 0;
+                }
             }
         }
 
@@ -461,30 +517,20 @@ namespace SynchrophasorAnalytics.Measurements
             {
                 if (m_enabled)
                 {
-                    if (m_useStatusFlagForRemovingMeasurements)
+                    bool activeNow = InternalIncludeInPositiveSequenceEstimator;
+                    
+                    if (WasActive && activeNow)
                     {
-                        if (m_posSeq.Measurement.IncludeInEstimator == false ||
-                                           m_statusWord.DataIsValid == true ||
-                                m_statusWord.SynchronizationIsValid == true)
-                        { 
-                            return false; 
-                        }
-                        else 
-                        { 
-                            return true; 
-                        }
+                        ActivationCount++;
                     }
-                    else
+                    else if (WasActive && !activeNow)
                     {
-                        if (m_posSeq.Measurement.IncludeInEstimator == false) 
-                        { 
-                            return false; 
-                        }
-                        else 
-                        { 
-                            return true; 
-                        }
+                        DeactivationCount++;
+                        ActivationCount = 0;
                     }
+                    WasActive = activeNow;
+
+                    return activeNow;
                 }
                 else
                 {
@@ -492,6 +538,39 @@ namespace SynchrophasorAnalytics.Measurements
                 }
             }
         }
+
+        [XmlIgnore()]
+        public bool InternalIncludeInPositiveSequenceEstimator
+        {
+            get
+            {
+                if (m_useStatusFlagForRemovingMeasurements)
+                {
+                    if (m_posSeq.Measurement.IncludeInEstimator == false ||
+                                       m_statusWord.DataIsValid == true ||
+                            m_statusWord.SynchronizationIsValid == true)
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    if (m_posSeq.Measurement.IncludeInEstimator == false)
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+
 
         /// <summary>
         /// A flag which represents whether or not to include the phasor group in the estimator
@@ -503,39 +582,61 @@ namespace SynchrophasorAnalytics.Measurements
             {
                 if (m_enabled)
                 {
-                    if (m_useStatusFlagForRemovingMeasurements)
+                    bool activeNow = InternalIncludeInEstimator;
+
+                    if (WasActive && activeNow)
                     {
-                        if (m_phaseA.Measurement.IncludeInEstimator == false ||
-                            m_phaseB.Measurement.IncludeInEstimator == false ||
-                            m_phaseC.Measurement.IncludeInEstimator == false ||
-                                           m_statusWord.DataIsValid == true ||
-                                              m_statusWord.PMUError == true ||
-                                m_statusWord.SynchronizationIsValid == true)
-                        { 
-                            return false; 
-                        }
-                        else 
-                        { 
-                            return true; 
-                        }
+                        ActivationCount++;
                     }
-                    else
+                    else if (WasActive && !activeNow)
                     {
-                        if (m_phaseA.Measurement.IncludeInEstimator == false ||
-                            m_phaseB.Measurement.IncludeInEstimator == false ||
-                            m_phaseC.Measurement.IncludeInEstimator == false)
-                        { 
-                            return false; 
-                        }
-                        else 
-                        { 
-                            return true; 
-                        }
+                        DeactivationCount++;
+                        ActivationCount = 0;
                     }
+                    WasActive = activeNow;
+
+                    return activeNow;
                 }
                 else
                 {
                     return false;
+                }
+            }
+        }
+
+        [XmlIgnore()]
+        public bool InternalIncludeInEstimator
+        {
+            get
+            {
+                if (m_useStatusFlagForRemovingMeasurements)
+                {
+                    if (m_phaseA.Measurement.IncludeInEstimator == false ||
+                        m_phaseB.Measurement.IncludeInEstimator == false ||
+                        m_phaseC.Measurement.IncludeInEstimator == false ||
+                                       m_statusWord.DataIsValid == true ||
+                                          m_statusWord.PMUError == true ||
+                            m_statusWord.SynchronizationIsValid == true)
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    if (m_phaseA.Measurement.IncludeInEstimator == false ||
+                        m_phaseB.Measurement.IncludeInEstimator == false ||
+                        m_phaseC.Measurement.IncludeInEstimator == false)
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        return true;
+                    }
                 }
             }
         }

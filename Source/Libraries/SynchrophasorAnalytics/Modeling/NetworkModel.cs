@@ -128,11 +128,16 @@ namespace SynchrophasorAnalytics.Modeling
         #endregion
 
         private bool m_inPruningMode;
+        private int m_maxDegreeOfParallelism = 4;
+        private bool m_tryDetectLevelTwoNetworkChange;
+        private bool m_tryDetectLevelThreeNetworkChange;
+        private bool m_useManagedProvidersInSteadyState = true;
 
         #endregion
 
         #region [ Properties ]
 
+        [XmlIgnore()]
         public bool InPruningMode
         {
             get
@@ -145,6 +150,7 @@ namespace SynchrophasorAnalytics.Modeling
             }
         }
 
+        [XmlIgnore()]
         public Stopwatch PerformanceTimer
         {
             get
@@ -272,6 +278,58 @@ namespace SynchrophasorAnalytics.Modeling
         }
 
         #endregion
+
+        [XmlAttribute("MaxAllowedCores")]
+        public int MaxDegreeOfParallelism
+        {
+            get
+            {
+                return m_maxDegreeOfParallelism;
+            }
+            set
+            {
+                m_maxDegreeOfParallelism = value;
+            }
+        }
+
+        [XmlAttribute("DetectLevelTwoChanges")]
+        public bool TryDetectLevelTwoNetworkChange
+        {
+            get
+            {
+                return m_tryDetectLevelTwoNetworkChange;
+            }
+            set
+            {
+                m_tryDetectLevelTwoNetworkChange = value;
+            }
+        }
+
+        [XmlAttribute("DetectLevelThreeAndAboveChanges")]
+        public bool TryDetectLevelThreeAndAboveNetworkChange
+        {
+            get
+            {
+                return m_tryDetectLevelThreeNetworkChange;
+            }
+            set
+            {
+                m_tryDetectLevelThreeNetworkChange = value;
+            }
+        }
+        
+        [XmlAttribute("UseManagedProvidersInSteadyState")]
+        public bool UseManagedProvidersInSteadyState
+        {
+            get
+            {
+                return m_useManagedProvidersInSteadyState;
+            }
+            set
+            {
+                m_useManagedProvidersInSteadyState = value;
+            }
+        }
 
         #region [ I/O ]
 
@@ -966,8 +1024,7 @@ namespace SynchrophasorAnalytics.Modeling
                 return m_expectedLevelTwoCircuitBreakers;
             }
         }
-
-
+        
         /// <summary>
         /// A list of <see cref="LinearStateEstimator.Modeling.Transformer"/> objects in the <see cref="LinearStateEstimator.Modeling.NetworkModel"/>.
         /// </summary>

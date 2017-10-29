@@ -38,6 +38,54 @@ namespace NetworkModelEditor.ViewModels
 
         #region [ Properties ]
 
+        public bool UseManagedProvidersInSteadyState
+        {
+            get
+            {
+                return m_model.UseManagedProvidersInSteadyState;
+            }
+            set
+            {
+                m_model.UseManagedProvidersInSteadyState = value;
+            }
+        }
+
+        public bool TryDetectLevelTwoNetworkChange
+        {
+            get
+            {
+                return m_model.TryDetectLevelTwoNetworkChange;
+            }
+            set
+            {
+                m_model.TryDetectLevelTwoNetworkChange = value;
+            }
+        }
+
+        public bool TryDetectLevelThreeAndAboveNetworkChange
+        {
+            get
+            {
+                return m_model.TryDetectLevelThreeAndAboveNetworkChange;
+            }
+            set
+            {
+                m_model.TryDetectLevelThreeAndAboveNetworkChange = value;
+            }
+        }
+
+        public int MaximumAllowedCores
+        {
+            get
+            {
+                return m_model.MaxDegreeOfParallelism;
+            }
+            set
+            {
+                m_model.MaxDegreeOfParallelism = value;
+            }
+        }
+
         public int InternalID
         {
             get

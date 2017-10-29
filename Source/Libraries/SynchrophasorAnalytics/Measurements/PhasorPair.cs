@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -21,15 +22,21 @@ namespace SynchrophasorAnalytics.Measurements
         {
             get
             {
-                return Math.Abs(m_phasorA.AngleInDegrees - m_phasorB.AngleInDegrees);
-            }
-        }
+                double phaseAAngleInDegrees = m_phasorA.AngleInDegrees;
+                double phaseBAngleInDegrees = m_phasorB.AngleInDegrees;
+                bool phaseAIsPositive = phaseAAngleInDegrees >= 0;
+                bool phaseBIsPositive = phaseBAngleInDegrees >= 0;
 
-        public double AbsoluteAngleDeltaInRadians
-        {
-            get
-            {
-                return Math.Abs(m_phasorA.AngleInRadians - m_phasorB.AngleInRadians);
+                if (phaseAIsPositive && !phaseBIsPositive)
+                {
+                    phaseBAngleInDegrees += 360;
+                }
+                else if (!phaseAIsPositive && phaseBIsPositive)
+                {
+                    phaseAAngleInDegrees += 360;
+                }
+
+                return Math.Abs(phaseAAngleInDegrees - phaseBAngleInDegrees);
             }
         }
 
@@ -81,11 +88,13 @@ namespace SynchrophasorAnalytics.Measurements
             }
         }
 
-        public double TotalVectorDelta
+        public double NormalizedTotalVectorDeltaMagnitude
         {
             get
             {
-                return Math.Abs((m_phasorA.PerUnitComplexPhasor - m_phasorB.PerUnitComplexPhasor).Magnitude) / m_phasorA.PerUnitMagnitude;
+                Complex phaseAUnitVector = m_phasorA.PerUnitComplexPhasor / m_phasorA.PerUnitMagnitude;
+                Complex phaseBUnitVector = m_phasorB.PerUnitComplexPhasor / m_phasorB.PerUnitMagnitude;
+                return Math.Abs((phaseAUnitVector - phaseBUnitVector).Magnitude);
             }
         }
 

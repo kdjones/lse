@@ -67,6 +67,32 @@ namespace SynchrophasorAnalytics.Networks
         #region [ Properties ]
 
         [XmlIgnore()]
+        public bool TryDetectLevelTwoNetworkChange
+        {
+            get
+            {
+                return m_networkModel.TryDetectLevelTwoNetworkChange;
+            }
+            set
+            {
+                m_networkModel.TryDetectLevelTwoNetworkChange = value;
+            }
+        }
+
+        [XmlIgnore()]
+        public bool TryDetectLevelThreeAndAboveNetworkChange
+        {
+            get
+            {
+                return m_networkModel.TryDetectLevelThreeAndAboveNetworkChange;
+            }
+            set
+            {
+                m_networkModel.TryDetectLevelThreeAndAboveNetworkChange = value;
+            }
+        }
+
+        [XmlIgnore()]
         public string LinearAlgebraProvider
         {
             get
@@ -949,6 +975,13 @@ namespace SynchrophasorAnalytics.Networks
             {
                 m_systemMatrix = new SystemMatrix(this);
             }
+            else
+            {
+                if (m_networkModel.UseManagedProvidersInSteadyState)
+                {
+                    m_systemMatrix.UseManagedProviders();
+                }
+            }
             
             PerUnitStateVector = m_systemMatrix.PsuedoInverseOfMatrix * PerUnitMeasurementVector;
             m_networkModel.PerformanceTimer.Stop();
@@ -1090,20 +1123,26 @@ namespace SynchrophasorAnalytics.Networks
                 }
             }
 
-            if (m_pastLevelTwoCircuitBreakerState.Length > 0)
+            if (TryDetectLevelTwoNetworkChange)
             {
-                for (int i = 0; i < m_pastLevelTwoCircuitBreakerState.Length; i++)
-
+                if (m_pastLevelTwoCircuitBreakerState.Length > 0)
                 {
-                    m_pastLevelTwoCircuitBreakerState[i] = SwitchingDeviceInferredState.Closed;
+                    for (int i = 0; i < m_pastLevelTwoCircuitBreakerState.Length; i++)
+
+                    {
+                        m_pastLevelTwoCircuitBreakerState[i] = SwitchingDeviceInferredState.Closed;
+                    }
                 }
             }
 
-            foreach (Substation substation in m_networkModel.LevelThreeAndAboveSubstations)
+            if (TryDetectLevelThreeAndAboveNetworkChange)
             {
-                if (substation.Graph != null)
+                foreach (Substation substation in m_networkModel.LevelThreeAndAboveSubstations)
                 {
-                    substation.Graph.InitializeConnectivityMatrix();
+                    if (substation.Graph != null)
+                    {
+                        substation.Graph.InitializeConnectivityMatrix();
+                    }
                 }
             }
         }
@@ -1180,19 +1219,25 @@ namespace SynchrophasorAnalytics.Networks
                 }
             }
 
-            for (int i = 0; i < m_networkModel.ExpectedLevelTwoCircuitBreakers.Count; i++)
+            if (TryDetectLevelTwoNetworkChange)
             {
-                if (m_pastLevelTwoCircuitBreakerState[i] != m_networkModel.ExpectedLevelTwoCircuitBreakers[i].InferredState)
+                for (int i = 0; i < m_networkModel.ExpectedLevelTwoCircuitBreakers.Count; i++)
                 {
-                    return true;
+                    if (m_pastLevelTwoCircuitBreakerState[i] != m_networkModel.ExpectedLevelTwoCircuitBreakers[i].InferredState)
+                    {
+                        return true;
+                    }
                 }
             }
 
-            foreach (Substation substation in m_networkModel.LevelThreeAndAboveSubstations)
+            if (TryDetectLevelThreeAndAboveNetworkChange)
             {
-                if (substation.Graph.ComparePastAndPresentConnectivityMatrices())
+                foreach (Substation substation in m_networkModel.LevelThreeAndAboveSubstations)
                 {
-                    return true;
+                    if (substation.Graph.ComparePastAndPresentConnectivityMatrices())
+                    {
+                        return true;
+                    }
                 }
             }
 

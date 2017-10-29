@@ -66,11 +66,24 @@ namespace SynchrophasorAnalytics.Matrices
         private DenseMatrix m_ExhaustiveK = DenseMatrix.OfArray(new Complex[1, 1]);
         private bool m_seriesPartitionIsValid;
         private bool m_systemMatrixIsValid;
-
+        private int m_maxDegreeOfParallelism;
+        
         #endregion
 
         #region [ Properties ]
 
+        public int MaxDegreeOfParallelism
+        {
+            get
+            {
+                return m_maxDegreeOfParallelism;
+            }
+            set
+            {
+                m_maxDegreeOfParallelism = value;
+            }
+        }
+        
         /// <summary>
         /// The <see cref="LinearStateEstimator.Matrices.CurrentFlowMeasurementBusIncidenceMatrix"/>.
         /// </summary>
@@ -195,8 +208,8 @@ namespace SynchrophasorAnalytics.Matrices
         /// <param name="network">The virtualized <see cref="LinearStateEstimator.Networks.Network"/> model.</param>
         public SystemMatrix(Network network)
         {
+            MaxDegreeOfParallelism = network.Model.MaxDegreeOfParallelism;
             UseNativeProviders();
-            //UseManagedProviders();
             BuildMatrices(network);
         }
 
@@ -204,12 +217,16 @@ namespace SynchrophasorAnalytics.Matrices
 
         #region [ Private Methods ]
 
-        private void UseNativeProviders()
+        public void UseNativeProviders()
         {
-            Control.UseNativeMKL();
+            if (!Control.TryUseNativeMKL())
+            {
+                UseManagedProviders();
+            }
+            Control.MaxDegreeOfParallelism = MaxDegreeOfParallelism;
         }
 
-        private void UseManagedProviders()
+        public void UseManagedProviders()
         {
             Control.UseManaged();
         }
