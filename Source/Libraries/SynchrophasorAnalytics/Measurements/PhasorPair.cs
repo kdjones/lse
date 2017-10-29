@@ -22,21 +22,21 @@ namespace SynchrophasorAnalytics.Measurements
         {
             get
             {
-                double phaseAAngleInDegrees = m_phasorA.AngleInDegrees;
-                double phaseBAngleInDegrees = m_phasorB.AngleInDegrees;
-                bool phaseAIsPositive = phaseAAngleInDegrees >= 0;
-                bool phaseBIsPositive = phaseBAngleInDegrees >= 0;
+                double delta = Math.Abs(m_phasorA.AngleInDegrees - m_phasorB.AngleInDegrees);
 
-                if (phaseAIsPositive && !phaseBIsPositive)
+                if (delta > 180)
                 {
-                    phaseBAngleInDegrees += 360;
-                }
-                else if (!phaseAIsPositive && phaseBIsPositive)
-                {
-                    phaseAAngleInDegrees += 360;
+                    if (delta < 0)
+                    {
+                        delta += 360;
+                    }
+                    else 
+                    {
+                        delta -= 360;
+                    }
                 }
 
-                return Math.Abs(phaseAAngleInDegrees - phaseBAngleInDegrees);
+                return delta;
             }
         }
 
@@ -109,6 +109,19 @@ namespace SynchrophasorAnalytics.Measurements
         }
 
         #endregion
+
+        /// <summary>
+        /// can create a setting to treat angle threshold as TVE magnitude in the future
+        /// </summary>
+        /// <param name="angleThresholdInDegrees"></param>
+        /// <returns></returns>
+        public double ComputeEquivalentTotalVectorMagnitudeDelta(double angleThresholdInDegrees)
+        {
+            double a = Math.Cos(0) - Math.Cos(angleThresholdInDegrees * Math.PI / 180);
+            double b = Math.Sin(0) - Math.Sin(angleThresholdInDegrees * Math.PI / 180);
+
+            return Math.Sqrt(a * a + b * b);
+        }
 
     }
 }

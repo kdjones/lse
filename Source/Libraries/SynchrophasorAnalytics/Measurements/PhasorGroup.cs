@@ -60,7 +60,8 @@ namespace SynchrophasorAnalytics.Measurements
         private const int DEFAULT_NUMBER = 0;
         private const string DEFAULT_NAME = "Undefined";
         private const string DEFAULT_DESCRIPTION = "Undefined";
-
+        private const int DEFAULT_REACTIVATION_THRESHOLD = 1000;
+        private const int DEFAULT_DEACTIVATION_THRESHOLD = 20;
         #endregion
 
         #region [ Private Members ]
@@ -96,7 +97,9 @@ namespace SynchrophasorAnalytics.Measurements
         private bool m_shouldSerializeEstimatedNegativeSequenceToPositiveSequenceRatio;
         private bool m_wasActive;
         private int m_deactivationCount = 0;
-        private int m_activationCount = 0;
+        private int m_deactivationThreshold = 0;
+        private int m_reactivationCount = 0;
+        private int m_reactivationThreshold = 0;
 
         #endregion
 
@@ -112,6 +115,23 @@ namespace SynchrophasorAnalytics.Measurements
             set
             {
                 m_wasActive = value;
+            }
+        }
+
+        [XmlIgnore()]
+        public int DeactivationThreshold
+        {
+            get
+            {
+                if (m_deactivationThreshold <= 0)
+                {
+                    m_deactivationThreshold = DEFAULT_DEACTIVATION_THRESHOLD;
+                }
+                return m_deactivationThreshold;
+            }
+            set
+            {
+                m_deactivationThreshold = value;
             }
         }
 
@@ -132,18 +152,35 @@ namespace SynchrophasorAnalytics.Measurements
             }
         }
 
-
         [XmlIgnore()]
-        public int ActivationCount
+        public int ReactivationThreshold
         {
             get
             {
-                return m_activationCount;
+                if (m_reactivationThreshold <= 0)
+                {
+                    m_reactivationThreshold = DEFAULT_REACTIVATION_THRESHOLD;
+                }
+                return m_reactivationThreshold;
             }
             set
             {
-                m_activationCount = value;
-                if (m_activationCount > 1000)
+                m_reactivationThreshold = value;
+            }
+        }
+
+
+        [XmlIgnore()]
+        public int ReactivationCount
+        {
+            get
+            {
+                return m_reactivationCount;
+            }
+            set
+            {
+                m_reactivationCount = value;
+                if (m_reactivationCount > ReactivationThreshold)
                 {
                     IsEnabled = true;
                 }
@@ -275,7 +312,7 @@ namespace SynchrophasorAnalytics.Measurements
             set
             {
                 m_enabled = value;
-                ActivationCount = 0;
+                ReactivationCount = 0;
                 if (m_enabled)
                 {
                     DeactivationCount = 0;
@@ -521,12 +558,12 @@ namespace SynchrophasorAnalytics.Measurements
                     
                     if (WasActive && activeNow)
                     {
-                        ActivationCount++;
+                        ReactivationCount++;
                     }
                     else if (WasActive && !activeNow)
                     {
                         DeactivationCount++;
-                        ActivationCount = 0;
+                        ReactivationCount = 0;
                     }
                     WasActive = activeNow;
 
@@ -586,12 +623,12 @@ namespace SynchrophasorAnalytics.Measurements
 
                     if (WasActive && activeNow)
                     {
-                        ActivationCount++;
+                        ReactivationCount++;
                     }
                     else if (WasActive && !activeNow)
                     {
                         DeactivationCount++;
-                        ActivationCount = 0;
+                        ReactivationCount = 0;
                     }
                     WasActive = activeNow;
 

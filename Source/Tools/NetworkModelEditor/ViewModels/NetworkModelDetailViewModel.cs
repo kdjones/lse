@@ -38,6 +38,31 @@ namespace NetworkModelEditor.ViewModels
 
         #region [ Properties ]
 
+        public int MeasurementChatterReactivationThreshold
+        {
+            get
+            {
+                return m_model.MeasurementChatterReactivationThreshold;
+            }
+            set
+            {
+                m_model.MeasurementChatterReactivationThreshold = value;
+            }
+        }
+
+
+        public int MeasurementChatterDeactivationThreshold
+        {
+            get
+            {
+                return m_model.MeasurementChatterDeactivationThreshold;
+            }
+            set
+            {
+                m_model.MeasurementChatterDeactivationThreshold = value;
+            }
+        }
+
         public bool UseManagedProvidersInSteadyState
         {
             get

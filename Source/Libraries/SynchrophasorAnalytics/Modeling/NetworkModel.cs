@@ -132,6 +132,8 @@ namespace SynchrophasorAnalytics.Modeling
         private bool m_tryDetectLevelTwoNetworkChange;
         private bool m_tryDetectLevelThreeNetworkChange;
         private bool m_useManagedProvidersInSteadyState = true;
+        private int m_chatterReactivationThreshold = 1000;
+        private int m_chatterDeactivationThreshold = 20;
 
         #endregion
 
@@ -331,6 +333,32 @@ namespace SynchrophasorAnalytics.Modeling
             }
         }
 
+        [XmlAttribute("MeasurementChatterReactivationThreshold")]
+        public int MeasurementChatterReactivationThreshold
+        {
+            get
+            {
+                return m_chatterReactivationThreshold;
+            }
+            set
+            {
+                m_chatterReactivationThreshold = value;
+            }
+        }
+
+        [XmlAttribute("MeasurementChatterDeactivationThreshold")]
+        public int MeasurementChatterDeactivationThreshold
+        {
+            get
+            {
+                return m_chatterDeactivationThreshold;
+            }
+            set
+            {
+                m_chatterDeactivationThreshold = value;
+            }
+        }
+        
         #region [ I/O ]
 
         #region [ Key Value Pairs ]
@@ -5328,6 +5356,9 @@ namespace SynchrophasorAnalytics.Modeling
                     {
                         foreach (Node node in substation.Nodes)
                         {
+                            node.Voltage.ReactivationThreshold = MeasurementChatterReactivationThreshold;
+                            node.Voltage.DeactivationThreshold = MeasurementChatterDeactivationThreshold;
+
                             m_voltages.Add(node.Voltage);
                             if (node.Voltage.ExpectsMeasurements)
                             {
@@ -5337,6 +5368,12 @@ namespace SynchrophasorAnalytics.Modeling
 
                         foreach (Transformer transformer in substation.Transformers)
                         {
+                            transformer.FromNodeCurrent.ReactivationThreshold = MeasurementChatterReactivationThreshold;
+                            transformer.FromNodeCurrent.DeactivationThreshold = MeasurementChatterDeactivationThreshold;
+
+                            transformer.ToNodeCurrent.ReactivationThreshold = MeasurementChatterReactivationThreshold;
+                            transformer.ToNodeCurrent.DeactivationThreshold = MeasurementChatterDeactivationThreshold;
+
                             // Add the current phasor groups to the list
                             m_currentFlows.Add(transformer.FromNodeCurrent);
                             m_currentFlows.Add(transformer.ToNodeCurrent);
@@ -5357,6 +5394,9 @@ namespace SynchrophasorAnalytics.Modeling
 
                         foreach (ShuntCompensator shunt in substation.Shunts)
                         {
+                            shunt.Current.ReactivationThreshold = MeasurementChatterReactivationThreshold;
+                            shunt.Current.DeactivationThreshold = MeasurementChatterDeactivationThreshold;
+
                             m_currentInjections.Add(shunt.Current);
 
                             shunt.Current.MeasuredBranch = shunt;
@@ -5369,6 +5409,12 @@ namespace SynchrophasorAnalytics.Modeling
                     }
                     foreach (TransmissionLine transmissionLine in division.TransmissionLines)
                     {
+                        transmissionLine.FromSubstationCurrent.ReactivationThreshold = MeasurementChatterReactivationThreshold;
+                        transmissionLine.FromSubstationCurrent.DeactivationThreshold = MeasurementChatterDeactivationThreshold;
+
+                        transmissionLine.ToSubstationCurrent.ReactivationThreshold = MeasurementChatterReactivationThreshold;
+                        transmissionLine.ToSubstationCurrent.DeactivationThreshold = MeasurementChatterDeactivationThreshold;
+
                         // Add the current phasor groups to the list
                         m_currentFlows.Add(transmissionLine.FromSubstationCurrent);
                         m_currentFlows.Add(transmissionLine.ToSubstationCurrent);
@@ -5390,6 +5436,9 @@ namespace SynchrophasorAnalytics.Modeling
                         {
                             if (!m_voltages.Contains(node.Voltage))
                             {
+                                node.Voltage.ReactivationThreshold = MeasurementChatterReactivationThreshold;
+                                node.Voltage.DeactivationThreshold = MeasurementChatterDeactivationThreshold;
+
                                 m_voltages.Add(node.Voltage);
                                 if (node.Voltage.ExpectsMeasurements)
                                 {
