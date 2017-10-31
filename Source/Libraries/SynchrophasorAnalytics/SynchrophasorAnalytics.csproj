@@ -243,20 +243,25 @@
     <None Include="Hdb\Scripts\Pattern\bs.pattern" />
     <None Include="Hdb\Scripts\Pattern\cb.pattern" />
     <None Include="Hdb\Scripts\Pattern\cblim.pattern" />
+    <None Include="Hdb\Scripts\Pattern\cb_extension.pattern" />
     <None Include="Hdb\Scripts\Pattern\co.pattern" />
     <None Include="Hdb\Scripts\Pattern\cp.pattern" />
+    <None Include="Hdb\Scripts\Pattern\cp_extension.pattern" />
     <None Include="Hdb\Scripts\Pattern\dv.pattern" />
     <None Include="Hdb\Scripts\Pattern\line.pattern" />
     <None Include="Hdb\Scripts\Pattern\ln.pattern" />
     <None Include="Hdb\Scripts\Pattern\lnlim.pattern" />
+    <None Include="Hdb\Scripts\Pattern\ln_extension.pattern" />
     <None Include="Hdb\Scripts\Pattern\mnol.pattern" />
     <None Include="Hdb\Scripts\Pattern\nd.pattern" />
     <None Include="Hdb\Scripts\Pattern\ndlim.pattern" />
+    <None Include="Hdb\Scripts\Pattern\nd_extension.pattern" />
     <None Include="Hdb\Scripts\Pattern\st.pattern" />
     <None Include="Hdb\Scripts\Pattern\tapty.pattern" />
     <None Include="Hdb\Scripts\Pattern\xf.pattern" />
     <None Include="Hdb\Scripts\Pattern\xflim.pattern" />
     <None Include="Hdb\Scripts\Pattern\xfmr.pattern" />
+    <None Include="Hdb\Scripts\Pattern\xf_extension.pattern" />
     <None Include="packages.config" />
     <None Include="SynchrophasorAnalytics.snk" />
   </ItemGroup>
