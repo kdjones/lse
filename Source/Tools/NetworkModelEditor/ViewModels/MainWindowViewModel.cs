@@ -3291,22 +3291,22 @@ namespace NetworkModelEditor.ViewModels
 
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    m_circuitBreakerExtensions = HdbReader.ReadCircuitBreakerExtensionFile(openFileDialog.FileName);
-                    ApplyCircuitBreakerExtensions();
-                    ActionStatus = $"Opened Circuit Breaker Extension File from {openFileDialog.FileName}";
-                    //try
-                    //{
-                    //    m_circuitBreakerExtensions = HdbReader.ReadCircuitBreakerExtensionFile(openFileDialog.FileName);
-                    //    ApplyCircuitBreakerExtensions();
-                    //    ActionStatus = $"Opened Circuit Breaker Extension File from {openFileDialog.FileName}";
-                    //}
-                    //    catch (Exception exception)
-                    //{
-                    //    if (exception != null)
-                    //    {
-                    //        System.Windows.MessageBox.Show(exception.ToString(), "Failed to load selected file.");
-                    //    }
-                    //}
+                    //m_circuitBreakerExtensions = HdbReader.ReadCircuitBreakerExtensionFile(openFileDialog.FileName);
+                    //ApplyCircuitBreakerExtensions();
+                    //ActionStatus = $"Opened Circuit Breaker Extension File from {openFileDialog.FileName}";
+                    try
+                    {
+                        m_circuitBreakerExtensions = HdbReader.ReadCircuitBreakerExtensionFile(openFileDialog.FileName);
+                        ApplyCircuitBreakerExtensions();
+                        ActionStatus = $"Opened Circuit Breaker Extension File from {openFileDialog.FileName}";
+                    }
+                    catch (Exception exception)
+                    {
+                        if (exception != null)
+                        {
+                            System.Windows.MessageBox.Show(exception.ToString(), "Failed to load selected file.");
+                        }
+                    }
                 }
             }
             else
@@ -3317,7 +3317,36 @@ namespace NetworkModelEditor.ViewModels
 
         private void ApplyCircuitBreakerExtensions()
         {
+            int unmappedExtensionCount = 0;
+            StringBuilder unmappedExtensionList = new StringBuilder("Failed to map the following breaker statuses: \r\n");
+            foreach (SynchrophasorAnalytics.Hdb.Records.CircuitBreakerExtension extension in m_circuitBreakerExtensions)
+            {
+                CircuitBreaker breaker = m_network.Model.CircuitBreakers.Find(x => x.Name == $"{extension.StationName}_{extension.Id}");
 
+                if (breaker != null)
+                {
+                    if (breaker.Status != null)
+                    {
+                        breaker.Status.Key = extension.HistorianId;
+                        breaker.Status.BitPositionString = extension.BitPosition;
+                    }
+                    else
+                    {
+                        unmappedExtensionCount++;
+                        unmappedExtensionList.AppendLine($"{extension.StationName}.{extension.Id}");
+                    }
+                }
+                else
+                {
+                    unmappedExtensionCount++;
+                    unmappedExtensionList.AppendLine($"{extension.StationName}.{extension.Id}");
+                }
+            }
+            SpecialStatus = $"Failed to map {unmappedExtensionCount} extension(s).";
+            if (unmappedExtensionCount > 0)
+            {
+                ShowTextReport("UnmappedBreakerStatusExtensions.txt", unmappedExtensionList.ToString());
+            }
         }
 
         private void OpenShuntExtensionFile()
@@ -3332,22 +3361,22 @@ namespace NetworkModelEditor.ViewModels
 
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    m_shuntExtensions = HdbReader.ReadShuntExtensionFile(openFileDialog.FileName);
-                    ApplyShuntExtensions();
-                    ActionStatus = $"Opened Shunt Extension File from {openFileDialog.FileName}";
-                    //try
-                    //{
-                    //    m_shuntExtensions = HdbReader.ReadShuntExtensionFile(openFileDialog.FileName);
-                    //    ApplyShuntExtensions();
-                    //    ActionStatus = $"Opened Shunt Extension File from {openFileDialog.FileName}";
-                    //}
-                    //    catch (Exception exception)
-                    //{
-                    //    if (exception != null)
-                    //    {
-                    //        System.Windows.MessageBox.Show(exception.ToString(), "Failed to load selected file.");
-                    //    }
-                    //}
+                    //m_shuntExtensions = HdbReader.ReadShuntExtensionFile(openFileDialog.FileName);
+                    //ApplyShuntExtensions();
+                    //ActionStatus = $"Opened Shunt Extension File from {openFileDialog.FileName}";
+                    try
+                    {
+                        m_shuntExtensions = HdbReader.ReadShuntExtensionFile(openFileDialog.FileName);
+                        ApplyShuntExtensions();
+                        ActionStatus = $"Opened Shunt Extension File from {openFileDialog.FileName}";
+                    }
+                    catch (Exception exception)
+                    {
+                        if (exception != null)
+                        {
+                            System.Windows.MessageBox.Show(exception.ToString(), "Failed to load selected file.");
+                        }
+                    }
                 }
             }
             else
@@ -3358,7 +3387,50 @@ namespace NetworkModelEditor.ViewModels
 
         private void ApplyShuntExtensions()
         {
+            int unmappedExtensionCount = 0;
+            StringBuilder unmappedExtensions = new StringBuilder("Failed to map the following devices: \r\n");
+            foreach (SynchrophasorAnalytics.Hdb.Records.ShuntExtension extension in m_shuntExtensions)
+            {
+                ShuntCompensator shunt = m_network.Model.ShuntCompensators.Find(x => x.InternalID == extension.Number);
+                if (shunt != null)
+                {
+                    CurrentInjectionPhasorGroup current = shunt.Current;
+                    current.PositiveSequence.Measurement.MagnitudeKey = extension.MagnitudeHistorianId;
+                    current.PositiveSequence.Measurement.AngleKey = extension.AngleHistorianId;
+                    bool isUnmappable = false;
+                    if (extension.DeviceName != "Undefined")
+                    {
+                        DataRow[] results = m_openEcaConnection.Metadata.Tables["MeasurementDetail"].Select($"SignalAcronym = 'FLAG' AND DeviceAcronym LIKE '{extension.DeviceName}'");
+                        if (results.Length > 0)
+                        {
+                            DataRow row = results.Single();
+                            string guid = row["SignalID"].ToString();
+                            StatusWord statusWord = m_network.Model.StatusWords.Find(x => x.Key == guid);
+                            current.Status = statusWord;
+                        }
+                        else
+                        {
+                            isUnmappable = true;
+                        }
+                    }
+                    if (isUnmappable)
+                    {
+                        unmappedExtensionCount++;
+                        unmappedExtensions.AppendLine($"{extension.StationName}.{extension.Id}");
+                    }
+                }
+                else
+                {
+                    unmappedExtensionCount++;
+                    unmappedExtensions.AppendLine($"{extension.StationName}.{extension.Id}");
+                }
+            }
+            SpecialStatus = $"Failed to map {unmappedExtensionCount} extension(s).";
 
+            if (unmappedExtensionCount > 0)
+            {
+                ShowTextReport("UnmappedShuntExtensions.txt", unmappedExtensions.ToString());
+            }
         }
 
         private void OpenTransformerExtensionFile()
@@ -3612,9 +3684,13 @@ namespace NetworkModelEditor.ViewModels
 
             foreach (VoltagePhasorGroup voltage in m_network.Model.ExpectedVoltages)
             {
-                string mappingIdentifier = $"{voltage.MeasuredNode.Name}_POS_V";
-                string magnitude = $"Magnitude: {voltage.PositiveSequence.Measurement.MagnitudeKey}";
-                string angle = $"Angle: {voltage.PositiveSequence.Measurement.AngleKey}";
+                string mappingIdentifier = $"{voltage.MeasuredNode.Name.Replace('-','_')}_POS_V";
+                if (Char.IsDigit(mappingIdentifier[0]))
+                {
+                    mappingIdentifier = mappingIdentifier.Remove(0, 1);
+                }
+                string magnitude = $"Magnitude: {voltage.PositiveSequence.Measurement.MagnitudeKey.ToLower()} ";
+                string angle = $"Angle: {voltage.PositiveSequence.Measurement.AngleKey.ToLower()} ";
                 mappings.AppendLine("ECA Phasor " + mappingIdentifier + " {");
                 mappings.AppendLine("    " + magnitude);
                 mappings.AppendLine("    " + angle);
@@ -3624,11 +3700,19 @@ namespace NetworkModelEditor.ViewModels
 
             foreach (CurrentFlowPhasorGroup flow in m_network.Model.ExpectedCurrentFlows)
             {
-                string fromNode = flow.MeasuredFromNode.Name;
-                string toNode = flow.MeasuredToNode.Name;
+                string fromNode = flow.MeasuredFromNode.Name.Replace('-', '_');
+                string toNode = flow.MeasuredToNode.Name.Replace('-', '_');
+                if (Char.IsDigit(fromNode[0]))
+                {
+                    fromNode = fromNode.Remove(0, 1);
+                }
+                if (Char.IsDigit(toNode[0]))
+                {
+                    toNode = toNode.Remove(0, 1);
+                }
                 string mappingIdentifier = $"{fromNode}_to_{toNode}_POS_I_FLOW";
-                string magnitude = $"Magnitude: {flow.PositiveSequence.Measurement.MagnitudeKey}";
-                string angle = $"Angle: {flow.PositiveSequence.Measurement.AngleKey}";
+                string magnitude = $"Magnitude: {flow.PositiveSequence.Measurement.MagnitudeKey.ToLower()} ";
+                string angle = $"Angle: {flow.PositiveSequence.Measurement.AngleKey.ToLower()} ";
                 mappings.AppendLine("ECA Phasor " + mappingIdentifier + " {");
                 mappings.AppendLine("    " + magnitude);
                 mappings.AppendLine("    " + angle);
@@ -3637,10 +3721,15 @@ namespace NetworkModelEditor.ViewModels
 
             foreach (CurrentInjectionPhasorGroup injection in m_network.Model.ExpectedCurrentInjections)
             {
-                string node = injection.MeasuredConnectedNode.Name;
+                string node = injection.MeasuredConnectedNode.Name.Replace('-', '_');
+                char[] nodeChars = node.ToCharArray();
+                if (Char.IsDigit(node[0]))
+                {
+                    node = node.Remove(0, 1);
+                }
                 string mappingIdentifier = $"{node}_POS_I_INJ";
-                string magnitude = $"Magnitude: {injection.PositiveSequence.Measurement.MagnitudeKey}";
-                string angle = $"Angle: {injection.PositiveSequence.Measurement.AngleKey}";
+                string magnitude = $"Magnitude: {injection.PositiveSequence.Measurement.MagnitudeKey.ToLower()} ";
+                string angle = $"Angle: {injection.PositiveSequence.Measurement.AngleKey.ToLower()} ";
                 mappings.AppendLine("ECA Phasor " + mappingIdentifier + " {");
                 mappings.AppendLine("    " + magnitude);
                 mappings.AppendLine("    " + angle);
@@ -3664,6 +3753,11 @@ namespace NetworkModelEditor.ViewModels
                 }
             }
 
+            if (m_network.Model.ExpectedStatusWords.Count == 0)
+            {
+                return $"FILTER ActiveMeasurements WHERE SignalType='FLAG'";
+            }
+
             return $"FILTER ActiveMeasurements WHERE ({clause})";
         }
 
@@ -3673,7 +3767,7 @@ namespace NetworkModelEditor.ViewModels
 
             StringBuilder mapping = new StringBuilder();
             mapping.AppendLine("ECA StatusWords AllStatusWords {");
-            mapping.AppendLine("    Values: { " + filterStatement + " }");
+            mapping.AppendLine("    Values: { " + filterStatement + " } ");
             mapping.AppendLine("}" + Environment.NewLine);
 
             return mapping.ToString();
@@ -3683,10 +3777,10 @@ namespace NetworkModelEditor.ViewModels
         {
             StringBuilder mapping = new StringBuilder();
             mapping.AppendLine("LSE Input Input {");
-            mapping.AppendLine("    Digitals: AllDigitals");
-            mapping.AppendLine("    StatusWords: AllStatusWords");
-            mapping.AppendLine("    VoltagePhasors: AllVoltagePhasors");
-            mapping.AppendLine("    CurrentPhasors: AllCurrentPhasors");
+            mapping.AppendLine("    Digitals: AllDigitals ");
+            mapping.AppendLine("    StatusWords: AllStatusWords ");
+            mapping.AppendLine("    VoltagePhasors: AllVoltagePhasors ");
+            mapping.AppendLine("    CurrentPhasors: AllCurrentPhasors ");
             mapping.AppendLine("}" + Environment.NewLine);
 
             return mapping.ToString();
@@ -3696,17 +3790,17 @@ namespace NetworkModelEditor.ViewModels
         {
             StringBuilder mapping = new StringBuilder();
             mapping.AppendLine("LSE EstimatorOutput Output {");
-            mapping.AppendLine("    CircuitBreakerStatuses: { FILTER ActiveMeasurements WHERE Device LIKE 'LSE!%' AND SignalType = 'DIGI' AND PointTag LIKE '%_CB:S' }");
-            mapping.AppendLine("    TopologyProfilingData: { FILTER ActiveMeasurements WHERE Device LIKE 'LSE!%' AND SignalType = 'DIGI' AND(PointTag LIKE '%TOPOLOGY_STATE%' OR PointTag LIKE '%TOPOLOGY_ID%') }");
-            mapping.AppendLine("    MeasurementValidationFlags: { FILTER ActiveMeasurements WHERE Device LIKE 'LSE!%' AND SignalType = 'DIGI' AND(PointTag LIKE '%_ND:VS%' OR PointTag LIKE '%_ND:FLOWS%') }");
-            mapping.AppendLine("    VoltageMagnitudeEstimates: { FILTER ActiveMeasurements WHERE Device LIKE 'LSE!%' AND SignalType = 'VPHM' AND PointTag LIKE '%:VME%' }");
-            mapping.AppendLine("    VoltageAngleEstimates: { FILTER ActiveMeasurements WHERE Device LIKE 'LSE!%' AND SignalType = 'VPHA' AND PointTag LIKE '%:VAE%' }");
-            mapping.AppendLine("    VoltageMagnitudeResiduals: { FILTER ActiveMeasurements WHERE Device LIKE 'LSE!%' AND SignalType = 'VPHM' AND PointTag LIKE '%:VMR%' }");
-            mapping.AppendLine("    VoltageAngleResiduals: { FILTER ActiveMeasurements WHERE Device LIKE 'LSE!%' AND SignalType = 'VPHA' AND PointTag LIKE '%:VAR%' }");
-            mapping.AppendLine("    CurrentFlowMagnitudeEstimates: { FILTER ActiveMeasurements WHERE Device LIKE 'LSE!%' AND SignalType = 'IPHM' AND PointTag LIKE '%:IME%' }");
-            mapping.AppendLine("    CurrentFlowAngleEstimates: { FILTER ActiveMeasurements WHERE Device LIKE 'LSE!%' AND SignalType = 'IPHA' AND PointTag LIKE '%:IAE%' }");
-            mapping.AppendLine("    CurrentFlowMagnitudeResiduals: { FILTER ActiveMeasurements WHERE Device LIKE 'LSE!%' AND SignalType = 'IPHM' AND PointTag LIKE '%:IMR%' }");
-            mapping.AppendLine("    CurrentFlowAngleResiduals: { FILTER ActiveMeasurements WHERE Device LIKE 'LSE!%' AND SignalType = 'IPHA' AND PointTag LIKE '%:IAR%' }");
+            mapping.AppendLine("    CircuitBreakerStatuses: { FILTER ActiveMeasurements WHERE Device LIKE 'LSE!%' AND SignalType = 'DIGI' AND PointTag LIKE '%_CB:S' } ");
+            mapping.AppendLine("    TopologyProfilingData: { FILTER ActiveMeasurements WHERE Device LIKE 'LSE!%' AND SignalType = 'DIGI' AND(PointTag LIKE '%TOPOLOGY_STATE%' OR PointTag LIKE '%TOPOLOGY_ID%') } ");
+            mapping.AppendLine("    MeasurementValidationFlags: { FILTER ActiveMeasurements WHERE Device LIKE 'LSE!%' AND SignalType = 'DIGI' AND(PointTag LIKE '%_ND:VS%' OR PointTag LIKE '%_ND:FLOWS%') } ");
+            mapping.AppendLine("    VoltageMagnitudeEstimates: { FILTER ActiveMeasurements WHERE Device LIKE 'LSE!%' AND SignalType = 'VPHM' AND PointTag LIKE '%:VME%' } ");
+            mapping.AppendLine("    VoltageAngleEstimates: { FILTER ActiveMeasurements WHERE Device LIKE 'LSE!%' AND SignalType = 'VPHA' AND PointTag LIKE '%:VAE%' } ");
+            mapping.AppendLine("    VoltageMagnitudeResiduals: { FILTER ActiveMeasurements WHERE Device LIKE 'LSE!%' AND SignalType = 'VPHM' AND PointTag LIKE '%:VMR%' } ");
+            mapping.AppendLine("    VoltageAngleResiduals: { FILTER ActiveMeasurements WHERE Device LIKE 'LSE!%' AND SignalType = 'VPHA' AND PointTag LIKE '%:VAR%' } ");
+            mapping.AppendLine("    CurrentFlowMagnitudeEstimates: { FILTER ActiveMeasurements WHERE Device LIKE 'LSE!%' AND SignalType = 'IPHM' AND PointTag LIKE '%:IME%' } ");
+            mapping.AppendLine("    CurrentFlowAngleEstimates: { FILTER ActiveMeasurements WHERE Device LIKE 'LSE!%' AND SignalType = 'IPHA' AND PointTag LIKE '%:IAE%' } ");
+            mapping.AppendLine("    CurrentFlowMagnitudeResiduals: { FILTER ActiveMeasurements WHERE Device LIKE 'LSE!%' AND SignalType = 'IPHM' AND PointTag LIKE '%:IMR%' } ");
+            mapping.AppendLine("    CurrentFlowAngleResiduals: { FILTER ActiveMeasurements WHERE Device LIKE 'LSE!%' AND SignalType = 'IPHA' AND PointTag LIKE '%:IAR%' } ");
             mapping.AppendLine("    PerformanceMetrics: PerformanceMetrics");
             mapping.AppendLine("}" + Environment.NewLine);
             return mapping.ToString();
@@ -3716,19 +3810,19 @@ namespace NetworkModelEditor.ViewModels
         {
             StringBuilder mapping = new StringBuilder();
             mapping.AppendLine("LSE PerformanceMetrics PerformanceMetrics {");
-            mapping.AppendLine($"    ActiveVoltagesCount: {m_network.PerformanceMetrics.ActiveVoltageCountKey}");
-            mapping.AppendLine($"    ActiveCurrentFlowsCount: {m_network.PerformanceMetrics.ActiveCurrentFlowCountKey}");
-            mapping.AppendLine($"    ActiveCurrentInjectionsCount: {m_network.PerformanceMetrics.ActiveCurrentInjectionCountKey}");
-            mapping.AppendLine($"    RefreshTime: {m_network.PerformanceMetrics.RefreshExecutionTimeKey}");
-            mapping.AppendLine($"    ParsingTime: {m_network.PerformanceMetrics.ParsingExecutionTimeKey}");
-            mapping.AppendLine($"    MeasurementMappingTime: {m_network.PerformanceMetrics.MeasurementMappingExecutionTimeKey}");
-            mapping.AppendLine($"    ActiveCurrentDeterminationTime: {m_network.PerformanceMetrics.ActiveCurrentPhasorDeterminationExecutionTimeKey}");
-            mapping.AppendLine($"    ObservabilityAnalysisTime: {m_network.PerformanceMetrics.ObservabilityAnalysisExecutionTimeKey}");
-            mapping.AppendLine($"    StateComputationTime: {m_network.PerformanceMetrics.StateComputationExecutionTimeKey}");
-            mapping.AppendLine($"    ObservedBusCount: {m_network.PerformanceMetrics.ObservedBusCountKey}");
-            mapping.AppendLine($"    OutputPreparationTime: {m_network.PerformanceMetrics.OutputPreparationExecutionTimeKey}");
-            mapping.AppendLine($"    TotalTimeInMilliseconds: {m_network.PerformanceMetrics.TotalExecutionTimeInMillisecondsKey}");
-            mapping.AppendLine($"    TotalTimeInTicks: {m_network.PerformanceMetrics.TotalExecutionTimeInTicksKey}");
+            mapping.AppendLine($"    ActiveVoltagesCount: {m_network.PerformanceMetrics.ActiveVoltageCountKey.ToLower()} ");
+            mapping.AppendLine($"    ActiveCurrentFlowsCount: {m_network.PerformanceMetrics.ActiveCurrentFlowCountKey.ToLower()} ");
+            mapping.AppendLine($"    ActiveCurrentInjectionsCount: {m_network.PerformanceMetrics.ActiveCurrentInjectionCountKey.ToLower()} ");
+            mapping.AppendLine($"    RefreshTime: {m_network.PerformanceMetrics.RefreshExecutionTimeKey.ToLower()} ");
+            mapping.AppendLine($"    ParsingTime: {m_network.PerformanceMetrics.ParsingExecutionTimeKey.ToLower()} ");
+            mapping.AppendLine($"    MeasurementMappingTime: {m_network.PerformanceMetrics.MeasurementMappingExecutionTimeKey.ToLower()} ");
+            mapping.AppendLine($"    ActiveCurrentDeterminationTime: {m_network.PerformanceMetrics.ActiveCurrentPhasorDeterminationExecutionTimeKey.ToLower()} ");
+            mapping.AppendLine($"    ObservabilityAnalysisTime: {m_network.PerformanceMetrics.ObservabilityAnalysisExecutionTimeKey.ToLower()} ");
+            mapping.AppendLine($"    StateComputationTime: {m_network.PerformanceMetrics.StateComputationExecutionTimeKey.ToLower()} ");
+            mapping.AppendLine($"    ObservedBusCount: {m_network.PerformanceMetrics.ObservedBusCountKey.ToLower()} ");
+            mapping.AppendLine($"    OutputPreparationTime: {m_network.PerformanceMetrics.OutputPreparationExecutionTimeKey.ToLower()} ");
+            mapping.AppendLine($"    TotalTimeInMilliseconds: {m_network.PerformanceMetrics.TotalExecutionTimeInMillisecondsKey.ToLower()} ");
+            mapping.AppendLine($"    TotalTimeInTicks: {m_network.PerformanceMetrics.TotalExecutionTimeInTicksKey.ToLower()} ");
             mapping.AppendLine("}" + Environment.NewLine);
             return mapping.ToString();
         }
@@ -3737,7 +3831,7 @@ namespace NetworkModelEditor.ViewModels
         {
             StringBuilder mapping = new StringBuilder();
             mapping.AppendLine("LSE NullOutput NullOutput {");
-            mapping.AppendLine("    Value: LSE_NullOutput: Value");
+            mapping.AppendLine($"    Value: {Guid.Empty} ");
             mapping.AppendLine("}" + Environment.NewLine);
             return mapping.ToString();
         }
@@ -3746,6 +3840,7 @@ namespace NetworkModelEditor.ViewModels
         {
             StringBuilder clause = new StringBuilder();
 
+
             foreach (BreakerStatus breakerStatus in m_network.Model.ExpectedBreakerStatuses)
             {
                 clause.Append($"SignalID='{breakerStatus.Key}'");
@@ -3753,6 +3848,11 @@ namespace NetworkModelEditor.ViewModels
                 {
                     clause.Append($" OR ");
                 }
+            }
+
+            if (m_network.Model.ExpectedBreakerStatuses.Count == 0)
+            {
+                return $"FILTER ActiveMeasurements WHERE SignalType='DIGI' AND SignalID='Undefined'";
             }
 
             return $"FILTER ActiveMeasurements WHERE ({clause})";
@@ -3764,7 +3864,7 @@ namespace NetworkModelEditor.ViewModels
 
             StringBuilder mapping = new StringBuilder();
             mapping.AppendLine("ECA Digitals AllDigitals {");
-            mapping.AppendLine("    Values: { " + filterStatement + " }");
+            mapping.AppendLine("    Values: { " + filterStatement + " } ");
             mapping.AppendLine("}" + Environment.NewLine);
 
             return mapping.ToString();
@@ -3776,7 +3876,7 @@ namespace NetworkModelEditor.ViewModels
 
             StringBuilder currentMapping = new StringBuilder();
             currentMapping.AppendLine("ECA PhasorCollection AllCurrentPhasors {");
-            currentMapping.AppendLine("    Phasors: { " + currentFilterStatement + " }");
+            currentMapping.AppendLine("    Phasors: { " + currentFilterStatement + " } ");
             currentMapping.AppendLine("}" + Environment.NewLine);
 
             return currentMapping.ToString();
@@ -3789,7 +3889,7 @@ namespace NetworkModelEditor.ViewModels
 
             StringBuilder voltageMapping = new StringBuilder();
             voltageMapping.AppendLine("ECA PhasorCollection AllVoltagePhasors {");
-            voltageMapping.AppendLine("    Phasors: { " + voltageFilterStatement + " }");
+            voltageMapping.AppendLine("    Phasors: { " + voltageFilterStatement + " } ");
             voltageMapping.AppendLine("}" + Environment.NewLine);
 
             return voltageMapping.ToString();

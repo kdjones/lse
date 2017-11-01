@@ -318,6 +318,83 @@ namespace SynchrophasorAnalytics.Measurements
             }
         }
 
+        [XmlIgnore()]
+        public string BitPositionString
+        {
+            get
+            {
+                return BitPosition.ToString();
+            }
+            set
+            {
+                if (value == BreakerStatusBit.PSV49.ToString())
+                {
+                    BitPosition = BreakerStatusBit.PSV49;
+                }
+                else if (value == BreakerStatusBit.PSV50.ToString())
+                {
+                    BitPosition = BreakerStatusBit.PSV50;
+                }
+                else if (value == BreakerStatusBit.PSV51.ToString())
+                {
+                    BitPosition = BreakerStatusBit.PSV51;
+                }
+                else if (value == BreakerStatusBit.PSV52.ToString())
+                {
+                    BitPosition = BreakerStatusBit.PSV52;
+                }
+                else if (value == BreakerStatusBit.PSV53.ToString())
+                {
+                    BitPosition = BreakerStatusBit.PSV53;
+                }
+                else if (value == BreakerStatusBit.PSV54.ToString())
+                {
+                    BitPosition = BreakerStatusBit.PSV54;
+                }
+                else if (value == BreakerStatusBit.PSV55.ToString())
+                {
+                    BitPosition = BreakerStatusBit.PSV55;
+                }
+                else if (value == BreakerStatusBit.PSV56.ToString())
+                {
+                    BitPosition = BreakerStatusBit.PSV56;
+                }
+                else if (value == BreakerStatusBit.PSV57.ToString())
+                {
+                    BitPosition = BreakerStatusBit.PSV57;
+                }
+                else if (value == BreakerStatusBit.PSV58.ToString())
+                {
+                    BitPosition = BreakerStatusBit.PSV58;
+                }
+                else if (value == BreakerStatusBit.PSV59.ToString())
+                {
+                    BitPosition = BreakerStatusBit.PSV59;
+                }
+                else if (value == BreakerStatusBit.PSV60.ToString())
+                {
+                    BitPosition = BreakerStatusBit.PSV60;
+                }
+                else if (value == BreakerStatusBit.PSV61.ToString())
+                {
+                    BitPosition = BreakerStatusBit.PSV61;
+                }
+                else if (value == BreakerStatusBit.PSV62.ToString())
+                {
+                    BitPosition = BreakerStatusBit.PSV62;
+                }
+                else if (value == BreakerStatusBit.PSV63.ToString())
+                {
+                    BitPosition = BreakerStatusBit.PSV63;
+                }
+                else if (value == BreakerStatusBit.PSV64.ToString())
+                {
+                    BitPosition = BreakerStatusBit.PSV64;
+                }
+            }
+        }
+
+
         /// <summary>
         /// Gets the type of the object
         /// </summary>
