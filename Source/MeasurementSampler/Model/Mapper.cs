@@ -80,9 +80,11 @@ namespace MeasurementSampler.Model
         }
 
 
+        private Dictionary<string, FieldMapping> m_LSEInputLookup;
+
         private Input CreateLSEInput(TypeMapping typeMapping)
         {
-            Dictionary<string, FieldMapping> fieldLookup = typeMapping.FieldMappings.ToDictionary(mapping => mapping.Field.Identifier);
+            Dictionary<string, FieldMapping> fieldLookup = m_LSEInputLookup ?? (m_LSEInputLookup = typeMapping.FieldMappings.ToDictionary(mapping => mapping.Field.Identifier));
             Input obj = new Input();
 
             {
@@ -128,9 +130,11 @@ namespace MeasurementSampler.Model
             return obj;
         }
 
+        private Dictionary<string, FieldMapping> m_LSE_InputMetaLookup;
+
         private _InputMeta CreateLSE_InputMeta(TypeMapping typeMapping)
         {
-            Dictionary<string, FieldMapping> fieldLookup = typeMapping.FieldMappings.ToDictionary(mapping => mapping.Field.Identifier);
+            Dictionary<string, FieldMapping> fieldLookup = m_LSE_InputMetaLookup ?? (m_LSE_InputMetaLookup = typeMapping.FieldMappings.ToDictionary(mapping => mapping.Field.Identifier));
             _InputMeta obj = new _InputMeta();
 
             {
@@ -176,9 +180,11 @@ namespace MeasurementSampler.Model
             return obj;
         }
 
+        private Dictionary<string, FieldMapping> m_ECADigitalsLookup;
+
         private Digitals CreateECADigitals(TypeMapping typeMapping)
         {
-            Dictionary<string, FieldMapping> fieldLookup = typeMapping.FieldMappings.ToDictionary(mapping => mapping.Field.Identifier);
+            Dictionary<string, FieldMapping> fieldLookup = m_ECADigitalsLookup ?? (m_ECADigitalsLookup = typeMapping.FieldMappings.ToDictionary(mapping => mapping.Field.Identifier));
             Digitals obj = new Digitals();
 
             {
@@ -200,9 +206,11 @@ namespace MeasurementSampler.Model
             return obj;
         }
 
+        private Dictionary<string, FieldMapping> m_ECA_DigitalsMetaLookup;
+
         private _DigitalsMeta CreateECA_DigitalsMeta(TypeMapping typeMapping)
         {
-            Dictionary<string, FieldMapping> fieldLookup = typeMapping.FieldMappings.ToDictionary(mapping => mapping.Field.Identifier);
+            Dictionary<string, FieldMapping> fieldLookup = m_ECA_DigitalsMetaLookup ?? (m_ECA_DigitalsMetaLookup = typeMapping.FieldMappings.ToDictionary(mapping => mapping.Field.Identifier));
             _DigitalsMeta obj = new _DigitalsMeta();
 
             {
@@ -224,9 +232,11 @@ namespace MeasurementSampler.Model
             return obj;
         }
 
+        private Dictionary<string, FieldMapping> m_ECAStatusWordsLookup;
+
         private StatusWords CreateECAStatusWords(TypeMapping typeMapping)
         {
-            Dictionary<string, FieldMapping> fieldLookup = typeMapping.FieldMappings.ToDictionary(mapping => mapping.Field.Identifier);
+            Dictionary<string, FieldMapping> fieldLookup = m_ECAStatusWordsLookup ?? (m_ECAStatusWordsLookup = typeMapping.FieldMappings.ToDictionary(mapping => mapping.Field.Identifier));
             StatusWords obj = new StatusWords();
 
             {
@@ -248,9 +258,11 @@ namespace MeasurementSampler.Model
             return obj;
         }
 
+        private Dictionary<string, FieldMapping> m_ECA_StatusWordsMetaLookup;
+
         private _StatusWordsMeta CreateECA_StatusWordsMeta(TypeMapping typeMapping)
         {
-            Dictionary<string, FieldMapping> fieldLookup = typeMapping.FieldMappings.ToDictionary(mapping => mapping.Field.Identifier);
+            Dictionary<string, FieldMapping> fieldLookup = m_ECA_StatusWordsMetaLookup ?? (m_ECA_StatusWordsMetaLookup = typeMapping.FieldMappings.ToDictionary(mapping => mapping.Field.Identifier));
             _StatusWordsMeta obj = new _StatusWordsMeta();
 
             {
@@ -272,9 +284,11 @@ namespace MeasurementSampler.Model
             return obj;
         }
 
+        private Dictionary<string, FieldMapping> m_ECAPhasorCollectionLookup;
+
         private PhasorCollection CreateECAPhasorCollection(TypeMapping typeMapping)
         {
-            Dictionary<string, FieldMapping> fieldLookup = typeMapping.FieldMappings.ToDictionary(mapping => mapping.Field.Identifier);
+            Dictionary<string, FieldMapping> fieldLookup = m_ECAPhasorCollectionLookup ?? (m_ECAPhasorCollectionLookup = typeMapping.FieldMappings.ToDictionary(mapping => mapping.Field.Identifier));
             PhasorCollection obj = new PhasorCollection();
 
             {
@@ -298,9 +312,11 @@ namespace MeasurementSampler.Model
             return obj;
         }
 
+        private Dictionary<string, FieldMapping> m_ECA_PhasorCollectionMetaLookup;
+
         private _PhasorCollectionMeta CreateECA_PhasorCollectionMeta(TypeMapping typeMapping)
         {
-            Dictionary<string, FieldMapping> fieldLookup = typeMapping.FieldMappings.ToDictionary(mapping => mapping.Field.Identifier);
+            Dictionary<string, FieldMapping> fieldLookup = m_ECA_PhasorCollectionMetaLookup ?? (m_ECA_PhasorCollectionMetaLookup = typeMapping.FieldMappings.ToDictionary(mapping => mapping.Field.Identifier));
             _PhasorCollectionMeta obj = new _PhasorCollectionMeta();
 
             {
@@ -324,9 +340,11 @@ namespace MeasurementSampler.Model
             return obj;
         }
 
+        private Dictionary<string, FieldMapping> m_ECAPhasorLookup;
+
         private Phasor CreateECAPhasor(TypeMapping typeMapping)
         {
-            Dictionary<string, FieldMapping> fieldLookup = typeMapping.FieldMappings.ToDictionary(mapping => mapping.Field.Identifier);
+            Dictionary<string, FieldMapping> fieldLookup = m_ECAPhasorLookup ?? (m_ECAPhasorLookup = typeMapping.FieldMappings.ToDictionary(mapping => mapping.Field.Identifier));
             Phasor obj = new Phasor();
 
             {
@@ -346,9 +364,11 @@ namespace MeasurementSampler.Model
             return obj;
         }
 
+        private Dictionary<string, FieldMapping> m_ECA_PhasorMetaLookup;
+
         private _PhasorMeta CreateECA_PhasorMeta(TypeMapping typeMapping)
         {
-            Dictionary<string, FieldMapping> fieldLookup = typeMapping.FieldMappings.ToDictionary(mapping => mapping.Field.Identifier);
+            Dictionary<string, FieldMapping> fieldLookup = m_ECA_PhasorMetaLookup ?? (m_ECA_PhasorMetaLookup = typeMapping.FieldMappings.ToDictionary(mapping => mapping.Field.Identifier));
             _PhasorMeta obj = new _PhasorMeta();
 
             {
