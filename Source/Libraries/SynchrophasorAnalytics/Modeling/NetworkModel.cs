@@ -1865,27 +1865,27 @@ namespace SynchrophasorAnalytics.Modeling
 
             InputKeyValuePairs.Clear();
 
-            foreach (VoltagePhasorGroup voltagePhasorGroup in ExpectedVoltages)
+            foreach (VoltagePhasorGroup voltagePhasorGroup in Voltages)
             {
                 voltagePhasorGroup.ClearValues();
             }
 
-            foreach (CurrentFlowPhasorGroup currentPhasorGroup in ExpectedCurrentFlows)
+            foreach (CurrentFlowPhasorGroup currentPhasorGroup in CurrentFlows)
             {
                 currentPhasorGroup.ClearValues();
             }
 
-            foreach (CurrentInjectionPhasorGroup currentInjectionPhasorGroup in ExpectedCurrentInjections)
+            foreach (CurrentInjectionPhasorGroup currentInjectionPhasorGroup in CurrentInjections)
             {
                 currentInjectionPhasorGroup.ClearValues();
             }
 
-            foreach (BreakerStatus breakerStatus in ExpectedBreakerStatuses)
+            foreach (BreakerStatus breakerStatus in BreakerStatuses)
             {
                 breakerStatus.ClearValues();
             }
 
-            foreach (StatusWord statusWord in ExpectedStatusWords)
+            foreach (StatusWord statusWord in StatusWords)
             {
                 statusWord.ClearValues();
             }
