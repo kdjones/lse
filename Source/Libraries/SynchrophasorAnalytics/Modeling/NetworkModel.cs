@@ -4699,27 +4699,28 @@ namespace SynchrophasorAnalytics.Modeling
             PerformanceTimer.Start();
 
             List<OutputMeasurement> output = new List<OutputMeasurement>();
-            List<string> keys = new List<string>();
 
             foreach (CircuitBreaker breaker in m_circuitBreakers)
             {
-                if (!keys.Contains(breaker.MeasurementKey))
+                double actualState = (double)breaker.ActualState;
+                double inferredState = (double)breaker.InferredState;
+                double value = 0;
+                if (actualState > 0 || inferredState > 0)
                 {
-                    keys.Add(breaker.MeasurementKey);
-
-                    output.Add(new OutputMeasurement()
-                    {
-                        InternalId = breaker.InternalID,
-                        SubstationName = breaker.ParentSubstation.Name,
-                        MeasuredDeviceType = MeasuredDeviceType.CircuitBreaker,
-                        OutputType = OutputType.CircuitBreakerStatus,
-                        DeviceId = breaker.Name,
-                        DeviceSuffix = breaker.ParentSubstation.Name,
-                        Key = breaker.MeasurementKey,
-                        Value = (double)breaker.ActualState,
-                        Description = $"{breaker.Description} Actual State"
-                    });
+                    value = 1.0;
                 }
+                output.Add(new OutputMeasurement()
+                {
+                    InternalId = breaker.InternalID,
+                    SubstationName = breaker.ParentSubstation.Name,
+                    MeasuredDeviceType = MeasuredDeviceType.CircuitBreaker,
+                    OutputType = OutputType.CircuitBreakerStatus,
+                    DeviceId = breaker.Name,
+                    DeviceSuffix = breaker.ParentSubstation.Name,
+                    Key = breaker.MeasurementKey,
+                    Value = value,
+                    Description = $"{breaker.Description} Measured State"
+                });
             }
 
             PerformanceTimer.Stop();

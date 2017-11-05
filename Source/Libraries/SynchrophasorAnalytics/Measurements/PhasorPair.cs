@@ -22,21 +22,27 @@ namespace SynchrophasorAnalytics.Measurements
         {
             get
             {
-                double delta = Math.Abs(m_phasorA.AngleInDegrees - m_phasorB.AngleInDegrees);
 
-                if (delta > 180)
+                double phaseA = m_phasorA.AngleInDegrees;
+                double phaseB = m_phasorB.AngleInDegrees;
+
+                if (phaseA < 0)
                 {
-                    if (delta < 0)
-                    {
-                        delta += 360;
-                    }
-                    else 
-                    {
-                        delta -= 360;
-                    }
+                    phaseA += 360;
+                }
+                if (phaseB < 0)
+                {
+                    phaseB += 360;
                 }
 
-                return delta;
+                double absoluteDelta = Math.Abs(phaseA - phaseB);
+
+                if (absoluteDelta > 180)
+                {
+                    absoluteDelta = 360 - absoluteDelta;
+                }
+
+                return absoluteDelta;
             }
         }
 
