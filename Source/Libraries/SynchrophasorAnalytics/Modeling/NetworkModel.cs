@@ -1918,6 +1918,14 @@ namespace SynchrophasorAnalytics.Modeling
             }
         }
 
+        public void PropagateSwitchMeasurements()
+        {
+            foreach (Substation substation in Substations)
+            {
+                substation.PropagateSwitchMeasurements();
+            }
+        }
+
         /// <summary>
         /// The key value pairs of the measurements which were successfully assigned to their network element.
         /// </summary>

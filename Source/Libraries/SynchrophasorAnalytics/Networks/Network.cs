@@ -1003,6 +1003,7 @@ namespace SynchrophasorAnalytics.Networks
             else
             {
                 m_hasChangedSincePreviousFrame = false;
+                m_networkModel.PropagateSwitchMeasurements();
             }
             m_networkModel.PerformanceTimer.Stop();
             PerformanceMetrics.ObservabilityAnalysisExecutionTime += m_networkModel.PerformanceTimer.ElapsedTicks;
