@@ -477,6 +477,8 @@ namespace NetworkModelEditor.ViewModels
         private MenuItemViewModel m_viewSeriesCompensatorInferenceDataMenuItem;
         private MenuItemViewModel m_viewSeriesCompensatorsMenuItem;
         private MenuItemViewModel m_viewTransformersMenuItem;
+        private MenuItemViewModel m_viewObservableIslandsMenuItem;
+        private MenuItemViewModel m_viewObservableIslandsByVoltageLevelMenuItem;
 
         private MenuItemViewModel m_viewSwitchingDeviceStatusesMenuItem;
         private MenuItemViewModel m_viewModeledBreakerStatusesMenuItem;
@@ -1342,6 +1344,22 @@ namespace NetworkModelEditor.ViewModels
             get
             {
                 return new RelayCommand(param => this.SaveCustomEcaMapping(), param => true);
+            }
+        }
+
+        public ICommand ViewObservableIslandsCommand
+        {
+            get
+            {
+                return new RelayCommand(param => this.ViewObservableIslands(), param => true);
+            }
+        }
+
+        public ICommand ViewObservableIslandsByVoltageLevelCommand
+        {
+            get
+            {
+                return new RelayCommand(param => this.ViewObservableIslandsByVoltageLevel(), param => true);
             }
         }
 
@@ -2699,6 +2717,8 @@ namespace NetworkModelEditor.ViewModels
             m_viewSeriesCompensatorInferenceDataMenuItem = new MenuItemViewModel("View Series Compensator Inference Data", m_viewSeriesCompensatorInferenceDataCommand);
             m_viewSeriesCompensatorsMenuItem = new MenuItemViewModel("View Series Compensators", ViewSeriesCompensatorsCommand);
             m_viewTransformersMenuItem = new MenuItemViewModel("View Transformers", ViewTransformersCommand);
+            m_viewObservableIslandsMenuItem = new MenuItemViewModel("View Observable Islands", ViewObservableIslandsCommand);
+            m_viewObservableIslandsByVoltageLevelMenuItem = new MenuItemViewModel("View Observable Islands by Voltage Level", ViewObservableIslandsByVoltageLevelCommand);
 
             m_viewStatusWordsMenuItem = new MenuItemViewModel("View Status Words", null);
             m_viewStatusWordsMenuItem.AddMenuItem(m_viewAllStatusWordsMenuItem);
@@ -2723,6 +2743,8 @@ namespace NetworkModelEditor.ViewModels
 
             m_inspectMenuItem = new MenuItemViewModel("Inspect", null);
             m_inspectMenuItem.AddMenuItem(m_viewComponentSummaryMenuItem);
+            m_inspectMenuItem.AddMenuItem(m_viewObservableIslandsMenuItem);
+            m_inspectMenuItem.AddMenuItem(m_viewObservableIslandsByVoltageLevelMenuItem);
             m_inspectMenuItem.AddMenuItem(m_viewMeasurementsMenuItem);
             m_inspectMenuItem.AddMenuItem(m_viewStatusWordsMenuItem);
             m_inspectMenuItem.AddMenuItem(m_viewVoltagePhasorsMenuItem);
@@ -3684,7 +3706,7 @@ namespace NetworkModelEditor.ViewModels
 
             foreach (VoltagePhasorGroup voltage in m_network.Model.ExpectedVoltages)
             {
-                string mappingIdentifier = $"{voltage.MeasuredNode.Name.Replace('-','_')}_POS_V";
+                string mappingIdentifier = $"{voltage.MeasuredNode.Name.Replace('-','_').Replace(' ','_')}_POS_V";
                 if (Char.IsDigit(mappingIdentifier[0]))
                 {
                     mappingIdentifier = mappingIdentifier.Remove(0, 1);
@@ -3700,8 +3722,8 @@ namespace NetworkModelEditor.ViewModels
 
             foreach (CurrentFlowPhasorGroup flow in m_network.Model.ExpectedCurrentFlows)
             {
-                string fromNode = flow.MeasuredFromNode.Name.Replace('-', '_');
-                string toNode = flow.MeasuredToNode.Name.Replace('-', '_');
+                string fromNode = flow.MeasuredFromNode.Name.Replace('-', '_').Replace(' ', '_');
+                string toNode = flow.MeasuredToNode.Name.Replace('-', '_').Replace(' ', '_');
                 if (Char.IsDigit(fromNode[0]))
                 {
                     fromNode = fromNode.Remove(0, 1);
@@ -3721,7 +3743,7 @@ namespace NetworkModelEditor.ViewModels
 
             foreach (CurrentInjectionPhasorGroup injection in m_network.Model.ExpectedCurrentInjections)
             {
-                string node = injection.MeasuredConnectedNode.Name.Replace('-', '_');
+                string node = injection.MeasuredConnectedNode.Name.Replace('-', '_').Replace(' ', '_');
                 char[] nodeChars = node.ToCharArray();
                 if (Char.IsDigit(node[0]))
                 {
@@ -5833,6 +5855,18 @@ namespace NetworkModelEditor.ViewModels
             ShowTextReport("ObservedSubstations.txt", stringBuilder.ToString());
         }
         
+        private void ViewObservableIslands()
+        {
+            List<ObservableIsland> islands = m_network.Model.DetermineObservableIslands();
+            ShowTextReport("ObservableIslands.txt", ObservableIsland.Report(islands));
+        }
+
+        private void ViewObservableIslandsByVoltageLevel()
+        {
+            List<ObservableIsland> islands = m_network.Model.DetermineObservableIslandsByVoltageLevel();
+            ShowTextReport("ObservableIslandsByVoltageLevel.txt", ObservableIsland.Report(islands));
+        }
+
         #endregion
 
         #region [ View Voltage Phasors ]

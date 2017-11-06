@@ -2554,6 +2554,67 @@ namespace SynchrophasorAnalytics.Modeling
             }
         }
 
+        public List<ObservableIsland> DetermineObservableIslands()
+        {
+            List<Substation> allSubstations = Substations.FindAll(x => x != null);
+            List<ObservableIsland> islands = new List<ObservableIsland>();
+            while (allSubstations.Count > 0)
+            {
+                Substation root = allSubstations[0];
+                List<Substation> islandSubstations = new List<Substation>();
+                islandSubstations.Add(root);
+                islandSubstations = ObservableIsland.FindConnectedSubstations(root, islandSubstations, this);
+                ObservableIsland island = new ObservableIsland();
+                island.Substations.AddRange(islandSubstations);
+                island.AppendTransmissionLines(this);
+                islands.Add(island);
+                allSubstations.RemoveAll(x => islandSubstations.Contains(x));
+            }
+            return islands;
+        }
+
+        public List<ObservableIsland> DetermineObservableIslandsByVoltageLevel()
+        {
+            List<ObservableIsland> islands = new List<ObservableIsland>();
+            foreach (VoltageLevel baseKv in VoltageLevels)
+            {
+
+                List<Substation> allSubstations = GetSubstationsWithBaseKv(baseKv);
+                while (allSubstations.Count > 0)
+                {
+                    Substation root = allSubstations[0];
+                    List<Substation> islandSubstations = new List<Substation>();
+                    islandSubstations.Add(root);
+                    islandSubstations = ObservableIsland.FindConnectedSubstationsAtVoltageLevel(root, islandSubstations, this, baseKv);
+                    ObservableIsland island = new ObservableIsland();
+                    island.Substations.AddRange(islandSubstations);
+                    island.AppendTransmissionLinesAtVoltageLevel(this, baseKv);
+                    islands.Add(island);
+                    allSubstations.RemoveAll(x => islandSubstations.Contains(x));
+                }
+            }
+
+            return islands;
+        }
+
+        private List<Substation> GetSubstationsWithBaseKv(VoltageLevel baseKv)
+        {
+            List<Substation> substations = new List<Substation>();
+            foreach (Substation substation in Substations)
+            {
+                foreach (Node node in substation.Nodes)
+                {
+                    if (node.BaseKV.InternalID == baseKv.InternalID)
+                    {
+                        if (!substations.Contains(substation))
+                        {
+                            substations.Add(substation);
+                        }
+                    }
+                }
+            }
+            return substations;
+        }
         #endregion
 
         #region [ Private Methods ]
@@ -4179,11 +4240,11 @@ namespace SynchrophasorAnalytics.Modeling
                 output.Add(new OutputMeasurement()
                 {
                     InternalId = node.Voltage.InternalID,
-                    SubstationName = node.ParentSubstation.Name,
+                    SubstationName = node.ParentSubstation.Name.Replace('-', '_').Replace('-', '_'),
                     MeasuredDeviceType = MeasuredDeviceType.Node,
                     OutputType = OutputType.VoltageMagnitudeEstimate,
-                    DeviceId = node.Name,
-                    DeviceSuffix = node.ParentSubstation.Name,
+                    DeviceId = node.Name.Replace('-','_').Replace('-','_'),
+                    DeviceSuffix = node.ParentSubstation.Name.Replace('-', '_').Replace('-', '_'),
                     Key = node.Voltage.PositiveSequence.Estimate.MagnitudeKey,
                     Value = node.Voltage.PositiveSequence.Estimate.Magnitude,
                     Description = $"{node.Voltage.Description} Positive Sequence Magnitude"
@@ -4191,11 +4252,11 @@ namespace SynchrophasorAnalytics.Modeling
                 output.Add(new OutputMeasurement()
                 {
                     InternalId = node.Voltage.InternalID,
-                    SubstationName = node.ParentSubstation.Name,
+                    SubstationName = node.ParentSubstation.Name.Replace('-', '_').Replace('-', '_'),
                     MeasuredDeviceType = MeasuredDeviceType.Node,
                     OutputType = OutputType.VoltageAngleEstimate,
-                    DeviceId = node.Name,
-                    DeviceSuffix = node.ParentSubstation.Name,
+                    DeviceId = node.Name.Replace('-', '_').Replace('-', '_'),
+                    DeviceSuffix = node.ParentSubstation.Name.Replace('-', '_').Replace('-', '_'),
                     Key = node.Voltage.PositiveSequence.Estimate.AngleKey,
                     Value = node.Voltage.PositiveSequence.Estimate.AngleInDegrees,
                     Description = $"{node.Voltage.Description} Positive Sequence Angle In Degrees"
@@ -4274,29 +4335,33 @@ namespace SynchrophasorAnalytics.Modeling
 
             foreach (CurrentFlowPhasorGroup current in m_currentFlows)
             {
+                string fromSubstation = current.MeasuredFromNode.ParentSubstation.Name.Replace('-', '_').Replace(' ', '_');
+                string fromNode = current.MeasuredFromNode.Name.Replace('-', '_').Replace(' ', '_');
+                string toNode = current.MeasuredToNode.Name.Replace('-', '_').Replace(' ', '_');
+
                 output.Add(new OutputMeasurement()
                 {
                     InternalId = current.InternalID,
-                    SubstationName = current.MeasuredFromNode.ParentSubstation.Name,
+                    SubstationName = fromSubstation,
                     MeasuredDeviceType = MeasuredDeviceType.Line,
                     OutputType = OutputType.CurrentFlowMagnitudeEstimate,
-                    DeviceId = (current.MeasuredBranch as INetworkDescribable).Name,
-                    DeviceSuffix = current.MeasuredFromNode.ParentSubstation.Name,
+                    DeviceId = $"{fromNode}_TO_{toNode}",
+                    DeviceSuffix = fromSubstation,
                     Key = current.PositiveSequence.Estimate.MagnitudeKey,
                     Value = current.PositiveSequence.Estimate.Magnitude,
-                    Description = $"{current.Description} Positive Sequence Magnitude"
+                    Description = $"{fromNode} to {toNode} Positive Sequence Magnitude"
                 });
                 output.Add(new OutputMeasurement()
                 {
                     InternalId = current.InternalID,
-                    SubstationName = current.MeasuredFromNode.ParentSubstation.Name,
+                    SubstationName = fromSubstation,
                     MeasuredDeviceType = MeasuredDeviceType.Line,
                     OutputType = OutputType.CurrentFlowAngleEstimate,
-                    DeviceId = (current.MeasuredBranch as INetworkDescribable).Name,
-                    DeviceSuffix = current.MeasuredFromNode.ParentSubstation.Name,
+                    DeviceId = $"{fromNode}_TO_{toNode}",
+                    DeviceSuffix = fromSubstation,
                     Key = current.PositiveSequence.Estimate.AngleKey,
                     Value = current.PositiveSequence.Estimate.AngleInDegrees,
-                    Description = $"{current.Description} Positive Sequence Angle In Degrees"
+                    Description = $"{fromNode} to {toNode} Positive Sequence Angle In Degrees"
                 });
             }
 
@@ -4372,29 +4437,32 @@ namespace SynchrophasorAnalytics.Modeling
 
             foreach (CurrentInjectionPhasorGroup current in m_currentInjections)
             {
+                string substation = current.MeasuredConnectedNode.ParentSubstation.Name.Replace('-', '_').Replace(' ', '_');
+                string node = current.MeasuredConnectedNode.Name.Replace('-', '_').Replace(' ', '_');
+
                 output.Add(new OutputMeasurement()
                 {
                     InternalId = current.InternalID,
-                    SubstationName = current.MeasuredConnectedNode.ParentSubstation.Name,
+                    SubstationName = substation,
                     MeasuredDeviceType = MeasuredDeviceType.Shunt,
                     OutputType = OutputType.CurrentInjectionMagnitudeEstimate,
-                    DeviceId = (current.MeasuredBranch as INetworkDescribable).Name,
-                    DeviceSuffix = current.MeasuredConnectedNode.ParentSubstation.Name,
+                    DeviceId = node,
+                    DeviceSuffix = substation,
                     Key = current.PositiveSequence.Estimate.MagnitudeKey,
                     Value = current.PositiveSequence.Estimate.Magnitude,
-                    Description = $"{current.Description} Positive Sequence Magnitude"
+                    Description = $"{node} Shunt Positive Sequence Magnitude"
                 });
                 output.Add(new OutputMeasurement()
                 {
                     InternalId = current.InternalID,
-                    SubstationName = current.MeasuredConnectedNode.ParentSubstation.Name,
+                    SubstationName = substation,
                     MeasuredDeviceType = MeasuredDeviceType.Shunt,
                     OutputType = OutputType.CurrentInjectionAngleEstimate,
-                    DeviceId = (current.MeasuredBranch as INetworkDescribable).Name,
-                    DeviceSuffix = current.MeasuredConnectedNode.ParentSubstation.Name,
+                    DeviceId = node,
+                    DeviceSuffix = substation,
                     Key = current.PositiveSequence.Estimate.AngleKey,
                     Value = current.PositiveSequence.Estimate.AngleInDegrees,
-                    Description = $"{current.Description} Positive Sequence Angle In Degrees"
+                    Description = $"{node} Shunt Positive Sequence Angle In Degrees"
                 });
             }
 

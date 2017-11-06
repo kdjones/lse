@@ -185,6 +185,7 @@
     <Compile Include="Modeling\LineSegment.cs" />
     <Compile Include="Modeling\NetworkModel.cs" />
     <Compile Include="Modeling\Node.cs" />
+    <Compile Include="Modeling\ObservableIsland.cs" />
     <Compile Include="Modeling\ObservationState.cs" />
     <Compile Include="Modeling\ObservedBus.cs" />
     <Compile Include="Modeling\SeriesBranchBase.cs" />
